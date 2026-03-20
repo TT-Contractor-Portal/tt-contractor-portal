@@ -168,7 +168,8 @@ select {
   <option value="Offices">Offices</option>
 </select>
        <div class="helper">Hold Ctrl (or Cmd on Mac) to select more than one area.</div>
-
+      </div>
+      
      
       <div class="field">
         <label for="risks">Risk type(s)</label>
@@ -186,7 +187,15 @@ select {
         <div class="helper">AI will later prompt if it detects extra risks not selected here.</div>
       </div>
 
+<div class="field">
+  <label for="contractorName">Contractor Name</label>
+  <input type="text" id="contractorName" name="contractorName" placeholder="e.g. ABC Engineering">
+</div>
 
+<div class="field">
+  <label for="taskDescription">Task Description</label>
+  <input type="text" id="taskDescription" name="taskDescription" placeholder="e.g. Steam valve replacement">
+</div>
 <div class="field">
   <label for="startDate">Expected Start Date</label>
   <input type="date" id="startDate" name="startDate">
@@ -237,27 +246,24 @@ select {
     const startDate = document.getElementById("startDate").value;
     const duration = parseInt(document.getElementById("duration").value, 10);
     const durationUnit = document.getElementById("durationUnit").value;
-const selectedAreas = getSelectedAreas();
 
-const draftRams = {
-  contractor: document.getElementById("contractorName") ? document.getElementById("contractorName").value : "Unknown Contractor",
-  area: selectedAreas.length ? selectedAreas.join(", ") : "No area selected",
-  task: document.getElementById("taskDescription") ? document.getElementById("taskDescription").value : "General works",
-  startDate: document.getElementById("startDate").value,
-  duration: parseInt(document.getElementById("duration").value, 10) || 1,
-  durationUnit: document.getElementById("durationUnit").value,
-  status: "Approved",
-  clash: false
-};
+    const draftRams = {
+      contractor: document.getElementById("contractorName")?.value || "Unknown Contractor",
+      area: selectedAreas.length ? selectedAreas.join(", ") : "No area selected",
+      task: document.getElementById("taskDescription")?.value || "General works",
+      startDate: startDate,
+      duration: duration || 1,
+      durationUnit: durationUnit,
+      status: "Approved",
+      clash: false
+    };
 
-localStorage.setItem("draftRams", JSON.stringify(draftRams));
     if (!selectedAreas.length || !startDate || !duration) {
       alert("Please complete area, start date and duration before running the RAMS review.");
       return;
     }
 
     const durationInDays = durationUnit === "weeks" ? duration * 7 : duration;
-
     const newStart = new Date(startDate);
     const newEnd = addDays(startDate, durationInDays - 1);
 
@@ -306,30 +312,29 @@ localStorage.setItem("draftRams", JSON.stringify(draftRams));
 
     if (clashFound) {
       draftRams.clash = true;
-localStorage.setItem("draftRams", JSON.stringify(draftRams));
+      localStorage.setItem("draftRams", JSON.stringify(draftRams));
       document.getElementById("clashModal").style.display = "flex";
       return;
-      draftRams.clash = false;
-localStorage.setItem("draftRams", JSON.stringify(draftRams));
-goToResults(false);
     }
 
+    draftRams.clash = false;
+    localStorage.setItem("draftRams", JSON.stringify(draftRams));
     goToResults(false);
   }
 
- function closeModal(shouldContinue) {
-  document.getElementById("clashModal").style.display = "none";
+  function closeModal(shouldContinue) {
+    document.getElementById("clashModal").style.display = "none";
 
-  if (shouldContinue) {
-    goToResults(true);
+    if (shouldContinue) {
+      goToResults(true);
+    }
   }
-}
 
-function goToResults(hasClash = false) {
-  window.location.href = hasClash
-    ? "/rams/results.html?clash=true"
-    : "/rams/results.html";
-}
+  function goToResults(hasClash = false) {
+    window.location.href = hasClash
+      ? "/rams/results.html?clash=true"
+      : "/rams/results.html";
+  }
 </script>
 
   <div id="clashModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
