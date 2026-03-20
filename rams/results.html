@@ -160,7 +160,7 @@
     <div class="topbar">
       <strong>Review Results</strong> — ABC Engineering / Boiler House Pipework Repair
     </div>
-<div class="panel" style="border-left: 6px solid #ff0000; background:#fff5f5;">
+<div id="clashWarning" class="panel warning" style="display:none; border-left: 6px solid #ff0000; background:#fff5f5;">
   <h3 style="margin-top:0; color:#b00000;">⚠ Area Clash Detected</h3>
   <p>
     Another contractor is scheduled to work in this area during the same period.
@@ -227,5 +227,14 @@
       </div>
     </div>
   </div>
+
+  <script>
+  const params = new URLSearchParams(window.location.search);
+  const clash = params.get("clash");
+
+  if (clash === "true") {
+    document.getElementById("clashWarning").style.display = "block";
+  }
+</script>
 </body>
 </html>
