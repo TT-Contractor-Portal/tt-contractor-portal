@@ -245,22 +245,22 @@
     </div>
 
     <div class="card-grid">
-      <div class="card">
-        <h3>Total RAMS</h3>
-        <p>128</p>
-      </div>
-      <div class="card">
-        <h3>Approved</h3>
-        <p>94</p>
-      </div>
-      <div class="card">
-        <h3>Under Review</h3>
-        <p>12</p>
-      </div>
-      <div class="card">
-        <h3>Expired</h3>
-        <p>22</p>
-      </div>
+ <div class="card">
+  <h3>Total RAMS</h3>
+  <p id="totalRams">0</p>
+</div>
+<div class="card">
+  <h3>Approved</h3>
+  <p id="approvedRams">0</p>
+</div>
+<div class="card">
+  <h3>Under Review</h3>
+  <p id="underReviewRams">0</p>
+</div>
+<div class="card">
+  <h3>Expired</h3>
+  <p id="expiredRams">0</p>
+</div>
     </div>
 
 <div class="dashboard-main">
@@ -315,7 +315,7 @@
   </div>
 </div>
 
- <script>
+<script>
   const data = JSON.parse(localStorage.getItem("ramsData")) || [];
   const table = document.getElementById("plannerBody");
 
@@ -328,11 +328,13 @@
     });
   }
 
+  table.innerHTML = "";
+
   data.forEach(item => {
     const row = document.createElement("tr");
 
     if (item.clash) {
-      row.style.background = "#ffe5e5";
+      row.classList.add("clash-row");
     }
 
     row.innerHTML = `
@@ -340,22 +342,17 @@
       <td>${item.contractor}</td>
       <td>${item.area}</td>
       <td>${item.task}</td>
-      <td>
-        <span style="
-          padding:6px 10px;
-          border-radius:12px;
-          background:${item.status === "Approved" ? "#d4edda" : "#ffeeba"};
-          color:${item.status === "Approved" ? "#155724" : "#856404"};
-          font-weight:bold;
-        ">
-          ${item.status}
-        </span>
-        ${item.clash ? '<span style="margin-left:8px; color:red; font-weight:bold;">⚠ CLASH</span>' : ''}
-      </td>
+      <td><span class="status ${item.status === "Approved" ? "approved" : "review"}">${item.status}</span></td>
+      <td>${item.clash ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
     `;
 
     table.appendChild(row);
   });
-</script>   
+
+  document.getElementById("totalRams").textContent = data.length;
+  document.getElementById("approvedRams").textContent = data.filter(item => item.status === "Approved").length;
+  document.getElementById("underReviewRams").textContent = data.filter(item => item.status === "Under Review").length;
+  document.getElementById("expiredRams").textContent = data.filter(item => item.status === "Expired").length;
+</script>
 </body>
 </html>
