@@ -222,28 +222,18 @@ select {
     </div>
   </div>
 
-  <script>
+ <script>
+  let continueSubmission = false;
+
   function runRamsReview() {
     const workArea = document.getElementById("workArea").value.trim();
     const startDate = document.getElementById("startDate").value;
-    const duration = document.getElementById("duration").value;
-    const durationUnit = document.getElementById("durationUnit").value;
 
-    // Prototype clash examples
     const existingWorks = [
       {
         contractor: "ABC Engineering",
         area: "Boiler House",
-        startDate: "2026-03-24",
-        duration: 2,
-        durationUnit: "days"
-      },
-      {
-        contractor: "Smith Electrical",
-        area: "Packaging Hall",
-        startDate: "2026-03-25",
-        duration: 1,
-        durationUnit: "days"
+        startDate: "2026-03-24"
       }
     ];
 
@@ -260,17 +250,36 @@ select {
     }
 
     if (clashFound) {
-      const proceed = confirm(
-        "Warning: Another contractor is already planned in this area on this date. Do you want to continue?"
-      );
-
-      if (!proceed) {
-        return;
-      }
+      document.getElementById("clashModal").style.display = "flex";
+      return;
     }
 
+    goToResults();
+  }
+
+  function closeModal(shouldContinue) {
+    document.getElementById("clashModal").style.display = "none";
+
+    if (shouldContinue) {
+      goToResults();
+    }
+  }
+
+  function goToResults() {
     window.location.href = "/rams/results.html";
   }
 </script>
+
+  <div id="clashModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div style="background:white; padding:24px; border-radius:12px; width:400px; max-width:90%;">
+    <h3 style="margin-top:0;">Clash Warning</h3>
+    <p>Another contractor is already planned in this area on this date. Do you want to continue?</p>
+
+    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+      <button onclick="closeModal(false)" style="padding:10px 16px; border:none; border-radius:8px; background:#ccc;">No</button>
+      <button onclick="closeModal(true)" style="padding:10px 16px; border:none; border-radius:8px; background:#035740; color:white;">Yes</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
