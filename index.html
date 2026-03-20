@@ -277,47 +277,7 @@
   <th>Alerts</th>
 </tr>
       </thead>
-   <tbody>
-  <tr class="clash-row">
-    <td>Mon 23 Mar</td>
-    <td>ABC Engineering</td>
-    <td>Boiler House</td>
-    <td>Steam valve replacement</td>
-    <td><span class="status approved">Approved</span></td>
-    <td><span class="alert-badge">CLASH</span></td>
-  </tr>
-  <tr class="clash-row">
-    <td>Mon 23 Mar</td>
-    <td>JM Mechanical</td>
-    <td>Boiler House</td>
-    <td>Pump maintenance</td>
-    <td><span class="status approved">Approved</span></td>
-    <td><span class="alert-badge">CLASH</span></td>
-  </tr>
-  <tr>
-    <td>Tue 24 Mar</td>
-    <td>Smith Electrical</td>
-    <td>Packaging</td>
-    <td>Lighting upgrade</td>
-    <td><span class="status review">Under Review</span></td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Wed 25 Mar</td>
-    <td>Northern Services</td>
-    <td>Utilities</td>
-    <td>Inspection works</td>
-    <td><span class="status approved">Approved</span></td>
-    <td>-</td>
-  </tr>
-  <tr>
-    <td>Thu 26 Mar</td>
-    <td>CleanFlow</td>
-    <td>Cellars / FV Areas</td>
-    <td>CIP line checks</td>
-    <td><span class="status approved">Approved</span></td>
-    <td>-</td>
-  </tr>
+ <tbody id="plannerBody">
 </tbody>
     </table>
   </div>
@@ -354,5 +314,48 @@
     </div>
   </div>
 </div>
+
+ <script>
+  const data = JSON.parse(localStorage.getItem("ramsData")) || [];
+  const table = document.getElementById("plannerBody");
+
+  function formatDate(dateStr) {
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-GB", {
+      weekday: "short",
+      day: "numeric",
+      month: "short"
+    });
+  }
+
+  data.forEach(item => {
+    const row = document.createElement("tr");
+
+    if (item.clash) {
+      row.style.background = "#ffe5e5";
+    }
+
+    row.innerHTML = `
+      <td>${formatDate(item.startDate)}</td>
+      <td>${item.contractor}</td>
+      <td>${item.area}</td>
+      <td>${item.task}</td>
+      <td>
+        <span style="
+          padding:6px 10px;
+          border-radius:12px;
+          background:${item.status === "Approved" ? "#d4edda" : "#ffeeba"};
+          color:${item.status === "Approved" ? "#155724" : "#856404"};
+          font-weight:bold;
+        ">
+          ${item.status}
+        </span>
+        ${item.clash ? '<span style="margin-left:8px; color:red; font-weight:bold;">⚠ CLASH</span>' : ''}
+      </td>
+    `;
+
+    table.appendChild(row);
+  });
+</script>   
 </body>
 </html>
