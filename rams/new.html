@@ -217,28 +217,75 @@ select {
     </div>
   </div>
 
- <script>
-  let continueSubmission = false;
+<script>
+  function getSelectedAreas() {
+    return Array.from(document.getElementById("areas").selectedOptions).map(option => option.value);
+  }
+
+  function addDays(dateString, daysToAdd) {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + daysToAdd);
+    return date;
+  }
+
+  function rangesOverlap(start1, end1, start2, end2) {
+    return start1 <= end2 && start2 <= end1;
+  }
 
   function runRamsReview() {
-    const selectedAreas = Array.from(document.getElementById("areas").selectedOptions).map(option => option.value);
+    const selectedAreas = getSelectedAreas();
     const startDate = document.getElementById("startDate").value;
+    const duration = parseInt(document.getElementById("duration").value, 10);
+    const durationUnit = document.getElementById("durationUnit").value;
+
+    if (!selectedAreas.length || !startDate || !duration) {
+      alert("Please complete area, start date and duration before running the RAMS review.");
+      return;
+    }
+
+    const durationInDays = durationUnit === "weeks" ? duration * 7 : duration;
+
+    const newStart = new Date(startDate);
+    const newEnd = addDays(startDate, durationInDays - 1);
 
     const existingWorks = [
       {
         contractor: "ABC Engineering",
         area: "Boiler House",
-        startDate: "2026-03-24"
+        startDate: "2026-03-24",
+        duration: 2,
+        durationUnit: "days"
+      },
+      {
+        contractor: "Smith Electrical",
+        area: "Packaging",
+        startDate: "2026-03-25",
+        duration: 1,
+        durationUnit: "days"
+      },
+      {
+        contractor: "Northern Services",
+        area: "Utilities",
+        startDate: "2026-03-26",
+        duration: 1,
+        durationUnit: "weeks"
       }
     ];
 
     let clashFound = false;
 
     for (const job of existingWorks) {
-      if (
-  selectedAreas.includes(job.area) &&
-  job.startDate === startDate
-) {
+      const sameArea = selectedAreas.includes(job.area);
+
+      const existingDurationInDays =
+        job.durationUnit === "weeks" ? job.duration * 7 : job.duration;
+
+      const existingStart = new Date(job.startDate);
+      const existingEnd = addDays(job.startDate, existingDurationInDays - 1);
+
+      const overlaps = rangesOverlap(newStart, newEnd, existingStart, existingEnd);
+
+      if (sameArea && overlaps) {
         clashFound = true;
         break;
       }
