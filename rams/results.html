@@ -167,6 +167,16 @@
     Please ensure coordination, segregation or permit controls are in place before approval.
   </p>
 </div>
+
+    <div id="clashAcknowledgement" class="panel" style="display:none; border-left: 6px solid #ff9900; background:#fffaf0;">
+  <label style="display:flex; align-items:flex-start; gap:10px; font-weight:normal;">
+    <input type="checkbox" id="clashConfirm" style="margin-top:4px;">
+    <span>I confirm this area clash has been reviewed and suitable coordination / segregation controls will be put in place.</span>
+  </label>
+</div>
+
+<button id="approveBtn" class="button">Approve RAMS</button>
+    
     <div class="panel">
       <h2 class="section-title">Overall Status</h2>
       <span class="status-badge">Under Review</span>
@@ -228,12 +238,35 @@
     </div>
   </div>
 
-  <script>
+<script>
   const params = new URLSearchParams(window.location.search);
   const clash = params.get("clash");
+  const clashWarning = document.getElementById("clashWarning");
+  const clashAcknowledgement = document.getElementById("clashAcknowledgement");
+  const approveBtn = document.getElementById("approveBtn");
 
   if (clash === "true") {
-    document.getElementById("clashWarning").style.display = "block";
+    clashWarning.style.display = "block";
+    clashAcknowledgement.style.display = "block";
+    approveBtn.disabled = true;
+    approveBtn.style.opacity = "0.5";
+    approveBtn.style.cursor = "not-allowed";
+  }
+
+  const clashConfirm = document.getElementById("clashConfirm");
+
+  if (clashConfirm) {
+    clashConfirm.addEventListener("change", function () {
+      if (this.checked) {
+        approveBtn.disabled = false;
+        approveBtn.style.opacity = "1";
+        approveBtn.style.cursor = "pointer";
+      } else {
+        approveBtn.disabled = true;
+        approveBtn.style.opacity = "0.5";
+        approveBtn.style.cursor = "not-allowed";
+      }
+    });
   }
 </script>
 </body>
