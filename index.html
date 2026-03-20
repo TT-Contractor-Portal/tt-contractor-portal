@@ -206,6 +206,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+    .clash-row {
+  background: #ffdddd;
+}
+
+.clash-row td {
+  border-bottom: 1px solid #f5a5a5;
+}
+
+.status.clash {
+  background: #ff0000;
+  color: white;
+}
   </style>
 </head>
 <body>
@@ -258,36 +271,43 @@
           <th>Status</th>
         </tr>
       </thead>
-      <tbody>
-        <tr>
-          <td>Mon 23 Mar</td>
-          <td>ABC Engineering</td>
-          <td>Boiler House</td>
-          <td>Steam valve replacement</td>
-          <td><span class="status approved">Approved</span></td>
-        </tr>
-        <tr>
-          <td>Tue 24 Mar</td>
-          <td>Smith Electrical</td>
-          <td>Packaging Hall</td>
-          <td>Lighting upgrade</td>
-          <td><span class="status review">Under Review</span></td>
-        </tr>
-        <tr>
-          <td>Wed 25 Mar</td>
-          <td>Northern Services</td>
-          <td>Fermenting Vessel Room</td>
-          <td>Inspection works</td>
-          <td><span class="status approved">Approved</span></td>
-        </tr>
-        <tr>
-          <td>Thu 26 Mar</td>
-          <td>JM Mechanical</td>
-          <td>Kegging Line</td>
-          <td>Pump maintenance</td>
-          <td><span class="status pending">Pending</span></td>
-        </tr>
-      </tbody>
+     <tbody>
+  <tr class="clash-row">
+    <td>Mon 23 Mar</td>
+    <td>ABC Engineering</td>
+    <td>Boiler House</td>
+    <td>Steam valve replacement</td>
+    <td><span class="status clash">CLASH</span></td>
+  </tr>
+  <tr class="clash-row">
+    <td>Mon 23 Mar</td>
+    <td>JM Mechanical</td>
+    <td>Boiler House</td>
+    <td>Pump maintenance</td>
+    <td><span class="status clash">CLASH</span></td>
+  </tr>
+  <tr>
+    <td>Tue 24 Mar</td>
+    <td>Smith Electrical</td>
+    <td>Packaging</td>
+    <td>Lighting upgrade</td>
+    <td><span class="status review">Under Review</span></td>
+  </tr>
+  <tr>
+    <td>Wed 25 Mar</td>
+    <td>Northern Services</td>
+    <td>Utilities</td>
+    <td>Inspection works</td>
+    <td><span class="status approved">Approved</span></td>
+  </tr>
+  <tr>
+    <td>Thu 26 Mar</td>
+    <td>CleanFlow</td>
+    <td>Cellars / FV Areas</td>
+    <td>CIP line checks</td>
+    <td><span class="status approved">Approved</span></td>
+  </tr>
+</tbody>
     </table>
   </div>
 
@@ -303,7 +323,13 @@
         <p>Packaging Hall — Lighting upgrade</p>
       </div>
     </div>
-
+<div class="panel">
+  <h2>Active Clash Alerts</h2>
+  <div class="mini-item">
+    <strong>Boiler House</strong>
+    <p>ABC Engineering and JM Mechanical planned on the same day</p>
+  </div>
+</div>
     <div class="panel">
       <h2>RAMS Expiring Soon</h2>
       <div class="mini-item">
