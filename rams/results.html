@@ -287,25 +287,31 @@
     });
   }
 
-  approveBtn.addEventListener("click", function () {
-    if (approveBtn.disabled) return;
+ approveBtn.addEventListener("click", function () {
+  if (approveBtn.disabled) return;
 
-    const newRams = {
-      contractor: "ABC Engineering",
-      area: "Boiler House",
-      task: "Pipework Repair",
-      startDate: "2026-03-24",
-      duration: 2,
-      status: "Approved",
-      clash: clash === "true"
-    };
+  const newRams = JSON.parse(localStorage.getItem("draftRams")) || {
+    contractor: "Unknown Contractor",
+    area: "Unknown Area",
+    task: "General works",
+    startDate: new Date().toISOString().split("T")[0],
+    duration: 1,
+    durationUnit: "days",
+    status: "Approved",
+    clash: clash === "true"
+  };
 
-    const existing = JSON.parse(localStorage.getItem("ramsData")) || [];
-    existing.push(newRams);
-    localStorage.setItem("ramsData", JSON.stringify(existing));
+  newRams.status = "Approved";
+  newRams.clash = clash === "true";
 
-    window.location.href = "/index.html";
-  });
+  const existing = JSON.parse(localStorage.getItem("ramsData")) || [];
+  existing.push(newRams);
+  localStorage.setItem("ramsData", JSON.stringify(existing));
+
+  localStorage.removeItem("draftRams");
+
+  window.location.href = "/index.html";
+});
 </script>
 </body>
 </html>
