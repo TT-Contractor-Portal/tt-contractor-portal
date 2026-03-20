@@ -136,6 +136,11 @@
         margin-left: 0;
       }
     }
+
+    .panel.warning {
+  border-left: 6px solid #ff0000;
+  background: #fff5f5;
+}
   </style>
 </head>
 <body>
@@ -155,7 +160,13 @@
     <div class="topbar">
       <strong>Review Results</strong> — ABC Engineering / Boiler House Pipework Repair
     </div>
-
+<div class="panel" style="border-left: 6px solid #ff0000; background:#fff5f5;">
+  <h3 style="margin-top:0; color:#b00000;">⚠ Area Clash Detected</h3>
+  <p>
+    Another contractor is scheduled to work in this area during the same period.
+    Please ensure coordination, segregation or permit controls are in place before approval.
+  </p>
+</div>
     <div class="panel">
       <h2 class="section-title">Overall Status</h2>
       <span class="status-badge">Under Review</span>
