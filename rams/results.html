@@ -141,6 +141,12 @@
   border-left: 6px solid #ff0000;
   background: #fff5f5;
 }
+
+    .button:disabled {
+  opacity: 0.6;
+  background: #999;
+  cursor: not-allowed;
+}
   </style>
 </head>
 <body>
@@ -259,13 +265,11 @@
     clashConfirm.addEventListener("change", function () {
       if (this.checked) {
         approveBtn.disabled = false;
-        approveBtn.style.opacity = "1";
-        approveBtn.style.cursor = "pointer";
+      
       } else {
+        approveBtn.textContent = "Acknowledge clash to approve";
         approveBtn.disabled = true;
-        approveBtn.style.opacity = "0.5";
-        approveBtn.style.cursor = "not-allowed";
-      }
+             }
     });
   }
 </script>
