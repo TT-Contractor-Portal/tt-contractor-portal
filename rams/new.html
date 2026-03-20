@@ -217,9 +217,60 @@ select {
       </div>
 
       <div style="margin-top: 24px;">
-        <button class="button">Run RAMS Review</button>
+      <button class="button" onclick="runRamsReview()">Run RAMS Review</button>
       </div>
     </div>
   </div>
+
+  <script>
+  function runRamsReview() {
+    const workArea = document.getElementById("workArea").value.trim();
+    const startDate = document.getElementById("startDate").value;
+    const duration = document.getElementById("duration").value;
+    const durationUnit = document.getElementById("durationUnit").value;
+
+    // Prototype clash examples
+    const existingWorks = [
+      {
+        contractor: "ABC Engineering",
+        area: "Boiler House",
+        startDate: "2026-03-24",
+        duration: 2,
+        durationUnit: "days"
+      },
+      {
+        contractor: "Smith Electrical",
+        area: "Packaging Hall",
+        startDate: "2026-03-25",
+        duration: 1,
+        durationUnit: "days"
+      }
+    ];
+
+    let clashFound = false;
+
+    for (const job of existingWorks) {
+      if (
+        job.area.toLowerCase() === workArea.toLowerCase() &&
+        job.startDate === startDate
+      ) {
+        clashFound = true;
+        break;
+      }
+    }
+
+    if (clashFound) {
+      const proceed = confirm(
+        "Warning: Another contractor is already planned in this area on this date. Do you want to continue?"
+      );
+
+      if (!proceed) {
+        return;
+      }
+    }
+
+    window.location.href = "/rams/results.html";
+  }
+</script>
 </body>
 </html>
