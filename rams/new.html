@@ -237,7 +237,20 @@ select {
     const startDate = document.getElementById("startDate").value;
     const duration = parseInt(document.getElementById("duration").value, 10);
     const durationUnit = document.getElementById("durationUnit").value;
+const selectedAreas = getSelectedAreas();
 
+const draftRams = {
+  contractor: document.getElementById("contractorName") ? document.getElementById("contractorName").value : "Unknown Contractor",
+  area: selectedAreas.length ? selectedAreas.join(", ") : "No area selected",
+  task: document.getElementById("taskDescription") ? document.getElementById("taskDescription").value : "General works",
+  startDate: document.getElementById("startDate").value,
+  duration: parseInt(document.getElementById("duration").value, 10) || 1,
+  durationUnit: document.getElementById("durationUnit").value,
+  status: "Approved",
+  clash: false
+};
+
+localStorage.setItem("draftRams", JSON.stringify(draftRams));
     if (!selectedAreas.length || !startDate || !duration) {
       alert("Please complete area, start date and duration before running the RAMS review.");
       return;
@@ -292,8 +305,13 @@ select {
     }
 
     if (clashFound) {
+      draftRams.clash = true;
+localStorage.setItem("draftRams", JSON.stringify(draftRams));
       document.getElementById("clashModal").style.display = "flex";
       return;
+      draftRams.clash = false;
+localStorage.setItem("draftRams", JSON.stringify(draftRams));
+goToResults(false);
     }
 
     goToResults(false);
