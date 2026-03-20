@@ -256,7 +256,6 @@
       </div>
     </div>
   </div>
-
 <script>
   const params = new URLSearchParams(window.location.search);
   const clash = params.get("clash");
@@ -287,14 +286,10 @@
       }
     });
   }
-</script>
-
- <script>
-  const approveBtn = document.getElementById("approveBtn");
 
   approveBtn.addEventListener("click", function () {
+    if (approveBtn.disabled) return;
 
-    // Fake RAMS data (for now)
     const newRams = {
       contractor: "ABC Engineering",
       area: "Boiler House",
@@ -302,21 +297,15 @@
       startDate: "2026-03-24",
       duration: 2,
       status: "Approved",
-      clash: true
+      clash: clash === "true"
     };
 
-    // Get existing RAMS from storage
     const existing = JSON.parse(localStorage.getItem("ramsData")) || [];
-
-    // Add new one
     existing.push(newRams);
-
-    // Save back
     localStorage.setItem("ramsData", JSON.stringify(existing));
 
-    // Redirect to dashboard
     window.location.href = "/index.html";
   });
-</script> 
+</script>
 </body>
 </html>
