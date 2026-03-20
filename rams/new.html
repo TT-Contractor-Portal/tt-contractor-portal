@@ -69,7 +69,11 @@
       margin-bottom: 8px;
     }
 
-    input[type="file"], select {
+   input[type="file"],
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ccc;
@@ -167,22 +171,7 @@
         <div class="helper">This will become a true multi-select field later.</div>
       </div>
 
-<label for="workArea">Work Area</label>
-<input type="text" id="workArea" name="workArea" placeholder="e.g. Boiler House">
-
-<label for="startDate">Expected Start Date</label>
-<input type="date" id="startDate" name="startDate">
-
-<label for="duration">Duration</label>
-<div style="display:flex; gap:12px;">
-  <input type="number" id="duration" name="duration" min="1" placeholder="e.g. 3" style="flex:1;">
-
-  <select id="durationUnit" name="durationUnit" style="flex:1;">
-    <option value="days">Days</option>
-    <option value="weeks">Weeks</option>
-  </select>
-</div>
-      
+     
       <div class="field">
         <label for="risks">Risk type(s)</label>
         <select id="risks">
@@ -198,7 +187,27 @@
         </select>
         <div class="helper">AI will later prompt if it detects extra risks not selected here.</div>
       </div>
+<div class="field">
+  <label for="workArea">Work Area</label>
+  <input type="text" id="workArea" name="workArea" placeholder="e.g. Boiler House">
+</div>
 
+<div class="field">
+  <label for="startDate">Expected Start Date</label>
+  <input type="date" id="startDate" name="startDate">
+</div>
+
+<div class="field">
+  <label for="duration">Duration</label>
+  <div style="display:flex; gap:12px;">
+    <input type="number" id="duration" name="duration" min="1" placeholder="e.g. 3" style="flex:1;">
+
+    <select id="durationUnit" name="durationUnit" style="flex:1;">
+      <option value="days">Days</option>
+      <option value="weeks">Weeks</option>
+    </select>
+  </div>
+</div>
       <div class="info-box">
         The final system will use:
         <br>• general RAMS rules
