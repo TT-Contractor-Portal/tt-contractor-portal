@@ -169,29 +169,77 @@
       </div>
     </div>
 
-<div class="panel">
-  <h2 style="margin-top: 0;">Portal Overview</h2>
-  <p style="color:#666; margin-bottom: 24px;">
-    This portal provides a central place to manage RAMS submissions, track approval status, monitor expiry dates and support safe contractor control.
-  </p>
+<div class="dashboard-main">
+  <div class="panel planned-works">
+    <h2>This Week’s Planned Contractor Works</h2>
+    <table class="works-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Contractor</th>
+          <th>Area</th>
+          <th>Task</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Mon 23 Mar</td>
+          <td>ABC Engineering</td>
+          <td>Boiler House</td>
+          <td>Steam valve replacement</td>
+          <td><span class="status approved">Approved</span></td>
+        </tr>
+        <tr>
+          <td>Tue 24 Mar</td>
+          <td>Smith Electrical</td>
+          <td>Packaging Hall</td>
+          <td>Lighting upgrade</td>
+          <td><span class="status review">Under Review</span></td>
+        </tr>
+        <tr>
+          <td>Wed 25 Mar</td>
+          <td>Northern Services</td>
+          <td>Fermenting Vessel Room</td>
+          <td>Inspection works</td>
+          <td><span class="status approved">Approved</span></td>
+        </tr>
+        <tr>
+          <td>Thu 26 Mar</td>
+          <td>JM Mechanical</td>
+          <td>Kegging Line</td>
+          <td>Pump maintenance</td>
+          <td><span class="status pending">Pending</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 
-  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
-    <div class="card">
-      <h3>Current Focus</h3>
-      <p>RAMS review workflow is the active module in this prototype.</p>
+  <div class="dashboard-side">
+    <div class="panel">
+      <h2>Today on Site</h2>
+      <div class="mini-item">
+        <strong>ABC Engineering</strong>
+        <p>Boiler House — Steam valve replacement</p>
+      </div>
+      <div class="mini-item">
+        <strong>Smith Electrical</strong>
+        <p>Packaging Hall — Lighting upgrade</p>
+      </div>
     </div>
 
-    <div class="card">
-      <h3>Reviewer Access</h3>
-      <p>Reviewers can assess submissions, identify issues and approve suitable RAMS.</p>
-    </div>
-
-    <div class="card">
-      <h3>Future Expansion</h3>
-      <p>Additional modules such as permits, contractor induction and SOP review can be added as required.</p>
+    <div class="panel">
+      <h2>RAMS Expiring Soon</h2>
+      <div class="mini-item">
+        <strong>ABC Engineering</strong>
+        <p>Boiler House — Expires 29 Mar 2026</p>
+      </div>
+      <div class="mini-item">
+        <strong>JM Mechanical</strong>
+        <p>Kegging Line — Expires 02 Apr 2026</p>
+      </div>
     </div>
   </div>
 </div>
-  </div>
 </body>
 </html>
