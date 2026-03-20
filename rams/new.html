@@ -153,23 +153,21 @@ select {
 
       <div class="field">
         <label for="areas">Area(s) working in</label>
-        <select id="areas">
-          <option>Select one or more areas</option>
-          <option>Brewery</option>
-          <option>Brewhouse</option>
-          <option>Boiler House</option>
-          <option>Packaging</option>
-          <option>Cellars / FV Areas</option>
-          <option>Effluent Plant</option>
-          <option>Utilities</option>
-          <option>Roof Areas</option>
-          <option>Yard / External</option>
-          <option>Workshop</option>
-          <option>Warehouse</option>
-          <option>Offices</option>
-        </select>
-        <div class="helper">This will become a true multi-select field later.</div>
-      </div>
+        <select id="areas" multiple size="6">
+  <option value="Brewery">Brewery</option>
+  <option value="Brewhouse">Brewhouse</option>
+  <option value="Boiler House">Boiler House</option>
+  <option value="Packaging">Packaging</option>
+  <option value="Cellars / FV Areas">Cellars / FV Areas</option>
+  <option value="Effluent Plant">Effluent Plant</option>
+  <option value="Utilities">Utilities</option>
+  <option value="Roof Areas">Roof Areas</option>
+  <option value="Yard / External">Yard / External</option>
+  <option value="Workshop">Workshop</option>
+  <option value="Warehouse">Warehouse</option>
+  <option value="Offices">Offices</option>
+</select>
+       <div class="helper">Hold Ctrl (or Cmd on Mac) to select more than one area.</div>
 
      
       <div class="field">
@@ -187,10 +185,7 @@ select {
         </select>
         <div class="helper">AI will later prompt if it detects extra risks not selected here.</div>
       </div>
-<div class="field">
-  <label for="workArea">Work Area</label>
-  <input type="text" id="workArea" name="workArea" placeholder="e.g. Boiler House">
-</div>
+
 
 <div class="field">
   <label for="startDate">Expected Start Date</label>
@@ -226,7 +221,7 @@ select {
   let continueSubmission = false;
 
   function runRamsReview() {
-    const workArea = document.getElementById("workArea").value.trim();
+    const selectedAreas = Array.from(document.getElementById("areas").selectedOptions).map(option => option.value);
     const startDate = document.getElementById("startDate").value;
 
     const existingWorks = [
@@ -241,9 +236,9 @@ select {
 
     for (const job of existingWorks) {
       if (
-        job.area.toLowerCase() === workArea.toLowerCase() &&
-        job.startDate === startDate
-      ) {
+  selectedAreas.includes(job.area) &&
+  job.startDate === startDate
+) {
         clashFound = true;
         break;
       }
