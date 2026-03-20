@@ -115,6 +115,21 @@
         grid-template-columns: 1fr;
       }
     }
+
+    .button {
+  display: inline-block;
+  margin-top: 12px;
+  padding: 12px 18px;
+  background: #005f47;
+  color: white;
+  text-decoration: none;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.button:hover {
+  opacity: 0.92;
+}
   </style>
 </head>
 <body>
@@ -154,11 +169,38 @@
       </div>
     </div>
 
-    <div class="panel">
-      <h2>View Only Dashboard</h2>
-      <p>You can search RAMS, view statuses, check expiry dates, and request reviewer access.</p>
-      <a class="button" href="#">Request Reviewer Access</a>
+   <div class="panel">
+  <h2 style="margin-top: 0;">Platform Modules</h2>
+  <p style="color:#666; margin-bottom: 24px;">
+    Access the main safety modules below. RAMS is live in prototype form. Other modules are placeholders for now.
+  </p>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>RAMS Module</h3>
+      <p>Create, review and track RAMS submissions for contractors and internal tasks.</p>
+      <a href="/rams/register.html" class="button">Open RAMS</a>
     </div>
+
+    <div class="card">
+      <h3>Contractor Module</h3>
+      <p>Future module for contractor onboarding, inductions and document checks.</p>
+      <a href="/contractors/index.html" class="button">Open Contractors</a>
+    </div>
+
+    <div class="card">
+      <h3>Permit Module</h3>
+      <p>Future module for permit creation, review and linking permits to RAMS.</p>
+      <a href="/permits/index.html" class="button">Open Permits</a>
+    </div>
+
+    <div class="card">
+      <h3>SOP / SSW Module</h3>
+      <p>Future module for reviewing, approving and creating SOPs and SSWs.</p>
+      <a href="/sop/index.html" class="button">Open SOP / SSW</a>
+    </div>
+  </div>
+</div>
   </div>
 </body>
 </html>
