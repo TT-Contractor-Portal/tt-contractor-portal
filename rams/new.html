@@ -167,6 +167,22 @@
         <div class="helper">This will become a true multi-select field later.</div>
       </div>
 
+<label for="workArea">Work Area</label>
+<input type="text" id="workArea" name="workArea" placeholder="e.g. Boiler House">
+
+<label for="startDate">Expected Start Date</label>
+<input type="date" id="startDate" name="startDate">
+
+<label for="duration">Duration</label>
+<div style="display:flex; gap:12px;">
+  <input type="number" id="duration" name="duration" min="1" placeholder="e.g. 3" style="flex:1;">
+
+  <select id="durationUnit" name="durationUnit" style="flex:1;">
+    <option value="days">Days</option>
+    <option value="weeks">Weeks</option>
+  </select>
+</div>
+      
       <div class="field">
         <label for="risks">Risk type(s)</label>
         <select id="risks">
