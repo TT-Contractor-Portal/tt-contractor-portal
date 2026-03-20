@@ -142,9 +142,10 @@
   background: #fff5f5;
 }
 
-    .button:disabled {
-  opacity: 0.6;
-  background: #999;
+.button:disabled {
+  background: #bfbfbf;
+  color: white;
+  opacity: 1;
   cursor: not-allowed;
 }
   </style>
@@ -181,7 +182,7 @@
   </label>
 </div>
 
-<button id="approveBtn" class="button">Approve RAMS</button>
+<button id="approveBtn" class="button" disabled>Acknowledge clash to approve</button>
     
     <div class="panel">
       <h2 class="section-title">Overall Status</h2>
@@ -247,29 +248,31 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const clash = params.get("clash");
+
   const clashWarning = document.getElementById("clashWarning");
   const clashAcknowledgement = document.getElementById("clashAcknowledgement");
   const approveBtn = document.getElementById("approveBtn");
+  const clashConfirm = document.getElementById("clashConfirm");
 
   if (clash === "true") {
     clashWarning.style.display = "block";
     clashAcknowledgement.style.display = "block";
     approveBtn.disabled = true;
-    approveBtn.style.opacity = "0.5";
-    approveBtn.style.cursor = "not-allowed";
+    approveBtn.textContent = "Acknowledge clash to approve";
+  } else {
+    approveBtn.disabled = false;
+    approveBtn.textContent = "Approve RAMS";
   }
-
-  const clashConfirm = document.getElementById("clashConfirm");
 
   if (clashConfirm) {
     clashConfirm.addEventListener("change", function () {
       if (this.checked) {
         approveBtn.disabled = false;
-      
+        approveBtn.textContent = "Approve RAMS";
       } else {
-        approveBtn.textContent = "Acknowledge clash to approve";
         approveBtn.disabled = true;
-             }
+        approveBtn.textContent = "Acknowledge clash to approve";
+      }
     });
   }
 </script>
