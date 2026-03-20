@@ -194,7 +194,7 @@
   </label>
 </div>
 
-<button id="approveBtn" class="button" disabled>Acknowledge clash to approve</button>
+<button id="approveBtn" class="button" disabled>Approve RAMS</button>
     
     <div class="panel">
       <h2 class="section-title">Overall Status</h2>
@@ -288,5 +288,35 @@
     });
   }
 </script>
+
+ <script>
+  const approveBtn = document.getElementById("approveBtn");
+
+  approveBtn.addEventListener("click", function () {
+
+    // Fake RAMS data (for now)
+    const newRams = {
+      contractor: "ABC Engineering",
+      area: "Boiler House",
+      task: "Pipework Repair",
+      startDate: "2026-03-24",
+      duration: 2,
+      status: "Approved",
+      clash: true
+    };
+
+    // Get existing RAMS from storage
+    const existing = JSON.parse(localStorage.getItem("ramsData")) || [];
+
+    // Add new one
+    existing.push(newRams);
+
+    // Save back
+    localStorage.setItem("ramsData", JSON.stringify(existing));
+
+    // Redirect to dashboard
+    window.location.href = "/index.html";
+  });
+</script> 
 </body>
 </html>
