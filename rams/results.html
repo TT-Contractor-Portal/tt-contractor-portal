@@ -207,86 +207,126 @@
 </div>
 
   <div class="main">
-    <div class="topbar">
-      <strong>Review Results</strong> — ABC Engineering / Boiler House Pipework Repair
+       <div class="topbar">
+      <strong>Review Results</strong> — <span id="topbarSummary">RAMS review</span>
     </div>
-<div id="clashWarning" class="panel warning" style="display:none; border-left: 6px solid #ff0000; background:#fff5f5;">
-  <h3 style="margin-top:0; color:#b00000;">⚠ Area Clash Detected</h3>
-  <p>
-    Another contractor is scheduled to work in this area during the same period.
-    Please ensure coordination, segregation or permit controls are in place before approval.
-  </p>
-</div>
 
-    <div id="clashAcknowledgement" class="panel" style="display:none; border-left: 6px solid #ff9900; background:#fffaf0;">
-  <label style="display:flex; align-items:flex-start; gap:10px; font-weight:normal;">
-    <input type="checkbox" id="clashConfirm" style="margin-top:4px;">
-    <span>I confirm this area clash has been reviewed and suitable coordination / segregation controls will be put in place.</span>
-  </label>
-</div>
-<button id="approveBtn" class="button" disabled>Acknowledge clash to approve</button>
-
-    
-    <div class="panel">
-      <h2 class="section-title">Overall Status</h2>
-      <span class="status-badge">Under Review</span>
-      <p style="margin-top: 16px;">
-        This RAMS appears mostly suitable but requires clarification before approval.
+    <div id="clashWarning" class="panel warning" style="display:none;">
+      <h3 style="margin-top:0; color:#b00000;">⚠ Area Clash Detected</h3>
+      <p>
+        Another contractor is scheduled to work in this area during the same period.
+        Please ensure coordination, segregation or permit controls are in place before approval.
       </p>
     </div>
 
-    <div class="panel">
-      <h2 class="section-title">Selected and Confirmed Areas</h2>
-      <span class="tag">Boiler House</span>
-      <span class="tag">Brewery</span>
-
-      <h2 class="section-title" style="margin-top: 24px;">Selected and Confirmed Risks</h2>
-      <span class="tag">Hot Work</span>
-      <span class="tag">Working at Height</span>
+    <div id="clashAcknowledgement" class="panel" style="display:none; border-left: 6px solid #ff9900; background:#fffaf0;">
+      <label style="display:flex; align-items:flex-start; gap:10px; font-weight:normal;">
+        <input type="checkbox" id="clashConfirm" style="margin-top:4px;">
+        <span>I confirm this area clash has been reviewed and suitable coordination / segregation controls will be put in place.</span>
+      </label>
     </div>
 
     <div class="panel">
-      <h2 class="section-title">AI Prompts Raised</h2>
-      <ul class="alert-list">
-        <li>Additional area detected in RAMS: <strong>Brewery</strong></li>
-        <li>Additional risk detected in RAMS: <strong>Working at Height</strong></li>
-      </ul>
+      <h2 id="resultStatus">RAMS Review Result</h2>
+
+      <div class="detail-grid">
+        <div class="detail-item">
+          <strong>RAMS ID</strong>
+          <span id="resultId">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Contractor</strong>
+          <span id="resultContractor">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Job Title</strong>
+          <span id="resultJobTitle">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Location</strong>
+          <span id="resultLocation">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Start Date</strong>
+          <span id="resultStartDate">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>End Date</strong>
+          <span id="resultEndDate">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Reviewer</strong>
+          <span id="resultReviewer">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Review Date</strong>
+          <span id="resultReviewDate">-</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Clash Acknowledged</strong>
+          <span id="resultClashAck">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Selected Areas</h2>
+      <div id="resultAreas" class="tag-wrap"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Selected Risks</h2>
+      <div id="resultRisks" class="tag-wrap"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">AI Detected Additional Areas</h2>
+      <div id="resultDetectedAreas" class="tag-wrap"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">AI Detected Additional Risks</h2>
+      <div id="resultDetectedRisks" class="tag-wrap"></div>
     </div>
 
     <div class="panel">
       <h2 class="section-title">Missing or Not Clearly Defined</h2>
-      <ul class="alert-list">
-        <li>Emergency arrangements not clearly defined</li>
-        <li>Named supervisor not identified</li>
-      </ul>
+      <ul id="resultMissingItems" class="alert-list"></ul>
     </div>
 
     <div class="panel">
       <h2 class="section-title">Weak / Generic Content</h2>
-      <ul class="alert-list">
-        <li>PPE section is too generic</li>
-        <li>Hot work controls do not mention fire watch</li>
-      </ul>
+      <ul id="resultWeakItems" class="alert-list"></ul>
     </div>
 
     <div class="panel">
       <h2 class="section-title">Permits to Issue</h2>
-      <span class="tag">P1 General Work Permit</span>
-      <span class="tag">P2 Hot Work Permit</span>
-      <span class="tag">P4 Working at Height Permit</span>
+      <div id="resultPermits" class="tag-wrap"></div>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Summary</h2>
+      <div id="resultSummary"></div>
     </div>
 
     <div class="panel">
       <h2 class="section-title">Reviewer Notes</h2>
-      <textarea placeholder="Add reviewer notes here..."></textarea>
+      <textarea id="reviewerNotes" placeholder="Add reviewer notes here..."></textarea>
 
       <div class="button-row">
-       <button id="approveBtn" class="button green">Approve</button>
-       <button id="underReviewBtn" class="button amber">Keep Under Review</button>
-       <button id="rejectBtn" class="button red">Reject</button>
+        <button id="approveBtn" class="button green">Approve</button>
+        <button id="underReviewBtn" class="button amber">Keep Under Review</button>
+        <button id="rejectBtn" class="button red">Reject</button>
       </div>
     </div>
-  </div>
 <script>
   const params = new URLSearchParams(window.location.search);
   const clash = params.get("clash");
