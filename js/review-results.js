@@ -102,6 +102,7 @@ function saveReviewWithStatus(status) {
     duration: draft.duration || 1,
     durationUnit: draft.durationUnit || "days",
     endDate: draft.endDate,
+    clash: !!draft.clash,
     clashAcknowledged: !!draft.clashAcknowledged,
     summary: draft.summary || "",
     missingItems: draft.missingItems || [],
