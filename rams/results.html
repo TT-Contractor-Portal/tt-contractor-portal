@@ -160,6 +160,37 @@
   background: #035740 !important;
   cursor: pointer;
 }  
+
+     .tag-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .tag.muted {
+      background: #efefef;
+      color: #666;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 12px 24px;
+    }
+
+    .detail-item strong {
+      display: block;
+      margin-bottom: 4px;
+      color: #035740;
+      font-size: 14px;
+    }
+
+    @media (max-width: 700px) {
+      .detail-grid {
+        grid-template-columns: 1fr;
+      }
+    }   
   </style>
 </head>
 <body>
