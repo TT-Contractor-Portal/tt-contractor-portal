@@ -403,8 +403,9 @@ select {
     const draftReview = buildDraftReview();
     if (!draftReview) return;
 
-    const clashFound = hasClash(draftReview);
+        const clashFound = hasClash(draftReview);
 
+    draftReview.clash = clashFound;
     draftReview.clashAcknowledged = false;
     saveDraftRamsReview(draftReview);
 
