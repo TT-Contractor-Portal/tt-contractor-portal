@@ -315,12 +315,16 @@
   </div>
 </div>
 
+<script src="js/rams-storage.js"></script>
 <script>
-  const data = JSON.parse(localStorage.getItem("ramsData")) || [];
+  const data = getRamsReviews();
   const table = document.getElementById("plannerBody");
 
   function formatDate(dateStr) {
+    if (!dateStr) return "-";
     const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return dateStr;
+
     return d.toLocaleDateString("en-GB", {
       weekday: "short",
       day: "numeric",
@@ -328,22 +332,32 @@
     });
   }
 
+  function getStatusClass(status) {
+    if (status === "Approved") return "approved";
+    if (status === "Under Review") return "review";
+    if (status === "Rejected") return "pending";
+    if (status === "Expired") return "pending";
+    return "review";
+  }
+
   table.innerHTML = "";
 
   data.forEach(item => {
     const row = document.createElement("tr");
 
-    if (item.clash) {
+    if (item.clashAcknowledged) {
       row.classList.add("clash-row");
     }
 
+    const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+
     row.innerHTML = `
       <td>${formatDate(item.startDate)}</td>
-      <td>${item.contractor}</td>
-      <td>${item.area}</td>
-      <td>${item.task}</td>
-      <td><span class="status ${item.status === "Approved" ? "approved" : "review"}">${item.status}</span></td>
-      <td>${item.clash ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+      <td>${item.contractorName || "-"}</td>
+      <td>${areaText}</td>
+      <td>${item.jobTitle || "-"}</td>
+      <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
+      <td>${item.clashAcknowledged ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
     `;
 
     table.appendChild(row);
