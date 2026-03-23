@@ -44,28 +44,7 @@ function renderList(listId, items) {
 }
 
 function getDraftReviewData() {
-  return {
-    contractorName: "Ace Contractors Ltd",
-    jobTitle: "Steam Line Modification",
-    location: "Brewhouse",
-    areas: ["Brewhouse", "Boiler House"],
-    risks: ["Hot Work", "Working at Height"],
-    detectedAreas: ["Utilities"],
-    detectedRisks: ["Pressure Systems / Steam"],
-    recommendedPermits: ["P1 General Work Permit", "P2 Hot Work Permit", "P4 Working at Height Permit"],
-    startDate: "2026-03-24",
-    endDate: "2026-03-24",
-    clashAcknowledged: true,
-    summary: "RAMS reviewed successfully. Additional controls should be confirmed before work starts.",
-    missingItems: [
-      "Emergency arrangements not clearly defined",
-      "Named supervisor not identified"
-    ],
-    weakItems: [
-      "PPE section is too generic",
-      "Hot work controls do not mention fire watch"
-    ]
-  };
+  return getDraftRamsReview();
 }
 
 function renderReview(review) {
@@ -95,22 +74,30 @@ function saveReviewWithStatus(status) {
   const draft = getDraftReviewData();
   const reviewerNotes = document.getElementById("reviewerNotes")?.value.trim() || "";
 
+  if (!draft) {
+    alert("No draft RAMS review found.");
+    return;
+  }
+
   const review = {
-    id: generateRamsId(),
+    id: draft.id || generateRamsId(),
     contractorName: draft.contractorName,
     jobTitle: draft.jobTitle,
     location: draft.location,
-    areas: draft.areas,
-    risks: draft.risks,
-    detectedAreas: draft.detectedAreas,
-    detectedRisks: draft.detectedRisks,
-    recommendedPermits: draft.recommendedPermits,
+    areas: draft.areas || [],
+    risks: draft.risks || [],
+    detectedAreas: draft.detectedAreas || [],
+    detectedRisks: draft.detectedRisks || [],
+    recommendedPermits: draft.recommendedPermits || [],
+    uploadedFileName: draft.uploadedFileName || "",
     startDate: draft.startDate,
+    duration: draft.duration || 1,
+    durationUnit: draft.durationUnit || "days",
     endDate: draft.endDate,
-    clashAcknowledged: draft.clashAcknowledged,
-    summary: draft.summary,
-    missingItems: draft.missingItems,
-    weakItems: draft.weakItems,
+    clashAcknowledged: !!draft.clashAcknowledged,
+    summary: draft.summary || "",
+    missingItems: draft.missingItems || [],
+    weakItems: draft.weakItems || [],
     reviewer: "Admin",
     reviewerNotes,
     status,
@@ -121,9 +108,9 @@ function saveReviewWithStatus(status) {
   reviews.push(review);
   saveRamsReviews(reviews);
   saveCurrentRamsReview(review);
+  clearDraftRamsReview();
 
-  console.log("Approve clicked");
-  console.log("Saved review:", review);
+  console.log("Review saved:", review);
   console.log("All reviews:", getRamsReviews());
 
   window.location.href = "/index.html";
@@ -131,13 +118,13 @@ function saveReviewWithStatus(status) {
 
 document.addEventListener("DOMContentLoaded", () => {
   const currentReview = getCurrentRamsReview();
-  const reviewToRender = currentReview || {
-    ...getDraftReviewData(),
-    id: "Preview Only",
-    reviewer: "Admin",
-    status: "Pending Review",
-    reviewDate: new Date().toISOString()
-  };
+  const draftReview = getDraftReviewData();
+  const reviewToRender = currentReview || draftReview;
+
+  if (!reviewToRender) {
+    console.warn("No current or draft RAMS review found");
+    return;
+  }
 
   renderReview(reviewToRender);
 
