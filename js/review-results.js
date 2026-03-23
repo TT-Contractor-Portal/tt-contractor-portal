@@ -133,6 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderReview(reviewToRender);
 
   document.getElementById("approveBtn")?.addEventListener("click", () => {
+    console.log("Approve clicked");
     saveReviewWithStatus("Approved");
   });
 
