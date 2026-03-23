@@ -122,6 +122,32 @@ select {
         margin-left: 0;
       }
     }
+
+   .checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(220px, 1fr));
+  gap: 10px 24px;
+  margin-top: 8px;
+}
+
+.checkbox-grid label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.checkbox-grid input[type="checkbox"] {
+  width: auto;
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .checkbox-grid {
+    grid-template-columns: 1fr;
+  }
+} 
   </style>
 </head>
 <body>
@@ -156,38 +182,43 @@ select {
       <div class="field">
   <label>Area(s) working in</label>
 
-  <div id="areas">
-    <label><input type="checkbox" value="Brewery"> Brewery</label><br>
-    <label><input type="checkbox" value="Brewhouse"> Brewhouse</label><br>
-    <label><input type="checkbox" value="Boiler House"> Boiler House</label><br>
-    <label><input type="checkbox" value="Packaging"> Packaging</label><br>
-    <label><input type="checkbox" value="Cellars / FV Areas"> Cellars / FV Areas</label><br>
-    <label><input type="checkbox" value="Effluent Plant"> Effluent Plant</label><br>
-    <label><input type="checkbox" value="Utilities"> Utilities</label><br>
-    <label><input type="checkbox" value="Roof Areas"> Roof Areas</label><br>
-    <label><input type="checkbox" value="Yard / External"> Yard / External</label><br>
-    <label><input type="checkbox" value="Workshop"> Workshop</label><br>
-    <label><input type="checkbox" value="Warehouse"> Warehouse</label><br>
+  <div class="field">
+  <label>Area(s) working in</label>
+
+  <div id="areas" class="checkbox-grid">
+    <label><input type="checkbox" value="Brewery"> Brewery</label>
+    <label><input type="checkbox" value="Brewhouse"> Brewhouse</label>
+    <label><input type="checkbox" value="Boiler House"> Boiler House</label>
+    <label><input type="checkbox" value="Packaging"> Packaging</label>
+    <label><input type="checkbox" value="Cellars / FV Areas"> Cellars / FV Areas</label>
+    <label><input type="checkbox" value="Effluent Plant"> Effluent Plant</label>
+    <label><input type="checkbox" value="Utilities"> Utilities</label>
+    <label><input type="checkbox" value="Roof Areas"> Roof Areas</label>
+    <label><input type="checkbox" value="Yard / External"> Yard / External</label>
+    <label><input type="checkbox" value="Workshop"> Workshop</label>
+    <label><input type="checkbox" value="Warehouse"> Warehouse</label>
     <label><input type="checkbox" value="Offices"> Offices</label>
   </div>
 
   <div class="helper">Select all areas the contractor will be working in.</div>
 </div>
-      
-     
+           
       <div class="field">
         <label for="risks">Risk type(s)</label>
        <div class="field">
   <label>Risk type(s)</label>
 
-  <div id="risks">
-    <label><input type="checkbox" value="Hot Work"> Hot Work</label><br>
-    <label><input type="checkbox" value="Working at Height"> Working at Height</label><br>
-    <label><input type="checkbox" value="Confined Space"> Confined Space</label><br>
-    <label><input type="checkbox" value="Electrical / Isolation"> Electrical / Isolation</label><br>
-    <label><input type="checkbox" value="COSHH / Chemicals"> COSHH / Chemicals</label><br>
-    <label><input type="checkbox" value="Lifting Operations"> Lifting Operations</label><br>
-    <label><input type="checkbox" value="Pressure Systems / Steam"> Pressure Systems / Steam</label><br>
+ <div class="field">
+  <label>Risk type(s)</label>
+
+  <div id="risks" class="checkbox-grid">
+    <label><input type="checkbox" value="Hot Work"> Hot Work</label>
+    <label><input type="checkbox" value="Working at Height"> Working at Height</label>
+    <label><input type="checkbox" value="Confined Space"> Confined Space</label>
+    <label><input type="checkbox" value="Electrical / Isolation"> Electrical / Isolation</label>
+    <label><input type="checkbox" value="COSHH / Chemicals"> COSHH / Chemicals</label>
+    <label><input type="checkbox" value="Lifting Operations"> Lifting Operations</label>
+    <label><input type="checkbox" value="Pressure Systems / Steam"> Pressure Systems / Steam</label>
     <label><input type="checkbox" value="Traffic / Vehicle Movement"> Traffic / Vehicle Movement</label>
   </div>
 
