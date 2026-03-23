@@ -153,39 +153,46 @@ select {
 
       <div class="field">
         <label for="areas">Area(s) working in</label>
-        <select id="areas" multiple size="6">
-  <option value="Brewery">Brewery</option>
-  <option value="Brewhouse">Brewhouse</option>
-  <option value="Boiler House">Boiler House</option>
-  <option value="Packaging">Packaging</option>
-  <option value="Cellars / FV Areas">Cellars / FV Areas</option>
-  <option value="Effluent Plant">Effluent Plant</option>
-  <option value="Utilities">Utilities</option>
-  <option value="Roof Areas">Roof Areas</option>
-  <option value="Yard / External">Yard / External</option>
-  <option value="Workshop">Workshop</option>
-  <option value="Warehouse">Warehouse</option>
-  <option value="Offices">Offices</option>
-</select>
-       <div class="helper">Hold Ctrl (or Cmd on Mac) to select more than one area.</div>
-      </div>
+      <div class="field">
+  <label>Area(s) working in</label>
+
+  <div id="areas">
+    <label><input type="checkbox" value="Brewery"> Brewery</label><br>
+    <label><input type="checkbox" value="Brewhouse"> Brewhouse</label><br>
+    <label><input type="checkbox" value="Boiler House"> Boiler House</label><br>
+    <label><input type="checkbox" value="Packaging"> Packaging</label><br>
+    <label><input type="checkbox" value="Cellars / FV Areas"> Cellars / FV Areas</label><br>
+    <label><input type="checkbox" value="Effluent Plant"> Effluent Plant</label><br>
+    <label><input type="checkbox" value="Utilities"> Utilities</label><br>
+    <label><input type="checkbox" value="Roof Areas"> Roof Areas</label><br>
+    <label><input type="checkbox" value="Yard / External"> Yard / External</label><br>
+    <label><input type="checkbox" value="Workshop"> Workshop</label><br>
+    <label><input type="checkbox" value="Warehouse"> Warehouse</label><br>
+    <label><input type="checkbox" value="Offices"> Offices</label>
+  </div>
+
+  <div class="helper">Select all areas the contractor will be working in.</div>
+</div>
       
      
       <div class="field">
         <label for="risks">Risk type(s)</label>
-        <select id="risks">
-          <option>Select one or more risk types</option>
-          <option>Hot Work</option>
-          <option>Working at Height</option>
-          <option>Confined Space</option>
-          <option>Electrical / Isolation</option>
-          <option>COSHH / Chemicals</option>
-          <option>Lifting Operations</option>
-          <option>Pressure Systems / Steam</option>
-          <option>Traffic / Vehicle Movement</option>
-        </select>
-        <div class="helper">AI will later prompt if it detects extra risks not selected here.</div>
-      </div>
+       <div class="field">
+  <label>Risk type(s)</label>
+
+  <div id="risks">
+    <label><input type="checkbox" value="Hot Work"> Hot Work</label><br>
+    <label><input type="checkbox" value="Working at Height"> Working at Height</label><br>
+    <label><input type="checkbox" value="Confined Space"> Confined Space</label><br>
+    <label><input type="checkbox" value="Electrical / Isolation"> Electrical / Isolation</label><br>
+    <label><input type="checkbox" value="COSHH / Chemicals"> COSHH / Chemicals</label><br>
+    <label><input type="checkbox" value="Lifting Operations"> Lifting Operations</label><br>
+    <label><input type="checkbox" value="Pressure Systems / Steam"> Pressure Systems / Steam</label><br>
+    <label><input type="checkbox" value="Traffic / Vehicle Movement"> Traffic / Vehicle Movement</label>
+  </div>
+
+  <div class="helper">Select all applicable risks.</div>
+</div>
 
 <div class="field">
   <label for="contractorName">Contractor Name</label>
