@@ -14,6 +14,11 @@ function formatDateTime(dateString) {
   return date.toLocaleString("en-GB");
 }
 
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
 function renderTags(containerId, items) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -64,17 +69,17 @@ function getDraftReviewData() {
 }
 
 function renderReview(review) {
-  document.getElementById("resultStatus").textContent = review.status || "RAMS Review Result";
-  document.getElementById("resultId").textContent = review.id || "-";
-  document.getElementById("resultContractor").textContent = review.contractorName || "-";
-  document.getElementById("resultJobTitle").textContent = review.jobTitle || "-";
-  document.getElementById("resultLocation").textContent = review.location || "-";
-  document.getElementById("resultStartDate").textContent = formatDate(review.startDate);
-  document.getElementById("resultEndDate").textContent = formatDate(review.endDate);
-  document.getElementById("resultReviewer").textContent = review.reviewer || "-";
-  document.getElementById("resultReviewDate").textContent = formatDateTime(review.reviewDate);
-  document.getElementById("resultSummary").textContent = review.summary || "-";
-  document.getElementById("resultClashAck").textContent = review.clashAcknowledged ? "Yes" : "No";
+  setText("resultStatus", review.status || "RAMS Review Result");
+  setText("resultId", review.id || "-");
+  setText("resultContractor", review.contractorName || "-");
+  setText("resultJobTitle", review.jobTitle || "-");
+  setText("resultLocation", review.location || "-");
+  setText("resultStartDate", formatDate(review.startDate));
+  setText("resultEndDate", formatDate(review.endDate));
+  setText("resultReviewer", review.reviewer || "-");
+  setText("resultReviewDate", formatDateTime(review.reviewDate));
+  setText("resultSummary", review.summary || "-");
+  setText("resultClashAck", review.clashAcknowledged ? "Yes" : "No");
 
   renderTags("resultAreas", review.areas);
   renderTags("resultRisks", review.risks);
@@ -117,7 +122,11 @@ function saveReviewWithStatus(status) {
   saveRamsReviews(reviews);
   saveCurrentRamsReview(review);
 
-  window.location.href = "index.html";
+  console.log("Approve clicked");
+  console.log("Saved review:", review);
+  console.log("All reviews:", getRamsReviews());
+
+  window.location.href = "/index.html";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -133,7 +142,6 @@ document.addEventListener("DOMContentLoaded", () => {
   renderReview(reviewToRender);
 
   document.getElementById("approveBtn")?.addEventListener("click", () => {
-    console.log("Approve clicked");
     saveReviewWithStatus("Approved");
   });
 
