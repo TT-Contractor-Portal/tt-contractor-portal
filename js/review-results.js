@@ -68,6 +68,8 @@ function renderReview(review) {
 
   renderList("resultMissingItems", review.missingItems);
   renderList("resultWeakItems", review.weakItems);
+
+   setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`); 
 }
 
 function saveReviewWithStatus(status) {
