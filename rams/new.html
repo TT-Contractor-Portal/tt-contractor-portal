@@ -235,8 +235,15 @@ select {
   
 <script src="../js/rams-storage.js"></script>
 <script>
-  function getSelectedAreas() {
-    return Array.from(document.getElementById("areas").selectedOptions).map(option => option.value);
+  function getSelectedValues(containerId) {
+    const container = document.getElementById(containerId);
+
+    const checkboxes = container.querySelectorAll("input[type='checkbox']:checked");
+    if (checkboxes.length) {
+      return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    return Array.from(container.selectedOptions || []).map(option => option.value);
   }
 
   function addDays(dateString, daysToAdd) {
@@ -249,93 +256,151 @@ select {
     return start1 <= end2 && start2 <= end1;
   }
 
-  function runRamsReview() {
-    const selectedAreas = getSelectedAreas();
+  function calculateEndDate(startDate, duration, durationUnit) {
+    const durationInDays = durationUnit === "weeks" ? duration * 7 : duration;
+    return addDays(startDate, durationInDays - 1);
+  }
+
+  function buildDraftReview() {
+    const contractorName = document.getElementById("contractorName").value.trim();
+    const jobTitle = document.getElementById("taskDescription").value.trim();
     const startDate = document.getElementById("startDate").value;
     const duration = parseInt(document.getElementById("duration").value, 10);
     const durationUnit = document.getElementById("durationUnit").value;
+    const selectedAreas = getSelectedValues("areas");
+    const selectedRisks = getSelectedValues("risks");
+    const fileInput = document.getElementById("ramsfile");
 
-    const draftRams = {
-      contractor: document.getElementById("contractorName")?.value || "Unknown Contractor",
-      area: selectedAreas.length ? selectedAreas.join(", ") : "No area selected",
-      task: document.getElementById("taskDescription")?.value || "General works",
-      startDate: startDate,
-      duration: duration || 1,
-      durationUnit: durationUnit,
-      status: "Approved",
-      clash: false
-    };
-
-    if (!selectedAreas.length || !startDate || !duration) {
-      alert("Please complete area, start date and duration before running the RAMS review.");
-      return;
+    if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
+      alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
+      return null;
     }
 
-    const durationInDays = durationUnit === "weeks" ? duration * 7 : duration;
-    const newStart = new Date(startDate);
-    const newEnd = addDays(startDate, durationInDays - 1);
+    const uploadedFileName = fileInput?.files?.length ? fileInput.files[0].name : "";
 
-    const existingWorks = [
+    const recommendedPermits = ["P1 General Work Permit"];
+
+    if (selectedRisks.includes("Hot Work")) {
+      recommendedPermits.push("P2 Hot Work Permit");
+    }
+
+    if (selectedRisks.includes("Confined Space")) {
+      recommendedPermits.push("P3 Confined Space Permit");
+    }
+
+    if (selectedRisks.includes("Working at Height")) {
+      recommendedPermits.push("P4 Working at Height Permit");
+    }
+
+    return {
+      id: generateRamsId(),
+      contractorName,
+      jobTitle,
+      location: selectedAreas.join(", "),
+      areas: selectedAreas,
+      risks: selectedRisks,
+      detectedAreas: [],
+      detectedRisks: [],
+      recommendedPermits,
+      uploadedFileName,
+      startDate,
+      duration,
+      durationUnit,
+      endDate: calculateEndDate(startDate, duration, durationUnit).toISOString(),
+      clashAcknowledged: false,
+      summary: "RAMS submitted and ready for review.",
+      missingItems: [],
+      weakItems: [],
+      reviewer: "",
+      reviewerNotes: "",
+      status: "Pending Review",
+      reviewDate: ""
+    };
+  }
+
+  function getExistingWorks() {
+    const approvedReviews = getRamsReviews();
+
+    const staticWorks = [
       {
-        contractor: "ABC Engineering",
-        area: "Boiler House",
+        contractorName: "ABC Engineering",
+        areas: ["Boiler House"],
         startDate: "2026-03-24",
-        duration: 2,
-        durationUnit: "days"
+        endDate: addDays("2026-03-24", 1).toISOString()
       },
       {
-        contractor: "Smith Electrical",
-        area: "Packaging",
+        contractorName: "Smith Electrical",
+        areas: ["Packaging"],
         startDate: "2026-03-25",
-        duration: 1,
-        durationUnit: "days"
+        endDate: addDays("2026-03-25", 0).toISOString()
       },
       {
-        contractor: "Northern Services",
-        area: "Utilities",
+        contractorName: "Northern Services",
+        areas: ["Utilities"],
         startDate: "2026-03-26",
-        duration: 1,
-        durationUnit: "weeks"
+        endDate: addDays("2026-03-26", 6).toISOString()
       }
     ];
 
-    let clashFound = false;
+    return [...approvedReviews, ...staticWorks];
+  }
 
-    for (const job of existingWorks) {
-      const sameArea = selectedAreas.includes(job.area);
+  function hasClash(draftReview) {
+    const newStart = new Date(draftReview.startDate);
+    const newEnd = new Date(draftReview.endDate);
+    const existingWorks = getExistingWorks();
 
-      const existingDurationInDays =
-        job.durationUnit === "weeks" ? job.duration * 7 : job.duration;
+    return existingWorks.some(job => {
+      const jobAreas = Array.isArray(job.areas)
+        ? job.areas
+        : String(job.area || job.location || "")
+            .split(",")
+            .map(item => item.trim())
+            .filter(Boolean);
+
+      const sameArea = draftReview.areas.some(area => jobAreas.includes(area));
+      if (!sameArea) return false;
 
       const existingStart = new Date(job.startDate);
-      const existingEnd = addDays(job.startDate, existingDurationInDays - 1);
+      const existingEnd = job.endDate ? new Date(job.endDate) : existingStart;
 
-      const overlaps = rangesOverlap(newStart, newEnd, existingStart, existingEnd);
+      return rangesOverlap(newStart, newEnd, existingStart, existingEnd);
+    });
+  }
 
-      if (sameArea && overlaps) {
-        clashFound = true;
-        break;
-      }
-    }
+  function runRamsReview() {
+    const draftReview = buildDraftReview();
+    if (!draftReview) return;
+
+    const clashFound = hasClash(draftReview);
+
+    draftReview.clashAcknowledged = false;
+    saveDraftRamsReview(draftReview);
 
     if (clashFound) {
-      draftRams.clash = true;
-      localStorage.setItem("draftRams", JSON.stringify(draftRams));
       document.getElementById("clashModal").style.display = "flex";
       return;
     }
 
-    draftRams.clash = false;
-    localStorage.setItem("draftRams", JSON.stringify(draftRams));
     goToResults(false);
   }
 
   function closeModal(shouldContinue) {
     document.getElementById("clashModal").style.display = "none";
 
-    if (shouldContinue) {
-      goToResults(true);
+    if (!shouldContinue) {
+      return;
     }
+
+    const draftReview = getDraftRamsReview();
+    if (!draftReview) {
+      alert("No draft RAMS review found.");
+      return;
+    }
+
+    draftReview.clashAcknowledged = true;
+    saveDraftRamsReview(draftReview);
+    goToResults(true);
   }
 
   function goToResults(hasClash = false) {
