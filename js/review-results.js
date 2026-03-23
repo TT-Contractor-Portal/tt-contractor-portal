@@ -58,7 +58,13 @@ function renderReview(review) {
   setText("resultReviewer", review.reviewer || "-");
   setText("resultReviewDate", formatDateTime(review.reviewDate));
   setText("resultSummary", review.summary || "-");
-  setText("resultClashAck", review.clashAcknowledged ? "Yes" : "No");
+  let clashText = "No clash detected";
+
+if (review.clash === true) {
+  clashText = review.clashAcknowledged ? "Yes" : "No";
+}
+
+setText("resultClashAck", clashText);
 
   renderTags("resultAreas", review.areas);
   renderTags("resultRisks", review.risks);
