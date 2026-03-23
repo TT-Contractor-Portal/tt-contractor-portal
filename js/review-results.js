@@ -1,3 +1,5 @@
+console.log("review-results.js loaded");
+
 function formatDate(dateString) {
   if (!dateString) return "-";
   const date = new Date(dateString);
