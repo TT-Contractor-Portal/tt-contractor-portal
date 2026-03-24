@@ -149,10 +149,14 @@ function saveReviewWithStatus(status) {
   };
 
   const reviews = getRamsReviews();
-  reviews.push(review);
-  saveRamsReviews(reviews);
-  saveCurrentRamsReview(review);
-  clearDraftRamsReview();
+reviews.push(review);
+saveRamsReviews(reviews);
+
+// ✅ ADD THIS LINE
+updateClashesForAll();
+
+saveCurrentRamsReview(review);
+clearDraftRamsReview();
 
   console.log("Review saved:", review);
   console.log("All reviews:", getRamsReviews());
