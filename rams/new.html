@@ -342,10 +342,7 @@ select {
   function getExistingWorks() {
     const approvedReviews = getRamsReviews();
 
-    return [...approvedReviews, ...staticWorks];
-  }
-
-  function hasClash(draftReview) {
+    function hasClash(draftReview) {
     const newStart = new Date(draftReview.startDate);
     const newEnd = new Date(draftReview.endDate);
     const existingWorks = getExistingWorks();
