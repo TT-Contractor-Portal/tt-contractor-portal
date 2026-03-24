@@ -214,13 +214,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("approveBtn")?.addEventListener("click", () => {
   const review = getDraftReviewData() || getCurrentRamsReview();
+  const clashConfirm = document.getElementById("clashConfirm");
 
-  if (review?.clash === true && !review?.clashAcknowledged) {
-    const modal = document.getElementById("clashApprovalModal");
-    if (modal) {
-      modal.style.display = "flex";
+  if (review?.clash === true) {
+    if (!clashConfirm?.checked) {
+      alert("You must confirm the clash has been reviewed and control measures are in place before approving.");
       return;
     }
+
+    review.clashAcknowledged = true;
+    saveDraftRamsReview(review);
+    saveCurrentRamsReview(review);
   }
 
   saveReviewWithStatus("Approved");
