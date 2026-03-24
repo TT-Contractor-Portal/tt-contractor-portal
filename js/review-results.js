@@ -79,7 +79,8 @@ setText("resultClashAck", clashText);
   const clashWarning = document.getElementById("clashWarning");
 const clashAcknowledgement = document.getElementById("clashAcknowledgement");
 const clashConfirm = document.getElementById("clashConfirm");
-
+const approveBtn = document.getElementById("approveBtn");
+  
 if (review.clash === true) {
   if (clashWarning) clashWarning.style.display = "block";
   if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
