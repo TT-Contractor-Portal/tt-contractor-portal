@@ -327,7 +327,9 @@ select {
       startDate,
       duration,
       durationUnit,
-      endDate: calculateEndDate(startDate, duration, durationUnit).toISOString(),
+    endDate: calculateEndDate(startDate, duration, durationUnit)
+  .toISOString()
+  .split("T")[0],
       clashAcknowledged: false,
       summary: "RAMS submitted and ready for review.",
       missingItems: [],
