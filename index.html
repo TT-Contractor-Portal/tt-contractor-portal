@@ -302,6 +302,9 @@
 <script>
   const data = getRamsReviews();
   const table = document.getElementById("plannerBody");
+  const todayOnSite = document.getElementById("todayOnSite");
+  const activeClashAlerts = document.getElementById("activeClashAlerts");
+  const expiringSoon = document.getElementById("expiringSoon");
 
   function formatDate(dateStr) {
     if (!dateStr) return "-";
@@ -315,6 +318,18 @@
     });
   }
 
+  function formatShortDate(dateStr) {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return dateStr;
+
+    return d.toLocaleDateString("en-GB", {
+      day: "numeric",
+      month: "short",
+      year: "numeric"
+    });
+  }
+
   function getStatusClass(status) {
     if (status === "Approved") return "approved";
     if (status === "Under Review") return "review";
@@ -323,29 +338,188 @@
     return "review";
   }
 
+  function startOfDay(date) {
+    const d = new Date(date);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function endOfDay(date) {
+    const d = new Date(date);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
+
+  function startOfWeek(date) {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = day === 0 ? -6 : 1 - day; // Monday start
+    d.setDate(d.getDate() + diff);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }
+
+  function endOfWeek(date) {
+    const d = startOfWeek(date);
+    d.setDate(d.getDate() + 6);
+    d.setHours(23, 59, 59, 999);
+    return d;
+  }
+
+  function addDays(date, days) {
+    const d = new Date(date);
+    d.setDate(d.getDate() + days);
+    return d;
+  }
+
+  function addMonths(date, months) {
+    const d = new Date(date);
+    d.setMonth(d.getMonth() + months);
+    return d;
+  }
+
+  function rangesOverlap(start1, end1, start2, end2) {
+    return start1 <= end2 && start2 <= end1;
+  }
+
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  const todayEnd = endOfDay(now);
+  const weekStart = startOfWeek(now);
+  const weekEnd = endOfWeek(now);
+
+  const approved = data.filter(item => (item.status || "") === "Approved");
+
+  // MAIN TABLE = CURRENT WEEK ONLY
+  const thisWeekItems = approved
+    .filter(item => {
+      const start = new Date(item.startDate);
+      const end = new Date(item.endDate || item.startDate);
+      return rangesOverlap(start, end, weekStart, weekEnd);
+    })
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
   table.innerHTML = "";
 
-  data.forEach(item => {
-    const row = document.createElement("tr");
-
-  if (item.clash === true) {
-  row.classList.add("clash-row");
-}
-
-    const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
-
-    row.innerHTML = `
-      <td>${formatDate(item.startDate)}</td>
-      <td>${item.contractorName || "-"}</td>
-      <td>${areaText}</td>
-      <td>${item.jobTitle || "-"}</td>
-      <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
-     <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+  if (!thisWeekItems.length) {
+    table.innerHTML = `
+      <tr>
+        <td colspan="6">No contractor works planned for this week.</td>
+      </tr>
     `;
+  } else {
+    thisWeekItems.forEach(item => {
+      const row = document.createElement("tr");
 
-    table.appendChild(row);
-  });
+      if (item.clash === true) {
+        row.classList.add("clash-row");
+      }
 
+      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+
+      row.innerHTML = `
+        <td>${formatDate(item.startDate)}</td>
+        <td>${item.contractorName || "-"}</td>
+        <td>${areaText}</td>
+        <td>${item.jobTitle || "-"}</td>
+        <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
+        <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+      `;
+
+      table.appendChild(row);
+    });
+  }
+
+  // TODAY ON SITE
+  const todayItems = approved
+    .filter(item => {
+      const start = new Date(item.startDate);
+      const end = new Date(item.endDate || item.startDate);
+      return rangesOverlap(start, end, todayStart, todayEnd);
+    })
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+  todayOnSite.innerHTML = "";
+
+  if (!todayItems.length) {
+    todayOnSite.innerHTML = `<div class="mini-item"><p>No contractors on site today.</p></div>`;
+  } else {
+    todayItems.forEach(item => {
+      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+
+      todayOnSite.innerHTML += `
+        <div class="mini-item">
+          <strong>${item.contractorName || "-"}</strong>
+          <p>${areaText} — ${item.jobTitle || "-"}</p>
+        </div>
+      `;
+    });
+  }
+
+  // ACTIVE CLASH ALERTS = LIVE CURRENT/FUTURE CLASHES
+  const clashItems = approved
+    .filter(item => item.clash === true)
+    .filter(item => {
+      const end = new Date(item.endDate || item.startDate);
+      return end >= todayStart;
+    })
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+  activeClashAlerts.innerHTML = "";
+
+  if (!clashItems.length) {
+    activeClashAlerts.innerHTML = `<div class="mini-item"><p>No active clash alerts.</p></div>`;
+  } else {
+    clashItems.forEach(item => {
+      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+
+      activeClashAlerts.innerHTML += `
+        <div class="mini-item">
+          <strong>${item.contractorName || "-"}</strong>
+          <p>${areaText} — ${formatDate(item.startDate)}</p>
+        </div>
+      `;
+    });
+  }
+
+  // RAMS EXPIRING SOON = 12 MONTHS FROM REVIEW DATE, NEXT 30 DAYS
+  const soonStart = todayStart;
+  const soonEnd = addDays(todayStart, 30);
+
+  const expiringItems = approved
+    .map(item => {
+      const baseDate = item.reviewDate ? new Date(item.reviewDate) : null;
+      if (!baseDate || Number.isNaN(baseDate.getTime())) return null;
+
+      const expiryDate = addMonths(baseDate, 12);
+
+      return {
+        ...item,
+        expiryDate
+      };
+    })
+    .filter(Boolean)
+    .filter(item => item.expiryDate >= soonStart && item.expiryDate <= soonEnd)
+    .sort((a, b) => a.expiryDate - b.expiryDate);
+
+  expiringSoon.innerHTML = "";
+
+  if (!expiringItems.length) {
+    expiringSoon.innerHTML = `<div class="mini-item"><p>No RAMS expiring soon.</p></div>`;
+  } else {
+    expiringItems.forEach(item => {
+      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+
+      expiringSoon.innerHTML += `
+        <div class="mini-item">
+          <strong>${item.contractorName || "-"}</strong>
+          <p>${areaText} — Expires ${formatShortDate(item.expiryDate)}</p>
+        </div>
+      `;
+    });
+  }
+
+  // SUMMARY CARDS
   document.getElementById("totalRams").textContent = data.length;
   document.getElementById("approvedRams").textContent = data.filter(item => item.status === "Approved").length;
   document.getElementById("underReviewRams").textContent = data.filter(item => item.status === "Under Review").length;
