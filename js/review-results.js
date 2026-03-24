@@ -77,11 +77,6 @@ setText("resultClashAck", clashText);
 
    setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`); 
 }
-const clashBox = document.getElementById("clashControlBox");
-
-if (clashBox) {
-  clashBox.style.display = review.clash ? "block" : "none";
-}
 
 function updateClashesForAll() {
   const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
