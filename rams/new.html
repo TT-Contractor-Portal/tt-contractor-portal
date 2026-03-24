@@ -342,6 +342,21 @@ select {
   function getExistingWorks() {
     const approvedReviews = getRamsReviews();
 
+function getExistingWorks() {
+  const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
+
+  // Only approved RAMS
+  return stored
+    .filter(r => r.status === "approved")
+    .map(r => ({
+      id: r.id,
+      contractor: r.contractorName,
+      areas: r.areas || [],
+      startDate: r.startDate,
+      endDate: r.endDate
+    }));
+}
+    
     function hasClash(draftReview) {
     const newStart = new Date(draftReview.startDate);
     const newEnd = new Date(draftReview.endDate);
