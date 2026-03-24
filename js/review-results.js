@@ -83,7 +83,7 @@ const clashConfirm = document.getElementById("clashConfirm");
 if (review.clash === true) {
   if (clashWarning) clashWarning.style.display = "block";
   if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
-  if (clashConfirm) clashConfirm.checked = !!review.clashAcknowledged;
+  if (clashConfirm) clashConfirm.checked = false;
 } else {
   if (clashWarning) clashWarning.style.display = "none";
   if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
