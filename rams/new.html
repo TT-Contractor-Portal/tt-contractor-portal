@@ -345,7 +345,7 @@ select {
   const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
 
   return stored
-    .filter(r => r.status === "approved")
+   .filter(r => r.status === "Approved")
     .map(r => ({
       id: r.id,
       contractor: r.contractorName,
