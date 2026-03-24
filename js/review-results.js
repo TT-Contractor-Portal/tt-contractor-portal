@@ -172,7 +172,7 @@ function updateClashesForAll() {
 }
 
 function saveReviewWithStatus(status) {
-  const draft = getDraftReviewData();
+ const draft = getDraftReviewData() || getCurrentRamsReview();
   const reviewerNotes = document.getElementById("reviewerNotes")?.value.trim() || "";
 
   if (!draft) {
