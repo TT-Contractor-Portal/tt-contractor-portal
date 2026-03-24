@@ -169,6 +169,30 @@ clearDraftRamsReview();
   window.location.href = "/index.html";
 }
 
+function closeClashApprovalModal() {
+  const modal = document.getElementById("clashApprovalModal");
+  if (modal) modal.style.display = "none";
+}
+
+function confirmClashApproval() {
+  const confirmBox = document.getElementById("clashApprovalConfirm");
+  const draft = getDraftReviewData() || getCurrentRamsReview();
+
+  if (!confirmBox?.checked) {
+    alert("Please tick the control measures confirmation box before approving.");
+    return;
+  }
+
+  if (draft) {
+    draft.clashAcknowledged = true;
+    saveDraftRamsReview(draft);
+    saveCurrentRamsReview(draft);
+  }
+
+  closeClashApprovalModal();
+  saveReviewWithStatus("Approved");
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   const currentReview = getCurrentRamsReview();
   const draftReview = getDraftReviewData();
