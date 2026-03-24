@@ -342,27 +342,6 @@ select {
   function getExistingWorks() {
     const approvedReviews = getRamsReviews();
 
-    const staticWorks = [
-      {
-        contractorName: "ABC Engineering",
-        areas: ["Boiler House"],
-        startDate: "2026-03-24",
-        endDate: addDays("2026-03-24", 1).toISOString()
-      },
-      {
-        contractorName: "Smith Electrical",
-        areas: ["Packaging"],
-        startDate: "2026-03-25",
-        endDate: addDays("2026-03-25", 0).toISOString()
-      },
-      {
-        contractorName: "Northern Services",
-        areas: ["Utilities"],
-        startDate: "2026-03-26",
-        endDate: addDays("2026-03-26", 6).toISOString()
-      }
-    ];
-
     return [...approvedReviews, ...staticWorks];
   }
 
