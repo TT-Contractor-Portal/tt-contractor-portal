@@ -47,6 +47,29 @@ function getDraftReviewData() {
   return getDraftRamsReview();
 }
 
+function getClashingReviews(currentReview) {
+  const all = getRamsReviews();
+
+  return all.filter(r => {
+    if (r.id === currentReview.id) return false;
+    if ((r.status || "").toLowerCase() !== "approved") return false;
+
+    const aStart = new Date(currentReview.startDate);
+    const aEnd = new Date(currentReview.endDate);
+    const bStart = new Date(r.startDate);
+    const bEnd = new Date(r.endDate);
+
+    const overlap = aStart <= bEnd && bStart <= aEnd;
+    if (!overlap) return false;
+
+    const sameArea = (currentReview.areas || []).some(area =>
+      (r.areas || []).includes(area)
+    );
+
+    return sameArea;
+  });
+}
+
 function renderReview(review) {
   setText("resultStatus", review.status || "RAMS Review Result");
   setText("resultId", review.id || "-");
