@@ -180,7 +180,7 @@ clearDraftRamsReview();
 document.addEventListener("DOMContentLoaded", () => {
   const currentReview = getCurrentRamsReview();
   const draftReview = getDraftReviewData();
-  const reviewToRender = currentReview || draftReview;
+  const reviewToRender = draftReview || currentReview;
 
   if (!reviewToRender) {
     console.warn("No current or draft RAMS review found");
