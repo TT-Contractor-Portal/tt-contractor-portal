@@ -339,13 +339,9 @@ select {
     };
   }
 
-  function getExistingWorks() {
-    const approvedReviews = getRamsReviews();
-
-function getExistingWorks() {
+ function getExistingWorks() {
   const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
 
-  // Only approved RAMS
   return stored
     .filter(r => r.status === "approved")
     .map(r => ({
