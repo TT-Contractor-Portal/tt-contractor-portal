@@ -357,7 +357,7 @@
       <td>${areaText}</td>
       <td>${item.jobTitle || "-"}</td>
       <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
-      <td>${item.clashAcknowledged ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+     <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
     `;
 
     table.appendChild(row);
