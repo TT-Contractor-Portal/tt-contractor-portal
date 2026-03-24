@@ -355,29 +355,29 @@ select {
     }));
 }
     
-    function hasClash(draftReview) {
-    const newStart = new Date(draftReview.startDate);
-    const newEnd = new Date(draftReview.endDate);
-    const existingWorks = getExistingWorks();
+   function hasClash(draftReview) {
+  const newStart = new Date(draftReview.startDate);
+  const newEnd = new Date(draftReview.endDate);
 
-    return existingWorks.some(job => {
-      const jobAreas = Array.isArray(job.areas)
-        ? job.areas
-        : String(job.area || job.location || "")
-            .split(",")
-            .map(item => item.trim())
-            .filter(Boolean);
+  const existingWorks = getExistingWorks();
 
-      const sameArea = draftReview.areas.some(area => jobAreas.includes(area));
-      if (!sameArea) return false;
+  return existingWorks.some(job => {
+    const jobStart = new Date(job.startDate);
+    const jobEnd = job.endDate ? new Date(job.endDate) : jobStart;
 
-      const existingStart = new Date(job.startDate);
-      const existingEnd = job.endDate ? new Date(job.endDate) : existingStart;
+    // ✅ DATE OVERLAP
+    const overlap = newStart <= jobEnd && jobStart <= newEnd;
+    if (!overlap) return false;
 
-      return rangesOverlap(newStart, newEnd, existingStart, existingEnd);
-    });
-  }
+    // ✅ AREA MATCH (multi-area safe)
+    const jobAreas = job.areas || [];
+    const sameArea = draftReview.areas.some(area =>
+      jobAreas.includes(area)
+    );
 
+    return sameArea;
+  });
+}
   function runRamsReview() {
     const draftReview = buildDraftReview();
     if (!draftReview) return;
