@@ -183,15 +183,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.getElementById("approveBtn")?.addEventListener("click", () => {
   const review = getDraftReviewData() || getCurrentRamsReview();
-  const confirmBox = document.getElementById("clashConfirm");
 
-  if (review?.clash === true) {
-    if (!confirmBox || !confirmBox.checked) {
-      alert("You must confirm control measures before approving this RAMS.");
+  if (review?.clash === true && !review?.clashAcknowledged) {
+    const modal = document.getElementById("clashApprovalModal");
+    if (modal) {
+      modal.style.display = "flex";
       return;
     }
-
-    review.clashAcknowledged = true;
   }
 
   saveReviewWithStatus("Approved");
