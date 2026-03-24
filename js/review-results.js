@@ -181,12 +181,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderReview(reviewToRender);
 
- document.getElementById("approveBtn")?.addEventListener("click", () => {
-  const draft = getDraftReviewData() || getCurrentRamsReview();
+document.getElementById("approveBtn")?.addEventListener("click", () => {
+  const review = getDraftReviewData() || getCurrentRamsReview();
+  const confirmBox = document.getElementById("clashConfirm");
 
-  if (draft?.clash && !draft?.clashAcknowledged) {
-    alert("You must acknowledge the clash and confirm control measures before approving.");
-    return;
+  if (review?.clash === true) {
+    if (!confirmBox || !confirmBox.checked) {
+      alert("You must confirm control measures before approving this RAMS.");
+      return;
+    }
+
+    review.clashAcknowledged = true;
   }
 
   saveReviewWithStatus("Approved");
