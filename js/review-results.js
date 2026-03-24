@@ -176,9 +176,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderReview(reviewToRender);
 
-  document.getElementById("approveBtn")?.addEventListener("click", () => {
-    saveReviewWithStatus("Approved");
-  });
+ document.getElementById("approveBtn")?.addEventListener("click", () => {
+  const draft = getDraftReviewData() || getCurrentRamsReview();
+
+  if (draft?.clash && !draft?.clashAcknowledged) {
+    alert("You must acknowledge the clash and confirm control measures before approving.");
+    return;
+  }
+
+  saveReviewWithStatus("Approved");
+});
 
   document.getElementById("underReviewBtn")?.addEventListener("click", () => {
     saveReviewWithStatus("Under Review");
