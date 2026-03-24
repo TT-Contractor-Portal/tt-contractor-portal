@@ -345,9 +345,9 @@
   data.forEach(item => {
     const row = document.createElement("tr");
 
-    if (item.clashAcknowledged) {
-      row.classList.add("clash-row");
-    }
+  if (item.clash === true) {
+  row.classList.add("clash-row");
+}
 
     const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
 
