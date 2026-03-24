@@ -78,6 +78,41 @@ setText("resultClashAck", clashText);
    setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`); 
 }
 
+function updateClashesForAll() {
+  const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
+
+  const approved = stored.filter(r => (r.status || "").toLowerCase() === "approved");
+
+  // reset
+  approved.forEach(r => r.clash = false);
+
+  for (let i = 0; i < approved.length; i++) {
+    for (let j = i + 1; j < approved.length; j++) {
+      const a = approved[i];
+      const b = approved[j];
+
+      const aStart = new Date(a.startDate);
+      const aEnd = new Date(a.endDate);
+      const bStart = new Date(b.startDate);
+      const bEnd = new Date(b.endDate);
+
+      const overlap = aStart <= bEnd && bStart <= aEnd;
+      if (!overlap) continue;
+
+      const sameArea = (a.areas || []).some(area =>
+        (b.areas || []).includes(area)
+      );
+
+      if (sameArea) {
+        a.clash = true;
+        b.clash = true;
+      }
+    }
+  }
+
+  localStorage.setItem("ramsReviews", JSON.stringify(stored));
+}
+
 function saveReviewWithStatus(status) {
   const draft = getDraftReviewData();
   const reviewerNotes = document.getElementById("reviewerNotes")?.value.trim() || "";
