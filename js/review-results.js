@@ -106,15 +106,34 @@ function renderReview(review) {
   const clashConfirm = document.getElementById("clashConfirm");
   const approveBtn = document.getElementById("approveBtn");
 
+   const clashDetails = document.getElementById("clashDetails");
+
   if (review.clash === true) {
     if (clashWarning) clashWarning.style.display = "block";
     if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
     if (clashConfirm) clashConfirm.checked = false;
     if (approveBtn) approveBtn.disabled = true;
+
+    const clashes = getClashingReviews(review);
+
+    if (clashDetails && clashes.length) {
+      clashDetails.innerHTML = clashes.map(c => {
+        return `
+          <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
+            <strong>${c.contractorName || "-"}</strong><br>
+            Area: ${(c.areas || []).join(", ") || "-"}<br>
+            Dates: ${formatDate(c.startDate)} to ${formatDate(c.endDate)}<br>
+            Approved by: ${c.reviewer || "Unknown"}
+          </div>
+        `;
+      }).join("");
+    }
+
   } else {
     if (clashWarning) clashWarning.style.display = "none";
     if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
     if (approveBtn) approveBtn.disabled = false;
+    if (clashDetails) clashDetails.innerHTML = "";
   }
 }
 function updateClashesForAll() {
