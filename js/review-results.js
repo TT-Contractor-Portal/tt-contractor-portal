@@ -58,13 +58,14 @@ function renderReview(review) {
   setText("resultReviewer", review.reviewer || "-");
   setText("resultReviewDate", formatDateTime(review.reviewDate));
   setText("resultSummary", review.summary || "-");
+
   let clashText = "No clash detected";
 
-if (review.clash === true) {
-  clashText = review.clashAcknowledged ? "Yes" : "No";
-}
+  if (review.clash === true) {
+    clashText = review.clashAcknowledged ? "Yes" : "No";
+  }
 
-setText("resultClashAck", clashText);
+  setText("resultClashAck", clashText);
 
   renderTags("resultAreas", review.areas);
   renderTags("resultRisks", review.risks);
@@ -75,28 +76,24 @@ setText("resultClashAck", clashText);
   renderList("resultMissingItems", review.missingItems);
   renderList("resultWeakItems", review.weakItems);
 
-   setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`); 
+  setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`);
+
   const clashWarning = document.getElementById("clashWarning");
-const clashAcknowledgement = document.getElementById("clashAcknowledgement");
-const clashConfirm = document.getElementById("clashConfirm");
-const approveBtn = document.getElementById("approveBtn");
-  
-if (review.clash === true) {
-  if (clashWarning) clashWarning.style.display = "block";
-  if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
+  const clashAcknowledgement = document.getElementById("clashAcknowledgement");
+  const clashConfirm = document.getElementById("clashConfirm");
+  const approveBtn = document.getElementById("approveBtn");
 
-  if (clashConfirm) clashConfirm.checked = false;
-
-  if (approveBtn) approveBtn.disabled = true;
-
-} else {
-  if (clashWarning) clashWarning.style.display = "none";
-  if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
-
-  if (approveBtn) approveBtn.disabled = false;
+  if (review.clash === true) {
+    if (clashWarning) clashWarning.style.display = "block";
+    if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
+    if (clashConfirm) clashConfirm.checked = false;
+    if (approveBtn) approveBtn.disabled = true;
+  } else {
+    if (clashWarning) clashWarning.style.display = "none";
+    if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
+    if (approveBtn) approveBtn.disabled = false;
+  }
 }
-}
-
 function updateClashesForAll() {
   const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
 
@@ -183,7 +180,6 @@ clearDraftRamsReview();
   window.location.href = "/index.html";
 }
 
-
 document.addEventListener("DOMContentLoaded", () => {
   const currentReview = getCurrentRamsReview();
   const draftReview = getDraftReviewData();
@@ -196,23 +192,36 @@ document.addEventListener("DOMContentLoaded", () => {
 
   renderReview(reviewToRender);
 
-document.getElementById("approveBtn")?.addEventListener("click", () => {
-  const review = getDraftReviewData() || getCurrentRamsReview();
   const clashConfirm = document.getElementById("clashConfirm");
+  const approveBtn = document.getElementById("approveBtn");
 
-  if (review?.clash === true) {
-    if (!clashConfirm?.checked) {
-      alert("You must confirm the clash has been reviewed and control measures are in place before approving.");
-      return;
+  clashConfirm?.addEventListener("change", () => {
+    if (!approveBtn) return;
+
+    if (clashConfirm.checked) {
+      approveBtn.disabled = false;
+    } else {
+      approveBtn.disabled = true;
+    }
+  });
+
+  document.getElementById("approveBtn")?.addEventListener("click", () => {
+    const review = getDraftReviewData() || getCurrentRamsReview();
+    const clashConfirm = document.getElementById("clashConfirm");
+
+    if (review?.clash === true) {
+      if (!clashConfirm?.checked) {
+        alert("You must confirm the clash has been reviewed and control measures are in place before approving.");
+        return;
+      }
+
+      review.clashAcknowledged = true;
+      saveDraftRamsReview(review);
+      saveCurrentRamsReview(review);
     }
 
-    review.clashAcknowledged = true;
-    saveDraftRamsReview(review);
-    saveCurrentRamsReview(review);
-  }
-
-  saveReviewWithStatus("Approved");
-});
+    saveReviewWithStatus("Approved");
+  });
 
   document.getElementById("underReviewBtn")?.addEventListener("click", () => {
     saveReviewWithStatus("Under Review");
