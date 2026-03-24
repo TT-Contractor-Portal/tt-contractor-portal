@@ -84,10 +84,16 @@ const approveBtn = document.getElementById("approveBtn");
 if (review.clash === true) {
   if (clashWarning) clashWarning.style.display = "block";
   if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
+
   if (clashConfirm) clashConfirm.checked = false;
+
+  if (approveBtn) approveBtn.disabled = true;
+
 } else {
   if (clashWarning) clashWarning.style.display = "none";
   if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
+
+  if (approveBtn) approveBtn.disabled = false;
 }
 }
 
