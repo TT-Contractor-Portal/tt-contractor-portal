@@ -162,6 +162,8 @@ showSignupBtn.addEventListener("click", () => {
   signupFields.style.display = "block";
   signupBtn.style.display = "block";
   showSignupBtn.style.display = "none";
+  form.querySelector('button[type="submit"]').style.display = "none";
+  document.querySelector(".login-card p").textContent = "Create your account";
   message.textContent = "";
 });
     
