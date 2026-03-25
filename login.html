@@ -166,7 +166,21 @@ showSignupBtn.addEventListener("click", () => {
   document.querySelector(".login-card p").textContent = "Create your account";
   message.textContent = "";
 });
-    
+    const backToLogin = document.getElementById("backToLogin");
+
+backToLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  signupFields.style.display = "none";
+  signupBtn.style.display = "none";
+  showSignupBtn.style.display = "block";
+
+  form.querySelector('button[type="submit"]').style.display = "block";
+
+  document.querySelector(".login-card p").textContent = "Sign in to continue";
+
+  message.textContent = "";
+});
 signupBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
   const password = document.getElementById("password").value;
