@@ -155,8 +155,6 @@ const signupFields = document.getElementById("signupFields");
       window.location.href = "index.html";
     });
 
-   const signupBtn = document.getElementById("signupBtn");
-
 showSignupBtn.addEventListener("click", () => {
   signupFields.style.display = "block";
   signupBtn.style.display = "block";
@@ -200,18 +198,7 @@ signupBtn.addEventListener("click", async () => {
 
   message.textContent = "Account created. Check your email if confirmation is turned on.";
 });
-  const { data, error } = await client.auth.signUp({
-    email,
-    password
-  });
-
-  if (error) {
-    message.textContent = error.message;
-    return;
-  }
-
-  message.textContent = "Account created. You can now log in.";
-}); 
+ 
   </script>
 </body>
 </html>
