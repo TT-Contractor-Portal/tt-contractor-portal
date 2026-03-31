@@ -81,45 +81,50 @@
 <body>
   <div class="login-card">
     <h1>TT Contractor Portal</h1>
-    <p>Create your account</p>
+<p id="formSubtitle">Sign in to continue</p>
 
-    <form id="loginForm">
-      <label for="email">Email address</label>
-      <input type="email" id="email" required />
+<form id="loginForm">
+  <label for="email">Email address</label>
+  <input type="email" id="email" required />
 
-      <label for="password">Password</label>
-      <input type="password" id="password" required />
-<div id="signupFields" style="display:none; margin-top: 10px;">
-  <label for="fullName">Full name</label>
-  <input type="text" id="fullName" />
+  <label for="password">Password</label>
+  <input type="password" id="password" required />
 
-  <label for="inductionComplete">Contractor induction training completed?</label>
-  <select id="inductionComplete">
-    <option value="">Select</option>
-    <option value="true">Yes</option>
-    <option value="false">No</option>
-  </select>
+  <div id="signupFields" style="display:none; margin-top: 10px;">
+    <label for="fullName">Full name</label>
+    <input type="text" id="fullName" />
 
-  <label for="ptwComplete">Permit to work training completed?</label>
-  <select id="ptwComplete">
-    <option value="">Select</option>
-    <option value="true">Yes</option>
-    <option value="false">No</option>
-  </select>
-</div>
-    
-<button type="button" id="showSignupBtn" style="margin-top:10px; background:#ccc; color:#000;">
-  Sign Up
-</button>
-<button type="button" id="signupBtn" style="display:none; margin-top:10px; background:#035740; color:#fff;">
-  Create Account
-</button>
-    </form>
-    
-<p style="margin-top:10px; text-align:center;">
-Already have an account? <a href="#" id="backToLogin">Log in</a>
+    <label for="inductionComplete">Contractor induction training completed?</label>
+    <select id="inductionComplete">
+      <option value="">Select</option>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <label for="ptwComplete">Permit to work training completed?</label>
+    <select id="ptwComplete">
+      <option value="">Select</option>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+  </div>
+
+  <button type="submit" id="loginBtn">Log in</button>
+
+  <button type="button" id="showSignupBtn" style="margin-top:10px; background:#ccc; color:#000;">
+    Sign Up
+  </button>
+
+  <button type="button" id="signupBtn" style="display:none; margin-top:10px; background:#035740; color:#fff;">
+    Create Account
+  </button>
+</form>
+
+<p id="backToLoginWrap" style="display:none; margin-top:10px; text-align:center;">
+  Already have an account? <a href="#" id="backToLogin">Log in</a>
 </p>
-    <div id="message"></div>
+
+<div id="message"></div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
