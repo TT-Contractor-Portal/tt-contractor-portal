@@ -564,7 +564,13 @@ console.log("Logged in user:", user.email);
 console.log("Profile:", profile);
 console.log("Can approve RAMS:", window.canApproveRams);
   }
+let roleLabel = "View Only";
 
+if (profile.role === "admin") {
+  roleLabel = "Admin";
+} else if (profile.can_review === true) {
+  roleLabel = "Reviewer";
+}
   checkAuth();
 </script>
 </body>
