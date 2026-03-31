@@ -216,17 +216,48 @@ signupBtn.addEventListener("click", async () => {
 
   message.textContent = "Creating account...";
 
-  const { data, error } = await client.auth.signUp({
-    email,
-    password
-  });
+ const { data, error } = await client.auth.signUp({
+  email,
+  password
+});
 
-  if (error) {
-    message.textContent = error.message;
-    return;
-  }
+if (error) {
+  message.textContent = error.message;
+  return;
+}
 
-  message.textContent = "Account created. Check your email if confirmation is turned on.";
+const user = data.user;
+
+if (!user) {
+  message.textContent = "Account created, but no user was returned.";
+  return;
+}
+
+const reviewerRequested =
+  inductionComplete === "true" && ptwComplete === "true";
+
+const { error: profileError } = await client
+  .from("user_profiles")
+  .insert([
+    {
+      id: user.id,
+      full_name: fullName,
+      email: email,
+      role: "view_only",
+      reviewer_requested: reviewerRequested,
+      induction_complete: inductionComplete === "true",
+      ptw_complete: ptwComplete === "true",
+      reviewer_approved: false,
+      is_active: true
+    }
+  ]);
+
+if (profileError) {
+  message.textContent = "Account created, but profile save failed: " + profileError.message;
+  return;
+}
+
+message.textContent = "Account created. Check your email if confirmation is turned on.";
 });
  
   </script>
