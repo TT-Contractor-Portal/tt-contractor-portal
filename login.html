@@ -169,7 +169,8 @@
       window.location.href = "index.html";
     });
 
-showSignupBtn.addEventListener("click", () => {
+showSignupBtn.addEventListener("click", (e) => {
+  e.preventDefault();
   formSubtitle.textContent = "Create your account";
   signupFields.style.display = "block";
   loginBtn.style.display = "none";
