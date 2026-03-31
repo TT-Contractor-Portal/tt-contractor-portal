@@ -563,7 +563,7 @@ window.canApproveRams =
 console.log("Logged in user:", user.email);
 console.log("Profile:", profile);
 console.log("Can approve RAMS:", window.canApproveRams);
-  }
+
 let roleLabel = "View Only";
 
 if (profile.role === "admin") {
@@ -571,7 +571,13 @@ if (profile.role === "admin") {
 } else if (profile.can_review === true) {
   roleLabel = "Reviewer";
 }
-  checkAuth();
+
+const firstName = profile.full_name.split(" ")[0];
+const welcomeText = document.getElementById("welcomeText");
+welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+}
+
+checkAuth();
 </script>
 </body>
 </html>
