@@ -555,11 +555,14 @@
       return;
     }
 
-    window.currentUser = user;
-    window.currentUserProfile = profile;
+   window.currentUser = user;
+window.currentUserProfile = profile;
+window.canApproveRams =
+  profile.role === "reviewer" || profile.role === "admin";
 
-    console.log("Logged in user:", user.email);
-    console.log("Profile:", profile);
+console.log("Logged in user:", user.email);
+console.log("Profile:", profile);
+console.log("Can approve RAMS:", window.canApproveRams);
   }
 
   checkAuth();
