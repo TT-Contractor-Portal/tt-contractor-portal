@@ -257,7 +257,25 @@ if (profileError) {
   return;
 }
 
-message.textContent = "Account created. Check your email if confirmation is turned on.";
+message.textContent = "Account created. Please check your email and click the link to verify your account.";
+
+// clear form fields
+document.getElementById("email").value = "";
+document.getElementById("password").value = "";
+document.getElementById("fullName").value = "";
+document.getElementById("inductionComplete").value = "";
+document.getElementById("ptwComplete").value = "";
+
+// switch back to login mode after 2 seconds
+setTimeout(() => {
+  formSubtitle.textContent = "Sign in to continue";
+  signupFields.style.display = "none";
+  loginBtn.style.display = "block";
+  showSignupBtn.style.display = "block";
+  signupBtn.style.display = "none";
+  backToLoginWrap.style.display = "none";
+  message.textContent = "";
+}, 2000);
 });
  
   </script>
