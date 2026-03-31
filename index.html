@@ -525,5 +525,24 @@
   document.getElementById("underReviewRams").textContent = data.filter(item => item.status === "Under Review").length;
   document.getElementById("expiredRams").textContent = data.filter(item => item.status === "Expired").length;
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function checkAuth() {
+    const { data, error } = await client.auth.getSession();
+
+    if (error || !data.session) {
+      window.location.href = "login.html";
+      return;
+    }
+  }
+
+  checkAuth();
+</script>    
 </body>
 </html>
