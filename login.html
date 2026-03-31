@@ -236,37 +236,6 @@ if (error) {
   return;
 }
 
-// Get user
-const user = data.user;
-
-// Determine reviewer request
-const reviewerRequested =
-  (inductionComplete === "true" && ptwComplete === "true");
-
-// Save to your table
-const { error: profileError } = await client
-  .from("user_profiles")
-  .insert([
-    {
-      id: user.id,
-      email: email,
-      full_name: fullName,
-      induction_complete: inductionComplete === "true",
-      ptw_complete: ptwComplete === "true",
-      reviewer_requested: reviewerRequested,
-      can_review: false
-    }
-  ]);
-
-if (profileError) {
-  message.textContent = "Account created, but profile save failed";
-  return;
-}
-  
-if (error) {
-  message.textContent = error.message;
-  return;
-}
 
 message.textContent = "Account created. Please check your email and click the link to verify your account.";
 
