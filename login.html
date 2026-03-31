@@ -219,7 +219,16 @@ signupBtn.addEventListener("click", async () => {
 
 const { data, error } = await client.auth.signUp({
   email,
-  password
+  password,
+  options: {
+    data: {
+      full_name: fullName,
+      induction_complete: inductionComplete === "true",
+      ptw_complete: ptwComplete === "true",
+      reviewer_requested:
+        inductionComplete === "true" && ptwComplete === "true"
+    }
+  }
 });
 
 if (error) {
