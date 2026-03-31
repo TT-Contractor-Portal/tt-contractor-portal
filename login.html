@@ -170,27 +170,29 @@
     });
 
 showSignupBtn.addEventListener("click", () => {
+  formSubtitle.textContent = "Create your account";
   signupFields.style.display = "block";
-  signupBtn.style.display = "block";
+  loginBtn.style.display = "none";
   showSignupBtn.style.display = "none";
-  form.querySelector('button[type="submit"]').style.display = "none";
-  document.querySelector(".login-card p").textContent = "Create your account";
+  signupBtn.style.display = "block";
+  backToLoginWrap.style.display = "block";
   message.textContent = "";
 });
-    const backToLogin = document.getElementById("backToLogin");
 
 backToLogin.addEventListener("click", (e) => {
   e.preventDefault();
 
+  formSubtitle.textContent = "Sign in to continue";
   signupFields.style.display = "none";
-  signupBtn.style.display = "none";
+  loginBtn.style.display = "block";
   showSignupBtn.style.display = "block";
-
-  form.querySelector('button[type="submit"]').style.display = "block";
-
-  document.querySelector(".login-card p").textContent = "Sign in to continue";
-
+  signupBtn.style.display = "none";
+  backToLoginWrap.style.display = "none";
   message.textContent = "";
+
+  document.getElementById("fullName").value = "";
+  document.getElementById("inductionComplete").value = "";
+  document.getElementById("ptwComplete").value = "";
 });
 signupBtn.addEventListener("click", async () => {
   const email = document.getElementById("email").value.trim();
