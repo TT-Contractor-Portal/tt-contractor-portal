@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Users - TT Contractor Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 30px;
+      color: #222;
+    }
+
+    h1 {
+      color: #035740;
+      margin-top: 0;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+      vertical-align: top;
+    }
+
+    th {
+      background: #f0f0f0;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 8px;
+      background: #035740;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    #message {
+      margin-top: 15px;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Admin User Management</h1>
+
+  <div class="card">
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Requested Reviewer</th>
+          <th>Approved</th>
+          <th>Can Review</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="message"></div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "PASTE_YOUR_ANON_KEY_HERE";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const tbody = document.querySelector("#usersTable tbody");
+    const message = document.getElementById("message");
+
+    async function loadUsers() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      const user = sessionData.session.user;
+
+      const { data: myProfile, error: myProfileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", user.id)
+        .single();
+
+      if (myProfileError || !myProfile) {
+        alert("Profile not found");
+        window.location.href = "login.html";
+        return;
+      }
+
+      if (myProfile.role !== "admin") {
+        alert("Admin access only");
+        window.location.href = "index.html";
+        return;
+      }
+
+      const { data: users, error: usersError } = await client
+        .from("user_profiles")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (usersError) {
+        message.textContent = usersError.message;
+        return;
+      }
+
+      tbody.innerHTML = "";
+
+      users.forEach((profile) => {
+        const row = document.createElement("tr");
+
+        const approveButton =
+          profile.reviewer_requested === true && profile.can_review === false
+            ? `<button data-id="${profile.id}" class="approveBtn">Approve Reviewer</button>`
+            : `<button disabled>Nothing to do</button>`;
+
+        row.innerHTML = `
+          <td>${profile.full_name || ""}</td>
+          <td>${profile.email || ""}</td>
+          <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
+          <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
+          <td>${profile.can_review ? "Yes" : "No"}</td>
+          <td>${approveButton}</td>
+        `;
+
+        tbody.appendChild(row);
+      });
+
+      document.querySelectorAll(".approveBtn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const userId = btn.getAttribute("data-id");
+
+          const { error: updateError } = await client
+            .from("user_profiles")
+            .update({
+              reviewer_approved: true,
+              can_review: true
+            })
+            .eq("id", userId);
+
+          if (updateError) {
+            message.textContent = updateError.message;
+            return;
+          }
+
+          message.textContent = "Reviewer approved.";
+          loadUsers();
+        });
+      });
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
