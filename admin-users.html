@@ -136,32 +136,32 @@
     <a href="/sop/index.html">SOP / SSW</a>
   </div>
 
-  <div class="main">
-    <div class="topbar">
-      <strong id="welcomeText">Welcome</strong>
-    </div>
-
-    <div class="card">
-      <h1>Admin User Management</h1>
-
-      <table id="usersTable">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Requested Reviewer</th>
-            <th>Approved</th>
-            <th>Can Review</th>
-            <th>Reviewer Action</th>
-            <th>Admin Action</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <div id="message"></div>
-    </div>
+ <div class="main">
+  <div class="topbar">
+    <strong id="welcomeText">Welcome</strong>
   </div>
+
+  <div class="panel">
+    <h2>Admin User Management</h2>
+
+    <table id="usersTable">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Requested Reviewer</th>
+          <th>Approved</th>
+          <th>Can Review</th>
+          <th>Reviewer Action</th>
+          <th>Admin Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div id="message"></div>
+  </div>
+</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
