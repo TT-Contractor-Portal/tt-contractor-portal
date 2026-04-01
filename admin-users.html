@@ -189,7 +189,22 @@
         window.location.href = "index.html";
         return;
       }
+let roleLabel = "View Only";
 
+if (myProfile.role === "admin") {
+  roleLabel = "Admin";
+} else if (myProfile.can_review === true) {
+  roleLabel = "Reviewer";
+}
+
+const firstName = (myProfile.full_name || "").split(" ")[0];
+const welcomeText = document.getElementById("welcomeText");
+welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+
+const adminNavLink = document.getElementById("adminNavLink");
+if (myProfile.role === "admin") {
+  adminNavLink.style.display = "block";
+}
       const { data: users, error: usersError } = await client
         .from("user_profiles")
         .select("*")
