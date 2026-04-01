@@ -573,6 +573,12 @@ if (profile.role === "admin") {
   roleLabel = "Reviewer";
 }
 
+const adminNavLink = document.getElementById("adminNavLink");
+
+if (profile.role === "admin") {
+  adminNavLink.style.display = "block";
+}
+    
 const firstName = profile.full_name.split(" ")[0];
 const welcomeText = document.getElementById("welcomeText");
 welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
