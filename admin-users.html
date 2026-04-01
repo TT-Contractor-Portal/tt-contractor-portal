@@ -64,27 +64,44 @@
   </style>
 </head>
 <body>
-  <h1>Admin User Management</h1>
-
-  <div class="card">
-    <table id="usersTable">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Email</th>
-          <th>Requested Reviewer</th>
-          <th>Approved</th>
-          <th>Can Review</th>
-          <th>Reviewer Action</th>
-          <th>Admin Action</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-
-    <div id="message"></div>
+  <div class="sidebar">
+    <h1>TT Contractor Portal</h1>
+    <a href="/index.html">Dashboard</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
   </div>
 
+  <div class="main">
+    <div class="topbar">
+      <strong id="welcomeText">Welcome</strong>
+    </div>
+
+    <div class="card">
+      <h1>Admin User Management</h1>
+
+      <table id="usersTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Requested Reviewer</th>
+            <th>Approved</th>
+            <th>Can Review</th>
+            <th>Reviewer Action</th>
+            <th>Admin Action</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="message"></div>
+    </div>
+  </div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
