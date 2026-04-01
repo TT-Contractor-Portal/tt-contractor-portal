@@ -139,18 +139,24 @@
         const row = document.createElement("tr");
 
         const approveButton =
-          profile.reviewer_requested === true && profile.can_review === false
-            ? `<button data-id="${profile.id}" class="approveBtn">Approve Reviewer</button>`
-            : `<button disabled>Nothing to do</button>`;
+  profile.reviewer_requested === true && profile.can_review === false
+    ? `<button data-id="${profile.id}" class="approveBtn">Approve Reviewer</button>`
+    : `<button disabled>Nothing to do</button>`;
 
-        row.innerHTML = `
-          <td>${profile.full_name || ""}</td>
-          <td>${profile.email || ""}</td>
-          <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
-          <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
-          <td>${profile.can_review ? "Yes" : "No"}</td>
-          <td>${approveButton}</td>
-        `;
+const makeAdminButton =
+  profile.role !== "admin"
+    ? `<button data-id="${profile.id}" class="makeAdminBtn">Make Admin</button>`
+    : `<button disabled>Already Admin</button>`;
+
+row.innerHTML = `
+  <td>${profile.full_name || ""}</td>
+  <td>${profile.email || ""}</td>
+  <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
+  <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
+  <td>${profile.can_review ? "Yes" : "No"}</td>
+  <td>${approveButton}</td>
+  <td>${makeAdminButton}</td>
+`;
 
         tbody.appendChild(row);
       });
