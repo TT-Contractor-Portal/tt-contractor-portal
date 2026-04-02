@@ -612,6 +612,11 @@ const welcomeText = document.getElementById("welcomeText");
 welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
 }
 
+logoutBtn.addEventListener("click", async () => {
+  await client.auth.signOut();
+  window.location.href = "/login.html";
+});
+
 checkAuth();
 </script>
 </body>
