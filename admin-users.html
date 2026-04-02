@@ -95,20 +95,54 @@
     cursor: pointer;
   }
 
-  button:hover {
-    opacity: 0.92;
-  }
+button:hover {
+  opacity: 0.92;
+}
 
-  button:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-  }
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
 
-  #message {
-    margin-top: 16px;
-    min-height: 20px;
-    font-weight: 600;
-  }
+.status-pill {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.status-pill.active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pill.inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.approve-btn {
+  background: #005f47;
+}
+
+.make-admin-btn {
+  background: #1d4ed8;
+}
+
+.toggle-active-btn.deactivate {
+  background: #b91c1c;
+}
+
+.toggle-active-btn.activate {
+  background: #166534;
+}
+
+#message {
+  margin-top: 16px;
+  min-height: 20px;
+  font-weight: 600;
+}
 
   @media (max-width: 700px) {
     .sidebar {
