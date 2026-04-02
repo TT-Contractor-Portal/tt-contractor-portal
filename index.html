@@ -550,11 +550,11 @@ if (sessionError || !sessionData.session) {
       .eq("id", user.id)
       .single();
 
-    if (profileError || !profile) {
-      alert("Profile not found.");
-      window.location.href = "login.html";
-      return;
-    }
+  if (profileError || !profile) {
+  alert("Profile not found.");
+  window.location.href = "/login.html";
+  return;
+}
 
    window.currentUser = user;
 window.currentUserProfile = profile;
