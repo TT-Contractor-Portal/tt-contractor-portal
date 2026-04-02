@@ -268,32 +268,59 @@ if (myProfile.role === "admin") {
 
       tbody.innerHTML = "";
 
-      users.forEach((profile) => {
-        const row = document.createElement("tr");
+   users.forEach((profile) => {
+  const row = document.createElement("tr");
 
-        const approveButton =
-  profile.reviewer_requested === true && profile.can_review === false
-    ? `<button data-id="${profile.id}" class="approveBtn">Approve Reviewer</button>`
-    : `<button disabled>Nothing to do</button>`;
+  const roleText =
+    profile.role === "admin"
+      ? "Admin"
+      : profile.role === "reviewer"
+      ? "Reviewer"
+      : "View Only";
 
-const makeAdminButton =
-  profile.role !== "admin"
-    ? `<button data-id="${profile.id}" class="makeAdminBtn">Make Admin</button>`
-    : `<button disabled>Already Admin</button>`;
+  const statusPill = profile.is_active === false
+    ? `<span class="status-pill inactive">Inactive</span>`
+    : `<span class="status-pill active">Active</span>`;
 
-row.innerHTML = `
-  <td>${profile.full_name || ""}</td>
-  <td>${profile.email || ""}</td>
-  <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
-  <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
-  <td>${profile.can_review ? "Yes" : "No"}</td>
-  <td>${approveButton}</td>
-  <td>${makeAdminButton}</td>
-`;
+  const approveButton =
+    profile.reviewer_requested === true && profile.role !== "reviewer" && profile.role !== "admin"
+      ? `<button data-id="${profile.id}" class="approveBtn approve-btn">Approve Reviewer</button>`
+      : `<button disabled>Nothing to do</button>`;
 
-        tbody.appendChild(row);
-      });
+  const makeAdminButton =
+    profile.role !== "admin"
+      ? `<button data-id="${profile.id}" class="makeAdminBtn make-admin-btn">Make Admin</button>`
+      : `<button disabled>Already Admin</button>`;
 
+  const toggleActiveButton =
+    profile.is_active === false
+      ? `<button data-id="${profile.id}" data-active="false" class="toggleActiveBtn toggle-active-btn activate">Activate</button>`
+      : `<button data-id="${profile.id}" data-active="true" class="toggleActiveBtn toggle-active-btn deactivate">Deactivate</button>`;
+
+  const lastSignInText = profile.last_sign_in_at
+    ? new Date(profile.last_sign_in_at).toLocaleString("en-GB")
+    : "Never";
+
+  const createdText = profile.created_at
+    ? new Date(profile.created_at).toLocaleString("en-GB")
+    : "-";
+
+  row.innerHTML = `
+    <td>${profile.full_name || ""}</td>
+    <td>${profile.email || ""}</td>
+    <td>${roleText}</td>
+    <td>${statusPill}</td>
+    <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
+    <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
+    <td>${lastSignInText}</td>
+    <td>${createdText}</td>
+    <td>${approveButton}</td>
+    <td>${makeAdminButton}</td>
+    <td>${toggleActiveButton}</td>
+  `;
+
+  tbody.appendChild(row);
+});
       document.querySelectorAll(".approveBtn").forEach((btn) => {
         btn.addEventListener("click", async () => {
           const userId = btn.getAttribute("data-id");
