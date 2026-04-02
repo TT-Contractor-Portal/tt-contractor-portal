@@ -216,6 +216,45 @@ button:disabled {
      if (sessionError || !sessionData.session) {
   window.location.href = "/login.html";
   return;
+             document.querySelectorAll(".toggleActiveBtn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const userId = btn.getAttribute("data-id");
+          const currentlyActive = btn.getAttribute("data-active") === "true";
+
+          if (userId === user.id) {
+            message.textContent = "You cannot deactivate your own admin account.";
+            return;
+          }
+
+          const updates = currentlyActive
+            ? {
+                is_active: false,
+                deactivated_at: new Date().toISOString(),
+                deactivated_by: user.id
+              }
+            : {
+                is_active: true,
+                deactivated_at: null,
+                deactivated_by: null
+              };
+
+          const { error: updateError } = await client
+            .from("user_profiles")
+            .update(updates)
+            .eq("id", userId);
+
+          if (updateError) {
+            message.textContent = updateError.message;
+            return;
+          }
+
+          message.textContent = currentlyActive
+            ? "User deactivated."
+            : "User activated.";
+
+          loadUsers();
+        });
+      });
 }
       const user = sessionData.session.user;
 
