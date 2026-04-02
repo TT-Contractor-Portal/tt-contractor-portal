@@ -569,7 +569,7 @@ let roleLabel = "View Only";
 
 if (profile.role === "admin") {
   roleLabel = "Admin";
-} else if (profile.can_review === true) {
+} else if (profile.role === "reviewer") {
   roleLabel = "Reviewer";
 }
 
