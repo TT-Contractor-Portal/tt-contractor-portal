@@ -320,7 +320,7 @@ if (myProfile.role === "admin") {
 
   row.innerHTML = `
    <td class="name-cell">${profile.full_name || ""}</td>
-    <td>${profile.email || ""}</td>
+   <td class="email-cell">${profile.email || ""}</td>
     <td>${roleText}</td>
     <td>${statusPill}</td>
     <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
