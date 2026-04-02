@@ -225,11 +225,11 @@ button:disabled {
         .eq("id", user.id)
         .single();
 
-      if (myProfileError || !myProfile) {
-        alert("Profile not found");
-        window.location.href = "login.html";
-        return;
-      }
+    if (myProfileError || !myProfile) {
+  alert("Profile not found");
+  window.location.href = "/login.html";
+  return;
+}
 
       if (myProfile.role !== "admin") {
         alert("Admin access only");
