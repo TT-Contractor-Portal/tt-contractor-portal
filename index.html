@@ -537,10 +537,10 @@
   async function checkAuth() {
     const { data: sessionData, error: sessionError } = await client.auth.getSession();
 
-    if (sessionError || !sessionData.session) {
-      window.location.href = "login.html";
-      return;
-    }
+if (sessionError || !sessionData.session) {
+  window.location.href = "/login.html";
+  return;
+}
 
     const user = sessionData.session.user;
 
