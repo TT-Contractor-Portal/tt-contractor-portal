@@ -164,28 +164,57 @@
     const signupFields = document.getElementById("signupFields");
     const backToLoginWrap = document.getElementById("backToLoginWrap");
     const backToLogin = document.getElementById("backToLogin");
-       
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+  form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      message.textContent = "Signing in...";
+  message.textContent = "Signing in...";
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
 
-      const { data, error } = await client.auth.signInWithPassword({
-        email,
-        password
-      });
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
 
-      if (error) {
-        message.textContent = error.message;
-        return;
-      }
+  if (error) {
+    message.textContent = error.message;
+    return;
+  }
 
-      message.textContent = "Login successful...";
-      window.location.href = "index.html";
-    });
+  const user = data.user;
+
+  if (!user) {
+    message.textContent = "Login failed. No user returned.";
+    return;
+  }
+
+  const { data: profile, error: profileError } = await client
+    .from("user_profiles")
+    .select("role, is_active")
+    .eq("id", user.id)
+    .single();
+
+  if (profileError || !profile) {
+    message.textContent = "Unable to load your profile.";
+    await client.auth.signOut();
+    return;
+  }
+
+  if (profile.is_active === false) {
+    message.textContent = "Your account has been deactivated. Please contact an administrator.";
+    await client.auth.signOut();
+    return;
+  }
+
+  await client
+    .from("user_profiles")
+    .update({ last_sign_in_at: new Date().toISOString() })
+    .eq("id", user.id);
+
+  message.textContent = "Login successful...";
+  window.location.href = "/index.html";
+});
 
 showSignupBtn.addEventListener("click", (e) => {
   e.preventDefault();
