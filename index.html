@@ -579,7 +579,10 @@ if (profile.role === "admin") {
   adminNavLink.style.display = "block";
 }
     
-const firstName = profile.full_name.split(" ")[0];
+const firstName = profile.full_name
+  ? profile.full_name.split(" ")[0]
+  : "User";
+
 const welcomeText = document.getElementById("welcomeText");
 welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
 }
