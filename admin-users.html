@@ -321,27 +321,28 @@ if (myProfile.role === "admin") {
 
   tbody.appendChild(row);
 });
-      document.querySelectorAll(".approveBtn").forEach((btn) => {
-        btn.addEventListener("click", async () => {
-          const userId = btn.getAttribute("data-id");
+    document.querySelectorAll(".approveBtn").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const userId = btn.getAttribute("data-id");
 
-          const { error: updateError } = await client
-            .from("user_profiles")
-            .update({
-              reviewer_approved: true,
-              can_review: true
-            })
-            .eq("id", userId);
+    const { error: updateError } = await client
+      .from("user_profiles")
+      .update({
+        reviewer_approved: true,
+        can_review: true,
+        role: "reviewer"
+      })
+      .eq("id", userId);
 
-          if (updateError) {
-            message.textContent = updateError.message;
-            return;
-          }
+    if (updateError) {
+      message.textContent = updateError.message;
+      return;
+    }
 
-          message.textContent = "Reviewer approved.";
-          loadUsers();
-        });
-      });
+    message.textContent = "Reviewer approved.";
+    loadUsers();
+  });
+});
 
       document.querySelectorAll(".makeAdminBtn").forEach((btn) => {
   btn.addEventListener("click", async () => {
