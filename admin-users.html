@@ -231,20 +231,24 @@ button:disabled {
   return;
 }
 
-      if (myProfile.role !== "admin") {
-        alert("Admin access only");
-        window.location.href = "index.html";
-        return;
-      }
+   if (myProfile.role !== "admin") {
+  alert("Admin access only");
+  window.location.href = "/index.html";
+  return;
+}
+
 let roleLabel = "View Only";
 
 if (myProfile.role === "admin") {
   roleLabel = "Admin";
-} else if (myProfile.can_review === true) {
+} else if (myProfile.role === "reviewer") {
   roleLabel = "Reviewer";
 }
 
-const firstName = (myProfile.full_name || "").split(" ")[0];
+const firstName = myProfile.full_name
+  ? myProfile.full_name.split(" ")[0]
+  : "User";
+
 const welcomeText = document.getElementById("welcomeText");
 welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
 
