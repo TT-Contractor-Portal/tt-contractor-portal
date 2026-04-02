@@ -213,11 +213,10 @@ button:disabled {
     async function loadUsers() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
 
-      if (sessionError || !sessionData.session) {
-        window.location.href = "login.html";
-        return;
-      }
-
+     if (sessionError || !sessionData.session) {
+  window.location.href = "/login.html";
+  return;
+}
       const user = sessionData.session.user;
 
       const { data: myProfile, error: myProfileError } = await client
