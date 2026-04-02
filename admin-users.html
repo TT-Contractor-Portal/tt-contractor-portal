@@ -315,7 +315,7 @@ if (myProfile.role === "admin") {
     : "-";
 
   row.innerHTML = `
-    <td>${profile.full_name || ""}</td>
+   <td class="name-cell">${profile.full_name || ""}</td>
     <td>${profile.email || ""}</td>
     <td>${roleText}</td>
     <td>${statusPill}</td>
