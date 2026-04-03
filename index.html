@@ -52,26 +52,26 @@
     }
 
     .topbar-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
 
-.logout-btn {
-  background: #035740;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-}
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-.logout-btn:hover {
-  background: #024534;
-}
+    .logout-btn:hover {
+      background: #024534;
+    }
 
     .card-grid {
       display: grid;
@@ -106,19 +106,108 @@
       box-shadow: 0 2px 10px rgba(0,0,0,0.06);
     }
 
-    .button {
+    .dashboard-main {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .dashboard-side {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .works-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
+    }
+
+    .works-table th,
+    .works-table td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .works-table th {
+      background: #f8fafc;
+      font-weight: 700;
+    }
+
+    .status {
       display: inline-block;
-      background: #035740;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status.approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.review {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.pending {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .mini-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .mini-item:last-child {
+      border-bottom: none;
+    }
+
+    .mini-item p {
+      margin: 6px 0 0;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .clash-row {
+      background: #ffdddd;
+    }
+
+    .clash-row td {
+      border-bottom: 1px solid #f5a5a5;
+    }
+
+    .alert-badge {
+      display: inline-block;
+      background: #ff0000;
       color: white;
-      text-decoration: none;
-      padding: 12px 18px;
-      border-radius: 8px;
-      margin-top: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .empty-text {
+      color: #666;
+      font-size: 14px;
+      margin: 0;
     }
 
     @media (max-width: 900px) {
       .card-grid {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .dashboard-main {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -137,487 +226,447 @@
         grid-template-columns: 1fr;
       }
     }
-
-    .button {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 12px 18px;
-  background: #005f47;
-  color: white;
-  text-decoration: none;
-  border-radius: 10px;
-  font-weight: 600;
-}
-
-.button:hover {
-  opacity: 0.92;
-}
-
-    .dashboard-main {
-  display: grid;
-  grid-template-columns: 2fr 1fr;
-  gap: 24px;
-  margin-top: 24px;
-}
-
-.dashboard-side {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.works-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-}
-
-.works-table th,
-.works-table td {
-  text-align: left;
-  padding: 12px 10px;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 14px;
-}
-
-.works-table th {
-  background: #f8fafc;
-  font-weight: 700;
-}
-
-.status {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.status.approved {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.status.review {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status.pending {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.mini-item {
-  padding: 12px 0;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.mini-item:last-child {
-  border-bottom: none;
-}
-
-.mini-item p {
-  margin: 6px 0 0;
-  color: #666;
-  font-size: 14px;
-}
-
-@media (max-width: 900px) {
-  .dashboard-main {
-    grid-template-columns: 1fr;
-  }
-}
-
-    .clash-row {
-  background: #ffdddd;
-}
-
-.clash-row td {
-  border-bottom: 1px solid #f5a5a5;
-}
-
-.alert-badge {
-  display: inline-block;
-  background: #ff0000;
-  color: white;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-}
   </style>
 </head>
 <body>
- <div class="sidebar">
-  <h1>TT Contractor<br>Portal</h1>
+  <div class="sidebar">
+    <h1>TT Contractor<br>Portal</h1>
 
-  <a href="/index.html">Dashboard</a>
-  <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
-  <a href="/rams/register.html">RAMS</a>
-  <a href="/rams/new.html">New RAMS</a>
-  <a href="/profile/index.html">My Profile</a>
-  <a href="/contractors/index.html">Contractors</a>
-  <a href="/permits/index.html">Permits</a>
-  <a href="/sop/index.html">SOP / SSW</a>
-</div>
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
 
   <div class="main">
-   <div class="topbar">
-  <div class="topbar-inner">
-    <strong id="welcomeText">Welcome</strong>
-    <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
-  </div>
-</div>
-
-    <div class="card-grid">
- <div class="card">
-  <h3>Total RAMS</h3>
-  <p id="totalRams">0</p>
-</div>
-<div class="card">
-  <h3>Approved</h3>
-  <p id="approvedRams">0</p>
-</div>
-<div class="card">
-  <h3>Under Review</h3>
-  <p id="underReviewRams">0</p>
-</div>
-<div class="card">
-  <h3>Expired</h3>
-  <p id="expiredRams">0</p>
-</div>
+    <div class="topbar">
+      <div class="topbar-inner">
+        <strong id="welcomeText">Welcome</strong>
+        <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+      </div>
     </div>
 
-<div class="dashboard-main">
-  <div class="panel planned-works">
-    <h2>This Week’s Planned Contractor Works</h2>
-    <table class="works-table">
-      <thead>
-       <tr>
-  <th>Date</th>
-  <th>Contractor</th>
-  <th>Area</th>
-  <th>Task</th>
-  <th>Status</th>
-  <th>Alerts</th>
-</tr>
-      </thead>
- <tbody id="plannerBody">
-</tbody>
-    </table>
+    <div class="card-grid">
+      <div class="card">
+        <h3>Total RAMS</h3>
+        <p id="totalRams">0</p>
+      </div>
+      <div class="card">
+        <h3>Approved</h3>
+        <p id="approvedRams">0</p>
+      </div>
+      <div class="card">
+        <h3>Under Review</h3>
+        <p id="underReviewRams">0</p>
+      </div>
+      <div class="card">
+        <h3>Expired</h3>
+        <p id="expiredRams">0</p>
+      </div>
+    </div>
+
+    <div class="dashboard-main">
+      <div class="panel planned-works">
+        <h2>This Week’s Planned Contractor Works</h2>
+        <table class="works-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Contractor</th>
+              <th>Area</th>
+              <th>Task</th>
+              <th>Status</th>
+              <th>Alerts</th>
+            </tr>
+          </thead>
+          <tbody id="plannerBody"></tbody>
+        </table>
+      </div>
+
+      <div class="dashboard-side">
+        <div class="panel">
+          <h2>Today on Site</h2>
+          <div id="todayOnSite"></div>
+        </div>
+
+        <div class="panel">
+          <h2>Active Clash Alerts</h2>
+          <div id="activeClashAlerts"></div>
+        </div>
+
+        <div class="panel">
+          <h2>RAMS Expiring Soon</h2>
+          <div id="expiringSoon"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div class="dashboard-side">
-   <div class="panel">
-  <h2>Today on Site</h2>
-  <div id="todayOnSite"></div>
-</div>
-<div class="panel">
-  <h2>Active Clash Alerts</h2>
-  <div id="activeClashAlerts"></div>
-</div>
-   <div class="panel">
-  <h2>RAMS Expiring Soon</h2>
-  <div id="expiringSoon"></div>
-</div>
-  </div>
-</div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-<script src="js/rams-storage.js"></script>
-<script>
-  const data = getRamsReviews();
-  const table = document.getElementById("plannerBody");
-  const todayOnSite = document.getElementById("todayOnSite");
-  const activeClashAlerts = document.getElementById("activeClashAlerts");
-  const expiringSoon = document.getElementById("expiringSoon");
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-  function formatDate(dateStr) {
-    if (!dateStr) return "-";
-    const d = new Date(dateStr);
-    if (Number.isNaN(d.getTime())) return dateStr;
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNavLink = document.getElementById("adminNavLink");
+    const welcomeText = document.getElementById("welcomeText");
 
-    return d.toLocaleDateString("en-GB", {
-      weekday: "short",
-      day: "numeric",
-      month: "short"
-    });
-  }
+    const plannerBody = document.getElementById("plannerBody");
+    const todayOnSite = document.getElementById("todayOnSite");
+    const activeClashAlerts = document.getElementById("activeClashAlerts");
+    const expiringSoon = document.getElementById("expiringSoon");
 
-  function formatShortDate(dateStr) {
-    if (!dateStr) return "-";
-    const d = new Date(dateStr);
-    if (Number.isNaN(d.getTime())) return dateStr;
+    let currentUser = null;
+    let currentProfile = null;
+    let allRams = [];
 
-    return d.toLocaleDateString("en-GB", {
-      day: "numeric",
-      month: "short",
-      year: "numeric"
-    });
-  }
+    function formatDate(dateStr) {
+      if (!dateStr) return "-";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return "-";
 
-  function getStatusClass(status) {
-    if (status === "Approved") return "approved";
-    if (status === "Under Review") return "review";
-    if (status === "Rejected") return "pending";
-    if (status === "Expired") return "pending";
-    return "review";
-  }
+      return d.toLocaleDateString("en-GB", {
+        weekday: "short",
+        day: "numeric",
+        month: "short"
+      });
+    }
 
-  function startOfDay(date) {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
+    function formatShortDate(dateStr) {
+      if (!dateStr) return "-";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return "-";
 
-  function endOfDay(date) {
-    const d = new Date(date);
-    d.setHours(23, 59, 59, 999);
-    return d;
-  }
+      return d.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    }
 
-  function startOfWeek(date) {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = day === 0 ? -6 : 1 - day; // Monday start
-    d.setDate(d.getDate() + diff);
-    d.setHours(0, 0, 0, 0);
-    return d;
-  }
+    function getStatusClass(status) {
+      if (status === "Approved") return "approved";
+      if (status === "Under Review") return "review";
+      if (status === "Rejected") return "pending";
+      if (status === "Expired") return "pending";
+      return "review";
+    }
 
-  function endOfWeek(date) {
-    const d = startOfWeek(date);
-    d.setDate(d.getDate() + 6);
-    d.setHours(23, 59, 59, 999);
-    return d;
-  }
+    function startOfDay(date) {
+      const d = new Date(date);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
 
-  function addDays(date, days) {
-    const d = new Date(date);
-    d.setDate(d.getDate() + days);
-    return d;
-  }
+    function endOfDay(date) {
+      const d = new Date(date);
+      d.setHours(23, 59, 59, 999);
+      return d;
+    }
 
-  function addMonths(date, months) {
-    const d = new Date(date);
-    d.setMonth(d.getMonth() + months);
-    return d;
-  }
+    function startOfWeek(date) {
+      const d = new Date(date);
+      const day = d.getDay();
+      const diff = day === 0 ? -6 : 1 - day;
+      d.setDate(d.getDate() + diff);
+      d.setHours(0, 0, 0, 0);
+      return d;
+    }
 
-  function rangesOverlap(start1, end1, start2, end2) {
-    return start1 <= end2 && start2 <= end1;
-  }
+    function endOfWeek(date) {
+      const d = startOfWeek(date);
+      d.setDate(d.getDate() + 6);
+      d.setHours(23, 59, 59, 999);
+      return d;
+    }
 
-  const now = new Date();
-  const todayStart = startOfDay(now);
-  const todayEnd = endOfDay(now);
-  const weekStart = startOfWeek(now);
-  const weekEnd = endOfWeek(now);
+    function addDays(date, days) {
+      const d = new Date(date);
+      d.setDate(d.getDate() + days);
+      return d;
+    }
 
-  const approved = data.filter(item => (item.status || "") === "Approved");
+    function addMonths(dateStr, months) {
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return null;
+      d.setMonth(d.getMonth() + months);
+      return d;
+    }
 
-  // MAIN TABLE = CURRENT WEEK ONLY
-  const thisWeekItems = approved
-    .filter(item => {
-      const start = new Date(item.startDate);
-      const end = new Date(item.endDate || item.startDate);
-      return rangesOverlap(start, end, weekStart, weekEnd);
-    })
-    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+    function rangesOverlap(start1, end1, start2, end2) {
+      return start1 <= end2 && start2 <= end1;
+    }
 
-  table.innerHTML = "";
-
-  if (!thisWeekItems.length) {
-    table.innerHTML = `
-      <tr>
-        <td colspan="6">No contractor works planned for this week.</td>
-      </tr>
-    `;
-  } else {
-    thisWeekItems.forEach(item => {
-      const row = document.createElement("tr");
-
-      if (item.clash === true) {
-        row.classList.add("clash-row");
+    function getComputedStatus(item) {
+      if (item.status === "Approved" && item.review_date) {
+        const expiryDate = addMonths(item.review_date, 12);
+        if (expiryDate && expiryDate < new Date()) {
+          return "Expired";
+        }
       }
 
-      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+      return item.status || "Under Review";
+    }
 
-      row.innerHTML = `
-        <td>${formatDate(item.startDate)}</td>
-        <td>${item.contractorName || "-"}</td>
-        <td>${areaText}</td>
-        <td>${item.jobTitle || "-"}</td>
-        <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
-        <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
-      `;
-
-      table.appendChild(row);
-    });
-  }
-
-  // TODAY ON SITE
-  const todayItems = approved
-    .filter(item => {
-      const start = new Date(item.startDate);
-      const end = new Date(item.endDate || item.startDate);
-      return rangesOverlap(start, end, todayStart, todayEnd);
-    })
-    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
-  todayOnSite.innerHTML = "";
-
-  if (!todayItems.length) {
-    todayOnSite.innerHTML = `<div class="mini-item"><p>No contractors on site today.</p></div>`;
-  } else {
-    todayItems.forEach(item => {
-      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
-
-      todayOnSite.innerHTML += `
-        <div class="mini-item">
-          <strong>${item.contractorName || "-"}</strong>
-          <p>${areaText} — ${item.jobTitle || "-"}</p>
-        </div>
-      `;
-    });
-  }
-
-  // ACTIVE CLASH ALERTS = LIVE CURRENT/FUTURE CLASHES
-  const clashItems = approved
-    .filter(item => item.clash === true)
-    .filter(item => {
-      const end = new Date(item.endDate || item.startDate);
-      return end >= todayStart;
-    })
-    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-
-  activeClashAlerts.innerHTML = "";
-
-  if (!clashItems.length) {
-    activeClashAlerts.innerHTML = `<div class="mini-item"><p>No active clash alerts.</p></div>`;
-  } else {
-    clashItems.forEach(item => {
-      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
-
-      activeClashAlerts.innerHTML += `
-        <div class="mini-item">
-          <strong>${item.contractorName || "-"}</strong>
-          <p>${areaText} — ${formatDate(item.startDate)}</p>
-        </div>
-      `;
-    });
-  }
-
-  // RAMS EXPIRING SOON = 12 MONTHS FROM REVIEW DATE, NEXT 30 DAYS
-  const soonStart = todayStart;
-  const soonEnd = addDays(todayStart, 30);
-
-  const expiringItems = approved
-    .map(item => {
-      const baseDate = item.reviewDate ? new Date(item.reviewDate) : null;
-      if (!baseDate || Number.isNaN(baseDate.getTime())) return null;
-
-      const expiryDate = addMonths(baseDate, 12);
-
+    function mapRamsRow(item) {
       return {
-        ...item,
-        expiryDate
+        id: item.id,
+        contractorName: item.contractor_name || "",
+        jobTitle: item.job_title || "",
+        location: item.location || "",
+        areas: Array.isArray(item.areas) ? item.areas : [],
+        risks: Array.isArray(item.risks) ? item.risks : [],
+        startDate: item.start_date || "",
+        endDate: item.end_date || item.start_date || "",
+        reviewDate: item.review_date || "",
+        reviewer: item.approved_by_name || "",
+        status: getComputedStatus(item),
+        clash: !!item.clash
       };
-    })
-    .filter(Boolean)
-    .filter(item => item.expiryDate >= soonStart && item.expiryDate <= soonEnd)
-    .sort((a, b) => a.expiryDate - b.expiryDate);
+    }
 
-  expiringSoon.innerHTML = "";
+    function renderPlanner(items, weekStart, weekEnd) {
+      plannerBody.innerHTML = "";
 
-  if (!expiringItems.length) {
-    expiringSoon.innerHTML = `<div class="mini-item"><p>No RAMS expiring soon.</p></div>`;
-  } else {
-    expiringItems.forEach(item => {
-      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : (item.area || "-");
+      const approvedItems = items.filter(item => item.status === "Approved");
 
-      expiringSoon.innerHTML += `
-        <div class="mini-item">
-          <strong>${item.contractorName || "-"}</strong>
-          <p>${areaText} — Expires ${formatShortDate(item.expiryDate)}</p>
-        </div>
-      `;
+      const thisWeekItems = approvedItems
+        .filter(item => {
+          const start = new Date(item.startDate);
+          const end = new Date(item.endDate || item.startDate);
+          return rangesOverlap(start, end, weekStart, weekEnd);
+        })
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+      if (!thisWeekItems.length) {
+        plannerBody.innerHTML = `
+          <tr>
+            <td colspan="6">No contractor works planned for this week.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      thisWeekItems.forEach(item => {
+        const row = document.createElement("tr");
+
+        if (item.clash === true) {
+          row.classList.add("clash-row");
+        }
+
+        const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
+
+        row.innerHTML = `
+          <td>${formatDate(item.startDate)}</td>
+          <td>${item.contractorName || "-"}</td>
+          <td>${areaText}</td>
+          <td>${item.jobTitle || "-"}</td>
+          <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
+          <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+        `;
+
+        plannerBody.appendChild(row);
+      });
+    }
+
+    function renderTodayOnSite(items, todayStart, todayEnd) {
+      todayOnSite.innerHTML = "";
+
+      const approvedItems = items.filter(item => item.status === "Approved");
+
+      const todayItems = approvedItems
+        .filter(item => {
+          const start = new Date(item.startDate);
+          const end = new Date(item.endDate || item.startDate);
+          return rangesOverlap(start, end, todayStart, todayEnd);
+        })
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+      if (!todayItems.length) {
+        todayOnSite.innerHTML = `<div class="mini-item"><p class="empty-text">No contractors on site today.</p></div>`;
+        return;
+      }
+
+      todayItems.forEach(item => {
+        const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
+
+        todayOnSite.innerHTML += `
+          <div class="mini-item">
+            <strong>${item.contractorName || "-"}</strong>
+            <p>${areaText} — ${item.jobTitle || "-"}</p>
+          </div>
+        `;
+      });
+    }
+
+    function renderActiveClashes(items, todayStart) {
+      activeClashAlerts.innerHTML = "";
+
+      const approvedItems = items.filter(item => item.status === "Approved");
+
+      const clashItems = approvedItems
+        .filter(item => item.clash === true)
+        .filter(item => {
+          const end = new Date(item.endDate || item.startDate);
+          return end >= todayStart;
+        })
+        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+      if (!clashItems.length) {
+        activeClashAlerts.innerHTML = `<div class="mini-item"><p class="empty-text">No active clash alerts.</p></div>`;
+        return;
+      }
+
+      clashItems.forEach(item => {
+        const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
+
+        activeClashAlerts.innerHTML += `
+          <div class="mini-item">
+            <strong>${item.contractorName || "-"}</strong>
+            <p>${areaText} — ${formatDate(item.startDate)}</p>
+          </div>
+        `;
+      });
+    }
+
+    function renderExpiringSoon(items, todayStart) {
+      expiringSoon.innerHTML = "";
+
+      const soonEnd = addDays(todayStart, 30);
+
+      const expiringItems = items
+        .filter(item => item.status === "Approved")
+        .map(item => {
+          const expiryDate = item.reviewDate ? addMonths(item.reviewDate, 12) : null;
+          if (!expiryDate) return null;
+
+          return {
+            ...item,
+            expiryDate
+          };
+        })
+        .filter(Boolean)
+        .filter(item => item.expiryDate >= todayStart && item.expiryDate <= soonEnd)
+        .sort((a, b) => a.expiryDate - b.expiryDate);
+
+      if (!expiringItems.length) {
+        expiringSoon.innerHTML = `<div class="mini-item"><p class="empty-text">No RAMS expiring soon.</p></div>`;
+        return;
+      }
+
+      expiringItems.forEach(item => {
+        const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
+
+        expiringSoon.innerHTML += `
+          <div class="mini-item">
+            <strong>${item.contractorName || "-"}</strong>
+            <p>${areaText} — Expires ${formatShortDate(item.expiryDate)}</p>
+          </div>
+        `;
+      });
+    }
+
+    function renderCards(items) {
+      document.getElementById("totalRams").textContent = items.length;
+      document.getElementById("approvedRams").textContent = items.filter(item => item.status === "Approved").length;
+      document.getElementById("underReviewRams").textContent = items.filter(item => item.status === "Under Review").length;
+      document.getElementById("expiredRams").textContent = items.filter(item => item.status === "Expired").length;
+    }
+
+    function renderDashboard(items) {
+      const now = new Date();
+      const todayStart = startOfDay(now);
+      const todayEnd = endOfDay(now);
+      const weekStart = startOfWeek(now);
+      const weekEnd = endOfWeek(now);
+
+      renderCards(items);
+      renderPlanner(items, weekStart, weekEnd);
+      renderTodayOnSite(items, todayStart, todayEnd);
+      renderActiveClashes(items, todayStart);
+      renderExpiringSoon(items, todayStart);
+    }
+
+    async function loadDashboard() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return;
+      }
+
+      currentProfile = profile;
+
+      let roleLabel = "View Only";
+      if (profile.role === "admin") {
+        roleLabel = "Admin";
+      } else if (profile.role === "reviewer") {
+        roleLabel = "Reviewer";
+      }
+
+      const firstName = profile.full_name
+        ? profile.full_name.split(" ")[0]
+        : "User";
+
+      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+
+      if (profile.role === "admin") {
+        adminNavLink.style.display = "block";
+      }
+
+      let query = client
+        .from("rams_reviews")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (profile.role !== "admin" && profile.role !== "reviewer") {
+        query = query.eq("user_id", currentUser.id);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        alert("Failed to load dashboard RAMS: " + error.message);
+        return;
+      }
+
+      allRams = (data || []).map(mapRamsRow);
+      renderDashboard(allRams);
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await client.auth.signOut();
+      window.location.href = "/login.html";
     });
-  }
 
-  // SUMMARY CARDS
-  document.getElementById("totalRams").textContent = data.length;
-  document.getElementById("approvedRams").textContent = data.filter(item => item.status === "Approved").length;
-  document.getElementById("underReviewRams").textContent = data.filter(item => item.status === "Under Review").length;
-  document.getElementById("expiredRams").textContent = data.filter(item => item.status === "Expired").length;
-</script>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
-
-  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const logoutBtn = document.getElementById("logoutBtn");
-  async function checkAuth() {
-    const { data: sessionData, error: sessionError } = await client.auth.getSession();
-
-if (sessionError || !sessionData.session) {
-  window.location.href = "/login.html";
-  return;
-}
-
-    const user = sessionData.session.user;
-
-    const { data: profile, error: profileError } = await client
-      .from("user_profiles")
-      .select("*")
-      .eq("id", user.id)
-      .single();
-
-  if (profileError || !profile) {
-  alert("Profile not found.");
-  window.location.href = "/login.html";
-  return;
-}
-
-   window.currentUser = user;
-window.currentUserProfile = profile;
-window.canApproveRams =
-  profile.role === "reviewer" || profile.role === "admin";
-
-console.log("Logged in user:", user.email);
-console.log("Profile:", profile);
-console.log("Can approve RAMS:", window.canApproveRams);
-
-let roleLabel = "View Only";
-
-if (profile.role === "admin") {
-  roleLabel = "Admin";
-} else if (profile.role === "reviewer") {
-  roleLabel = "Reviewer";
-}
-
-const adminNavLink = document.getElementById("adminNavLink");
-
-if (profile.role === "admin") {
-  adminNavLink.style.display = "block";
-}
-    
-const firstName = profile.full_name
-  ? profile.full_name.split(" ")[0]
-  : "User";
-
-const welcomeText = document.getElementById("welcomeText");
-welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
-}
-
-logoutBtn.addEventListener("click", async () => {
-  await client.auth.signOut();
-  window.location.href = "/login.html";
-});
-
-checkAuth();
-</script>
+    loadDashboard();
+  </script>
 </body>
 </html>
