@@ -347,15 +347,16 @@
           : "-";
 
         const row = document.createElement("tr");
-        row.innerHTML = `
-          <td>${item.contractor_name || "-"}</td>
-          <td>${areaText}</td>
-          <td>${riskText}</td>
-          <td><span class="badge ${getBadgeClass(computedStatus)}">${computedStatus}</span></td>
-          <td>${item.approved_by_name || "-"}</td>
-          <td>${getExpiryText(item)}</td>
-          <td><a class="view-link" href="/rams/results.html?id=${item.id}">View Record</a></td>
-        `;
+      row.innerHTML = `
+  <td>${item.contractor_name || "-"}</td>
+  <td>${areaText}</td>
+  <td>${riskText}</td>
+  <td>${item.start_date ? formatDate(item.start_date) : "-"}</td>
+  <td><span class="badge ${getBadgeClass(computedStatus)}">${computedStatus}</span></td>
+  <td>${item.approved_by_name || "-"}</td>
+  <td>${getExpiryText(item)}</td>
+  <td><a class="view-link" href="/rams/results.html?id=${item.id}">View Record</a></td>
+`;
 
         registerTableBody.appendChild(row);
       });
