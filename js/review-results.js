@@ -289,15 +289,20 @@ async function saveReviewWithStatus(status) {
     reviewDate: new Date().toISOString()
   };
 
-  const reviews = getRamsReviews();
-reviews.push(review);
-saveRamsReviews(reviews);
+   const reviews = getRamsReviews();
+  reviews.push(review);
+  saveRamsReviews(reviews);
 
-// ✅ ADD THIS LINE
-updateClashesForAll();
+  updateClashesForAll();
 
-saveCurrentRamsReview(review);
-clearDraftRamsReview();
+  saveCurrentRamsReview(review);
+
+  const supabaseOk = await updateSupabaseReview(review, status);
+  if (!supabaseOk) {
+    return;
+  }
+
+  clearDraftRamsReview();
 
   console.log("Review saved:", review);
   console.log("All reviews:", getRamsReviews());
