@@ -1,5 +1,47 @@
 console.log("review-results.js loaded");
 
+const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
+let reviewClient = null;
+let reviewCurrentUser = null;
+let reviewCurrentProfile = null;
+
+function getReviewClient() {
+  if (!reviewClient) {
+    reviewClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+  return reviewClient;
+}
+
+async function loadReviewerContext() {
+  const client = getReviewClient();
+
+  const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+  if (sessionError || !sessionData.session) {
+    window.location.href = "/login.html";
+    return false;
+  }
+
+  reviewCurrentUser = sessionData.session.user;
+
+  const { data: profile, error: profileError } = await client
+    .from("user_profiles")
+    .select("*")
+    .eq("id", reviewCurrentUser.id)
+    .single();
+
+  if (profileError || !profile) {
+    alert("Profile not found.");
+    window.location.href = "/login.html";
+    return false;
+  }
+
+  reviewCurrentProfile = profile;
+  return true;
+}
+
 function formatDate(dateString) {
   if (!dateString) return "-";
   const date = new Date(dateString);
