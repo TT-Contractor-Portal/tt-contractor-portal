@@ -69,11 +69,11 @@
       margin-bottom: 8px;
     }
 
-   input[type="file"],
-input[type="text"],
-input[type="date"],
-input[type="number"],
-select {
+    input[type="file"],
+    input[type="text"],
+    input[type="date"],
+    input[type="number"],
+    select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ccc;
@@ -101,6 +101,11 @@ select {
       cursor: pointer;
     }
 
+    .button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
     .info-box {
       background: #f8f8f8;
       border-left: 4px solid #035740;
@@ -108,6 +113,42 @@ select {
       border-radius: 8px;
       margin-top: 8px;
       color: #444;
+      font-size: 14px;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(220px, 1fr));
+      gap: 10px 24px;
+      margin-top: 8px;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      box-sizing: border-box;
+    }
+
+    .checkbox-grid label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 400;
+      margin: 0;
+      padding: 4px 0;
+    }
+
+    .checkbox-grid input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    .warning-box {
+      background: #fff4e5;
+      border-left: 6px solid #ff9800;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-top: 8px;
+      color: #663c00;
       font-size: 14px;
     }
 
@@ -121,70 +162,26 @@ select {
       .main {
         margin-left: 0;
       }
+
+      .checkbox-grid {
+        grid-template-columns: 1fr;
+      }
     }
-
- .checkbox-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(220px, 1fr));
-  gap: 10px 24px;
-  margin-top: 8px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  background: white;
-  box-sizing: border-box;
-}
-
-.checkbox-grid label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 400;
-  margin: 0;
-}
-.checkbox-grid label {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-weight: 400;
-  margin: 0;
-  padding: 4px 0;
-}
-.checkbox-grid input[type="checkbox"] {
-  width: auto;
-  margin: 0;
-}
-
-@media (max-width: 700px) {
-  .checkbox-grid {
-    grid-template-columns: 1fr;
-  }
-} 
-
-    .warning-box {
-  background: #fff4e5;
-  border-left: 6px solid #ff9800;
-  padding: 14px 16px;
-  border-radius: 8px;
-  margin-top: 8px;
-  color: #663c00;
-  font-size: 14px;
-}
   </style>
 </head>
 <body>
   <div class="sidebar">
-  <h1>TT Contractor<br>Portal</h1>
+    <h1>TT Contractor<br>Portal</h1>
 
- <a href="/index.html">Dashboard</a>
-<a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
-<a href="/rams/register.html">RAMS</a>
-<a href="/rams/new.html">New RAMS</a>
-<a href="/profile/index.html">My Profile</a>
-<a href="/contractors/index.html">Contractors</a>
-<a href="/permits/index.html">Permits</a>
-<a href="/sop/index.html">SOP / SSW</a>
-</div>
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
 
   <div class="main">
     <div class="topbar">
@@ -200,7 +197,7 @@ select {
         <div class="helper">Accepted formats will later be PDF and DOCX.</div>
       </div>
 
-            <div class="field">
+      <div class="field">
         <label>Area(s) working in</label>
 
         <div id="areas" class="checkbox-grid">
@@ -238,361 +235,379 @@ select {
         <div class="helper">Select all applicable risks.</div>
       </div>
 
-<div class="field">
-  <label for="contractorName">Contractor Name</label>
-  <input type="text" id="contractorName" name="contractorName" placeholder="e.g. ABC Engineering">
-</div>
+      <div class="field">
+        <label for="contractorName">Contractor Name</label>
+        <input type="text" id="contractorName" name="contractorName" placeholder="e.g. ABC Engineering">
+      </div>
 
-<div class="field">
-  <label for="taskDescription">Task Description</label>
-  <input type="text" id="taskDescription" name="taskDescription" placeholder="e.g. Steam valve replacement">
-</div>
-<div class="field">
-  <label for="startDate">Expected Start Date</label>
-  <input type="date" id="startDate" name="startDate">
-</div>
+      <div class="field">
+        <label for="taskDescription">Task Description</label>
+        <input type="text" id="taskDescription" name="taskDescription" placeholder="e.g. Steam valve replacement">
+      </div>
 
-<div class="field">
-  <label for="duration">Duration</label>
-  <div style="display:flex; gap:12px;">
-    <input type="number" id="duration" name="duration" min="1" placeholder="e.g. 3" style="flex:1;">
+      <div class="field">
+        <label for="startDate">Expected Start Date</label>
+        <input type="date" id="startDate" name="startDate">
+      </div>
 
-    <select id="durationUnit" name="durationUnit" style="flex:1;">
-      <option value="days">Days</option>
-      <option value="weeks">Weeks</option>
-    </select>
-  </div>
-</div>
+      <div class="field">
+        <label for="duration">Duration</label>
+        <div style="display:flex; gap:12px;">
+          <input type="number" id="duration" name="duration" min="1" placeholder="e.g. 3" style="flex:1;">
+          <select id="durationUnit" name="durationUnit" style="flex:1;">
+            <option value="days">Days</option>
+            <option value="weeks">Weeks</option>
+          </select>
+        </div>
+      </div>
+
       <div class="warning-box">
-  <strong>⚠️ Reviewer Responsibility</strong>
-  <br><br>
-  This system is a decision-support tool only.
-  <br>
-  The responsibility for reviewing, approving, and ensuring suitable control measures are in place remains with the reviewer at all times.
-</div>
+        <strong>⚠️ Reviewer Responsibility</strong>
+        <br><br>
+        This system is a decision-support tool only.
+        <br>
+        The responsibility for reviewing, approving, and ensuring suitable control measures are in place remains with the reviewer at all times.
+      </div>
 
       <div style="margin-top: 24px;">
-      <button class="button" onclick="runRamsReview()">Run RAMS Review</button>
+        <button class="button" id="runReviewBtn" onclick="runRamsReview()">Run RAMS Review</button>
       </div>
     </div>
   </div>
-  
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="../js/rams-storage.js"></script>
-<script>
-  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  <div id="clashModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+    <div style="background:white; padding:24px; border-radius:12px; width:400px; max-width:90%;">
+      <h3 style="margin-top:0;">Clash Warning</h3>
+      <p>Another contractor is already planned in this area on this date. Do you want to continue?</p>
 
-  let currentUser = null;
-  let currentUserProfile = null;
+      <div id="clashModalDetails" style="margin-top:12px; font-size:14px; color:#444;"></div>
 
-  async function protectPage() {
-    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+      <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+        <button onclick="closeModal(false)" style="padding:10px 16px; border:none; border-radius:8px; background:#ccc;">No</button>
+        <button onclick="closeModal(true)" style="padding:10px 16px; border:none; border-radius:8px; background:#035740; color:white;">Yes</button>
+      </div>
+    </div>
+  </div>
 
-    if (sessionError || !sessionData.session) {
-      window.location.href = "/login.html";
-      return false;
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
+  </script>
+  <script>
+    // Replace the line above with your real anon key if needed.
+    // Keeping the full script separate here so the page is easy to edit.
+
+    const client = supabase.createClient(
+      "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
+    );
+
+    let currentUser = null;
+    let currentUserProfile = null;
+    let pendingSupabaseId = null;
+
+    async function protectPage() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return false;
+      }
+
+      currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return false;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return false;
+      }
+
+      currentUserProfile = profile;
+
+      const adminNavLink = document.getElementById("adminNavLink");
+      if (profile.role === "admin" && adminNavLink) {
+        adminNavLink.style.display = "block";
+      }
+
+      return true;
     }
 
-    currentUser = sessionData.session.user;
-
-    const { data: profile, error: profileError } = await client
-      .from("user_profiles")
-      .select("*")
-      .eq("id", currentUser.id)
-      .single();
-
-    if (profileError || !profile) {
-      alert("Profile not found.");
-      window.location.href = "/login.html";
-      return false;
-    }
-
-    if (profile.is_active === false) {
-      alert("Your account has been deactivated. Please contact an administrator.");
-      await client.auth.signOut();
-      window.location.href = "/login.html";
-      return false;
-    }
-
-    currentUserProfile = profile;
-
-    const adminNavLink = document.getElementById("adminNavLink");
-    if (profile.role === "admin" && adminNavLink) {
-      adminNavLink.style.display = "block";
-    }
-
-    return true;
-  }
-
-  function getSelectedValues(containerId) {
-    const container = document.getElementById(containerId);
-
-    const checkboxes = container.querySelectorAll("input[type='checkbox']:checked");
-    if (checkboxes.length) {
+    function getSelectedValues(containerId) {
+      const container = document.getElementById(containerId);
+      const checkboxes = container.querySelectorAll("input[type='checkbox']:checked");
       return Array.from(checkboxes).map(cb => cb.value);
     }
 
-    return Array.from(container.selectedOptions || []).map(option => option.value);
-  }
-
-  function addDays(dateString, daysToAdd) {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + daysToAdd);
-    return date;
-  }
-
-  function rangesOverlap(start1, end1, start2, end2) {
-    return start1 <= end2 && start2 <= end1;
-  }
-
-  function calculateEndDate(startDate, duration, durationUnit) {
-    const durationInDays = durationUnit === "weeks" ? duration * 7 : duration;
-    return addDays(startDate, durationInDays - 1);
-  }
-
-  function buildDraftReview() {
-    const contractorName = document.getElementById("contractorName").value.trim();
-    const jobTitle = document.getElementById("taskDescription").value.trim();
-    const startDate = document.getElementById("startDate").value;
-    const duration = parseInt(document.getElementById("duration").value, 10);
-    const durationUnit = document.getElementById("durationUnit").value;
-    const selectedAreas = getSelectedValues("areas");
-    const selectedRisks = getSelectedValues("risks");
-    const fileInput = document.getElementById("ramsfile");
-
-    if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
-      alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
-      return null;
+    function addDays(dateString, daysToAdd) {
+      const date = new Date(dateString);
+      date.setDate(date.getDate() + daysToAdd);
+      return date;
     }
 
-    const uploadedFileName = fileInput?.files?.length ? fileInput.files[0].name : "";
-
-    const recommendedPermits = ["P1 General Work Permit"];
-
-    if (selectedRisks.includes("Hot Work")) {
-      recommendedPermits.push("P2 Hot Work Permit");
+    function calculateEndDate(startDate, duration, durationUnit) {
+      const durationInDays = durationUnit === "weeks" ? duration * 7 : duration;
+      return addDays(startDate, durationInDays - 1);
     }
 
-    if (selectedRisks.includes("Confined Space")) {
-      recommendedPermits.push("P3 Confined Space Permit");
-    }
+    function buildDraftReview() {
+      const contractorName = document.getElementById("contractorName").value.trim();
+      const jobTitle = document.getElementById("taskDescription").value.trim();
+      const startDate = document.getElementById("startDate").value;
+      const duration = parseInt(document.getElementById("duration").value, 10);
+      const durationUnit = document.getElementById("durationUnit").value;
+      const selectedAreas = getSelectedValues("areas");
+      const selectedRisks = getSelectedValues("risks");
+      const fileInput = document.getElementById("ramsfile");
 
-    if (selectedRisks.includes("Working at Height")) {
-      recommendedPermits.push("P4 Working at Height Permit");
-    }
-
-    return {
-      id: generateRamsId(),
-      contractorName,
-      jobTitle,
-      location: selectedAreas.join(", "),
-      areas: selectedAreas,
-      risks: selectedRisks,
-      detectedAreas: [],
-      detectedRisks: [],
-      recommendedPermits,
-      uploadedFileName,
-      startDate,
-      duration,
-      durationUnit,
-    endDate: calculateEndDate(startDate, duration, durationUnit)
-  .toISOString()
-  .split("T")[0],
-      clashAcknowledged: false,
-      summary: "RAMS submitted and ready for review.",
-      missingItems: [],
-      weakItems: [],
-      reviewer: "",
-      reviewerNotes: "",
-     status: "Under Review",
-      reviewDate: ""
-    };
-  }
-
- function getExistingWorks() {
-  const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
-
-  return stored
-   .filter(r => r.status === "Approved")
-    .map(r => ({
-      id: r.id,
-      contractor: r.contractorName,
-      areas: r.areas || [],
-      startDate: r.startDate,
-      endDate: r.endDate
-    }));
-}
-    
-   function hasClash(draftReview) {
-  const newStart = new Date(draftReview.startDate);
-  const newEnd = new Date(draftReview.endDate);
-
-  const existingWorks = getExistingWorks();
-
-  return existingWorks.some(job => {
-    const jobStart = new Date(job.startDate);
-    const jobEnd = job.endDate ? new Date(job.endDate) : jobStart;
-
-    // ✅ DATE OVERLAP
-    const overlap = newStart <= jobEnd && jobStart <= newEnd;
-    if (!overlap) return false;
-
-    // ✅ AREA MATCH (multi-area safe)
-    const jobAreas = job.areas || [];
-    const sameArea = draftReview.areas.some(area =>
-      jobAreas.includes(area)
-    );
-
-    return sameArea;
-  });
-}
-
-function updateClashesForAll() {
-  const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
-
-  const approved = stored.filter(r => (r.status || "").toLowerCase() === "approved");
-
-  // Reset all clashes
-  approved.forEach(r => r.clash = false);
-
-  // Compare every job with every other job
-  for (let i = 0; i < approved.length; i++) {
-    for (let j = i + 1; j < approved.length; j++) {
-      const a = approved[i];
-      const b = approved[j];
-
-      const aStart = new Date(a.startDate);
-      const aEnd = new Date(a.endDate);
-      const bStart = new Date(b.startDate);
-      const bEnd = new Date(b.endDate);
-
-      const overlap = aStart <= bEnd && bStart <= aEnd;
-      if (!overlap) continue;
-
-      const sameArea = (a.areas || []).some(area =>
-        (b.areas || []).includes(area)
-      );
-
-      if (sameArea) {
-        a.clash = true;
-        b.clash = true;
+      if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
+        alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
+        return null;
       }
-    }
-  }
 
-  localStorage.setItem("ramsReviews", JSON.stringify(stored));
-}
+      const uploadedFileName = fileInput?.files?.length ? fileInput.files[0].name : "";
 
-async function saveDraftToSupabase(draftReview) {
-  if (!currentUser) {
-    alert("You must be logged in to save a RAMS.");
-    return null;
-  }
+      const recommendedPermits = ["P1 General Work Permit"];
 
-  const payload = {
-    user_id: currentUser.id,
-    contractor_name: draftReview.contractorName,
-    job_title: draftReview.jobTitle,
-    location: draftReview.location,
-    areas: draftReview.areas || [],
-    risks: draftReview.risks || [],
-    detected_areas: draftReview.detectedAreas || [],
-    detected_risks: draftReview.detectedRisks || [],
-    recommended_permits: draftReview.recommendedPermits || [],
-    uploaded_file_name: draftReview.uploadedFileName || "",
-    start_date: draftReview.startDate || null,
-    end_date: draftReview.endDate || null,
-    duration: draftReview.duration || 1,
-    duration_unit: draftReview.durationUnit || "days",
-    review_date: draftReview.reviewDate || null,
-    reviewer_notes: draftReview.reviewerNotes || "",
-    status: draftReview.status || "Under Review",
-    clash: !!draftReview.clash
-  };
+      if (selectedRisks.includes("Hot Work")) {
+        recommendedPermits.push("P2 Hot Work Permit");
+      }
 
-  const { data, error } = await client
-    .from("rams_reviews")
-    .insert([payload])
-    .select()
-    .single();
+      if (selectedRisks.includes("Confined Space")) {
+        recommendedPermits.push("P3 Confined Space Permit");
+      }
 
-  if (error) {
-    alert("Failed to save RAMS to Supabase: " + error.message);
-    return null;
-  }
+      if (selectedRisks.includes("Working at Height")) {
+        recommendedPermits.push("P4 Working at Height Permit");
+      }
 
-  return data;
-}
-  
-async function runRamsReview() {
-  const pageOk = await protectPage();
-  if (!pageOk) return;
-
-  const draftReview = buildDraftReview();
-  if (!draftReview) return;
-
-  const clashFound = hasClash(draftReview);
-
-  draftReview.clash = clashFound;
-  draftReview.clashAcknowledged = false;
-  draftReview.userId = currentUser.id;
-  draftReview.submittedByName = currentUserProfile?.full_name || "";
-  draftReview.submittedByEmail = currentUser.email || "";
-
-  const savedRecord = await saveDraftToSupabase(draftReview);
-  if (!savedRecord) return;
-
-  draftReview.supabaseId = savedRecord.id;
-
-  saveDraftRamsReview(draftReview);
-
-  if (clashFound) {
-    document.getElementById("clashModal").style.display = "flex";
-    return;
-  }
-
-  goToResults(false);
-}
-
-  function closeModal(shouldContinue) {
-    document.getElementById("clashModal").style.display = "none";
-
-    if (!shouldContinue) {
-      return;
+      return {
+        contractorName,
+        jobTitle,
+        location: selectedAreas.join(", "),
+        areas: selectedAreas,
+        risks: selectedRisks,
+        detectedAreas: [],
+        detectedRisks: [],
+        recommendedPermits,
+        uploadedFileName,
+        startDate,
+        duration,
+        durationUnit,
+        endDate: calculateEndDate(startDate, duration, durationUnit).toISOString().split("T")[0],
+        clashAcknowledged: false,
+        summary: "RAMS submitted and ready for review.",
+        missingItems: [],
+        weakItems: [],
+        reviewer: "",
+        reviewerNotes: "",
+        status: "Under Review",
+        reviewDate: ""
+      };
     }
 
-    const draftReview = getDraftRamsReview();
-    if (!draftReview) {
-      alert("No draft RAMS review found.");
-      return;
+    async function getExistingApprovedWorksFromSupabase() {
+      const { data, error } = await client
+        .from("rams_reviews")
+        .select("*")
+        .eq("status", "Approved");
+
+      if (error) {
+        console.warn("Could not load existing approved RAMS for clash check.");
+        return [];
+      }
+
+      return (data || []).map(r => ({
+        id: r.id,
+        contractor: r.contractor_name,
+        areas: r.areas || [],
+        startDate: r.start_date,
+        endDate: r.end_date || r.start_date
+      }));
     }
 
-    draftReview.clashAcknowledged = true;
-    saveDraftRamsReview(draftReview);
-    goToResults(true);
-  }
+    async function hasClash(draftReview) {
+      const newStart = new Date(draftReview.startDate);
+      const newEnd = new Date(draftReview.endDate);
 
-  function goToResults(hasClash = false) {
-    window.location.href = hasClash
-      ? "/rams/results.html?clash=true"
-      : "/rams/results.html";
-  }
-  protectPage();
-</script>
+      const existingWorks = await getExistingApprovedWorksFromSupabase();
 
-  <div id="clashModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
-  <div style="background:white; padding:24px; border-radius:12px; width:400px; max-width:90%;">
-    <h3 style="margin-top:0;">Clash Warning</h3>
-    <p>Another contractor is already planned in this area on this date. Do you want to continue?</p>
+      return existingWorks.some(job => {
+        const jobStart = new Date(job.startDate);
+        const jobEnd = job.endDate ? new Date(job.endDate) : jobStart;
 
-    <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
-      <button onclick="closeModal(false)" style="padding:10px 16px; border:none; border-radius:8px; background:#ccc;">No</button>
-      <button onclick="closeModal(true)" style="padding:10px 16px; border:none; border-radius:8px; background:#035740; color:white;">Yes</button>
-    </div>
-  </div>
-</div>
+        const overlap = newStart <= jobEnd && jobStart <= newEnd;
+        if (!overlap) return false;
+
+        const jobAreas = job.areas || [];
+        return draftReview.areas.some(area => jobAreas.includes(area));
+      });
+    }
+
+    async function getClashSummary(draftReview) {
+      const newStart = new Date(draftReview.startDate);
+      const newEnd = new Date(draftReview.endDate);
+
+      const { data, error } = await client
+        .from("rams_reviews")
+        .select("*")
+        .eq("status", "Approved");
+
+      if (error || !data) {
+        return [];
+      }
+
+      return data.filter(r => {
+        const jobStart = new Date(r.start_date);
+        const jobEnd = new Date(r.end_date || r.start_date);
+
+        const overlap = newStart <= jobEnd && jobStart <= newEnd;
+        if (!overlap) return false;
+
+        const otherAreas = Array.isArray(r.areas) ? r.areas : [];
+        return draftReview.areas.some(area => otherAreas.includes(area));
+      });
+    }
+
+    async function saveDraftToSupabase(draftReview) {
+      if (!currentUser) {
+        alert("You must be logged in to save a RAMS.");
+        return null;
+      }
+
+      const payload = {
+        user_id: currentUser.id,
+        contractor_name: draftReview.contractorName,
+        job_title: draftReview.jobTitle,
+        location: draftReview.location,
+        areas: draftReview.areas || [],
+        risks: draftReview.risks || [],
+        detected_areas: draftReview.detectedAreas || [],
+        detected_risks: draftReview.detectedRisks || [],
+        recommended_permits: draftReview.recommendedPermits || [],
+        uploaded_file_name: draftReview.uploadedFileName || "",
+        start_date: draftReview.startDate || null,
+        end_date: draftReview.endDate || null,
+        duration: draftReview.duration || 1,
+        duration_unit: draftReview.durationUnit || "days",
+        review_date: draftReview.reviewDate || null,
+        reviewer_notes: draftReview.reviewerNotes || "",
+        status: draftReview.status || "Under Review",
+        clash: !!draftReview.clash
+      };
+
+      const { data, error } = await client
+        .from("rams_reviews")
+        .insert([payload])
+        .select()
+        .single();
+
+      if (error) {
+        alert("Failed to save RAMS to Supabase: " + error.message);
+        return null;
+      }
+
+      return data;
+    }
+
+    async function runRamsReview() {
+      const pageOk = await protectPage();
+      if (!pageOk) return;
+
+      const runReviewBtn = document.getElementById("runReviewBtn");
+      if (runReviewBtn) runReviewBtn.disabled = true;
+
+      const draftReview = buildDraftReview();
+      if (!draftReview) {
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      const clashFound = await hasClash(draftReview);
+
+      draftReview.clash = clashFound;
+      draftReview.clashAcknowledged = false;
+      draftReview.userId = currentUser.id;
+      draftReview.submittedByName = currentUserProfile?.full_name || "";
+      draftReview.submittedByEmail = currentUser.email || "";
+
+      const savedRecord = await saveDraftToSupabase(draftReview);
+      if (!savedRecord) {
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      pendingSupabaseId = savedRecord.id;
+
+      if (clashFound) {
+        const clashModalDetails = document.getElementById("clashModalDetails");
+        const clashes = await getClashSummary(draftReview);
+
+        if (clashModalDetails) {
+          if (!clashes.length) {
+            clashModalDetails.innerHTML = `<p>No further clash detail available.</p>`;
+          } else {
+            clashModalDetails.innerHTML = clashes.map(c => `
+              <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
+                <strong>${c.contractor_name || "-"}</strong><br>
+                Area: ${(c.areas || []).join(", ") || "-"}<br>
+                Dates: ${c.start_date || "-"} to ${c.end_date || c.start_date || "-"}<br>
+                Approved by: ${c.approved_by_name || "Unknown"}
+              </div>
+            `).join("");
+          }
+        }
+
+        document.getElementById("clashModal").style.display = "flex";
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      goToResults(savedRecord.id, false);
+    }
+
+    async function closeModal(shouldContinue) {
+      document.getElementById("clashModal").style.display = "none";
+
+      if (!shouldContinue) {
+        return;
+      }
+
+      if (!pendingSupabaseId) {
+        alert("No saved RAMS record found.");
+        return;
+      }
+
+      goToResults(pendingSupabaseId, true);
+    }
+
+    function goToResults(supabaseId, hasClash = false) {
+      if (!supabaseId) {
+        alert("No RAMS record found.");
+        return;
+      }
+
+      const url = hasClash
+        ? `/rams/results.html?id=${supabaseId}&clash=true`
+        : `/rams/results.html?id=${supabaseId}`;
+
+      window.location.href = url;
+    }
+
+    protectPage();
+  </script>
 </body>
 </html>
