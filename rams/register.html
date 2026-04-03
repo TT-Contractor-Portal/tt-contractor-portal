@@ -401,23 +401,7 @@
       renderTable(filtered);
     }
 
-    function getStartDateDisplay(dateString) {
-  if (!dateString) return "-";
 
-  const today = new Date();
-  const start = new Date(dateString);
-
-  today.setHours(0,0,0,0);
-  start.setHours(0,0,0,0);
-
-  const diffDays = Math.floor((start - today) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return `<strong>Today</strong>`;
-  if (diffDays === 1) return `<strong>Tomorrow</strong>`;
-  if (diffDays < 0) return `<span style="color:#b42318;">Overdue</span>`;
-
-  return formatDate(dateString);
-}
 
     async function loadRegister() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
@@ -482,6 +466,24 @@
     statusFilter.addEventListener("change", applyFilters);
 
     loadRegister();
+
+        function getStartDateDisplay(dateString) {
+  if (!dateString) return "-";
+
+  const today = new Date();
+  const start = new Date(dateString);
+
+  today.setHours(0,0,0,0);
+  start.setHours(0,0,0,0);
+
+  const diffDays = Math.floor((start - today) / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) return `<strong>Today</strong>`;
+  if (diffDays === 1) return `<strong>Tomorrow</strong>`;
+  if (diffDays < 0) return `<span style="color:#b42318;">Overdue</span>`;
+
+  return formatDate(dateString);
+}
   </script>
 </body>
 </html>
