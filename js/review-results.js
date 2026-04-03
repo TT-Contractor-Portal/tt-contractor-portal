@@ -310,7 +310,10 @@ async function saveReviewWithStatus(status) {
   window.location.href = "/index.html";
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  const contextOk = await loadReviewerContext();
+  if (!contextOk) return;
+
   const currentReview = getCurrentRamsReview();
   const draftReview = getDraftReviewData();
   const reviewToRender = draftReview || currentReview;
@@ -335,7 +338,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  document.getElementById("approveBtn")?.addEventListener("click", () => {
+  document.getElementById("approveBtn")?.addEventListener("click", async () => {
     const review = getDraftReviewData() || getCurrentRamsReview();
     const clashConfirm = document.getElementById("clashConfirm");
 
@@ -350,14 +353,14 @@ document.addEventListener("DOMContentLoaded", () => {
       saveCurrentRamsReview(review);
     }
 
-    saveReviewWithStatus("Approved");
+    await saveReviewWithStatus("Approved");
   });
 
-  document.getElementById("underReviewBtn")?.addEventListener("click", () => {
-    saveReviewWithStatus("Under Review");
+  document.getElementById("underReviewBtn")?.addEventListener("click", async () => {
+    await saveReviewWithStatus("Under Review");
   });
 
-  document.getElementById("rejectBtn")?.addEventListener("click", () => {
-    saveReviewWithStatus("Rejected");
+  document.getElementById("rejectBtn")?.addEventListener("click", async () => {
+    await saveReviewWithStatus("Rejected");
   });
 });
