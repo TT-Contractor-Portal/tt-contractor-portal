@@ -389,13 +389,18 @@ async function updateStatus(status) {
     updates.approved_at = null;
   }
 
-  const { error } = await client
+    const { error } = await client
     .from("rams_reviews")
     .update(updates)
     .eq("id", currentReview.supabaseId);
 
   if (error) {
     alert("Update failed: " + error.message);
+    return;
+  }
+
+  const clashOk = await recalculateSupabaseClashes();
+  if (!clashOk) {
     return;
   }
 
