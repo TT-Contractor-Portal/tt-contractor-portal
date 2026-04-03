@@ -151,26 +151,38 @@ button:disabled {
   font-weight: 600;
 }
 
-  @media (max-width: 700px) {
-    .sidebar {
-      position: static;
-      width: 100%;
-      height: auto;
-    }
-    .name-cell {
+ .name-cell {
   white-space: normal;
   min-width: 150px;
 }
+
 .email-cell {
   min-width: 240px;
 }
-    td button {
+
+td button {
   white-space: nowrap;
 }
-    .main {
-      margin-left: 0;
-    }
+
+.role-action-btn.make-reviewer {
+  background: #7c3aed;
+}
+
+.role-action-btn.make-view-only {
+  background: #6b7280;
+}
+
+@media (max-width: 700px) {
+  .sidebar {
+    position: static;
+    width: 100%;
+    height: auto;
   }
+
+  .main {
+    margin-left: 0;
+  }
+}
 </style>
 </head>
 <body>
