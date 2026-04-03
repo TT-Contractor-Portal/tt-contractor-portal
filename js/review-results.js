@@ -263,6 +263,8 @@ async function saveReviewWithStatus(status) {
 
   const review = {
     id: draft.id || generateRamsId(),
+    supabaseId: draft.supabaseId || null,
+    userId: draft.userId || null,
     contractorName: draft.contractorName,
     jobTitle: draft.jobTitle,
     location: draft.location,
