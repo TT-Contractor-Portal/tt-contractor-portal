@@ -357,53 +357,6 @@
   <script src="../js/rams-storage.js"></script>
 <script src="../js/review-results.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
-  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
-
-  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-  async function checkApprovalPermission() {
-    const { data: sessionData, error: sessionError } = await client.auth.getSession();
-
-    if (sessionError || !sessionData.session) {
-      window.location.href = "../login.html";
-      return;
-    }
-
-    const user = sessionData.session.user;
-
-    const { data: profile, error: profileError } = await client
-      .from("user_profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile) {
-      alert("Profile not found.");
-      window.location.href = "../login.html";
-      return;
-    }
-
-   const canApprove = profile.role === "reviewer" || profile.role === "admin";
-
-const adminNavLink = document.getElementById("adminNavLink");
-if (profile.role === "admin" && adminNavLink) {
-  adminNavLink.style.display = "block";
-}
-
-const approveBtn = document.getElementById("approveBtn");
-
-    if (approveBtn && !canApprove) {
-      approveBtn.disabled = true;
-      approveBtn.textContent = "Approval requires Reviewer/Admin access";
-      approveBtn.style.opacity = "0.6";
-      approveBtn.style.cursor = "not-allowed";
-    }
-  }
-
-  checkApprovalPermission();
-</script>    
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script> 
 </body>
 </html>
