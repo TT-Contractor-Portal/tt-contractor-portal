@@ -43,7 +43,10 @@
       padding: 30px;
     }
 
-    .topbar, .panel, .filter-bar, .table-wrap {
+    .topbar,
+    .panel,
+    .filter-bar,
+    .table-wrap {
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -66,33 +69,40 @@
       margin-top: 14px;
     }
 
-    input, select {
+    input,
+    select {
       width: 100%;
       padding: 12px;
       border: 1px solid #ccc;
       border-radius: 8px;
       box-sizing: border-box;
       font-size: 14px;
+      background: white;
     }
 
     .table-wrap {
       padding: 20px;
+      overflow-x: auto;
     }
 
     table {
       width: 100%;
+      min-width: 1000px;
       border-collapse: collapse;
     }
 
-    th, td {
+    th,
+    td {
       text-align: left;
       padding: 14px 10px;
       border-bottom: 1px solid #e5e5e5;
       font-size: 14px;
+      vertical-align: middle;
     }
 
     th {
       color: #666;
+      font-weight: 700;
     }
 
     .badge {
@@ -101,16 +111,42 @@
       border-radius: 999px;
       font-size: 12px;
       font-weight: bold;
+      white-space: nowrap;
     }
 
-    .approved { background: #dff3e8; color: #17663d; }
-    .review { background: #fff3d6; color: #8a6200; }
-    .expired { background: #e6e6e6; color: #444; }
+    .approved {
+      background: #dff3e8;
+      color: #17663d;
+    }
+
+    .review {
+      background: #fff3d6;
+      color: #8a6200;
+    }
+
+    .expired {
+      background: #e6e6e6;
+      color: #444;
+    }
+
+    .rejected {
+      background: #fde2e2;
+      color: #b42318;
+    }
 
     .view-link {
       color: #035740;
       font-weight: bold;
       text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .view-link:hover {
+      text-decoration: underline;
+    }
+
+    .empty-row {
+      color: #666;
     }
 
     @media (max-width: 900px) {
@@ -133,60 +169,55 @@
       .filter-row {
         grid-template-columns: 1fr;
       }
-
-      table {
-        font-size: 12px;
-      }
     }
   </style>
 </head>
 <body>
   <div class="sidebar">
-  <h1>TT Contractor<br>Portal</h1>
+    <h1>TT Contractor<br>Portal</h1>
 
-  <a href="/index.html">Dashboard</a>
-  <a href="/rams/register.html">RAMS</a>
-  <a href="/rams/new.html">New RAMS</a>
-  <a href="/profile/index.html">My Profile</a>
-  <a href="/contractors/index.html">Contractors</a>
-  <a href="/permits/index.html">Permits</a>
-  <a href="/sop/index.html">SOP / SSW</a>
-</div>
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
+
   <div class="main">
     <div class="topbar">
       <strong>RAMS Register</strong> — Search and view submitted RAMS
     </div>
 
     <div class="filter-bar">
-      <label><strong>Search RAMS</strong></label>
-      <input type="text" placeholder="Search by contractor, area, risk type or reviewer" />
+      <label for="searchInput"><strong>Search RAMS</strong></label>
+      <input
+        type="text"
+        id="searchInput"
+        placeholder="Search by contractor, area, risk type or reviewer"
+      />
 
       <div class="filter-row">
-        <select>
-          <option>Contractor</option>
-          <option>ABC Engineering</option>
-          <option>Smith Electrical</option>
+        <select id="contractorFilter">
+          <option value="">All Contractors</option>
         </select>
 
-        <select>
-          <option>Work Area</option>
-          <option>Boiler House</option>
-          <option>Brewery</option>
-          <option>Packaging</option>
+        <select id="areaFilter">
+          <option value="">All Areas</option>
         </select>
 
-        <select>
-          <option>Risk Type</option>
-          <option>Hot Work</option>
-          <option>Working at Height</option>
-          <option>Confined Space</option>
+        <select id="riskFilter">
+          <option value="">All Risk Types</option>
         </select>
 
-        <select>
-          <option>Status</option>
-          <option>Approved</option>
-          <option>Under Review</option>
-          <option>Expired</option>
+        <select id="statusFilter">
+          <option value="">All Statuses</option>
+          <option value="Approved">Approved</option>
+          <option value="Under Review">Under Review</option>
+          <option value="Rejected">Rejected</option>
+          <option value="Expired">Expired</option>
         </select>
       </div>
     </div>
@@ -204,37 +235,233 @@
             <th>Action</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>ABC Engineering</td>
-            <td>Boiler House</td>
-            <td>Hot Work</td>
-            <td><span class="badge approved">Approved</span></td>
-            <td>Lee Scott</td>
-            <td>12/02/2027</td>
-            <td><a class="view-link" href="#">View Record</a></td>
-          </tr>
-          <tr>
-            <td>Smith Electrical</td>
-            <td>Brewery</td>
-            <td>Working at Height</td>
-            <td><span class="badge review">Under Review</span></td>
-            <td>John Smith</td>
-            <td>-</td>
-            <td><a class="view-link" href="#">View Record</a></td>
-          </tr>
-          <tr>
-            <td>Northern Services</td>
-            <td>Packaging</td>
-            <td>Confined Space</td>
-            <td><span class="badge expired">Expired</span></td>
-            <td>Lee Scott</td>
-            <td>03/01/2026</td>
-            <td><a class="view-link" href="#">View Record</a></td>
-          </tr>
-        </tbody>
+        <tbody id="registerTableBody"></tbody>
       </table>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    let currentUser = null;
+    let currentProfile = null;
+    let allRams = [];
+
+    const adminNavLink = document.getElementById("adminNavLink");
+    const registerTableBody = document.getElementById("registerTableBody");
+    const searchInput = document.getElementById("searchInput");
+    const contractorFilter = document.getElementById("contractorFilter");
+    const areaFilter = document.getElementById("areaFilter");
+    const riskFilter = document.getElementById("riskFilter");
+    const statusFilter = document.getElementById("statusFilter");
+
+    function addMonths(dateString, months) {
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return null;
+      date.setMonth(date.getMonth() + months);
+      return date;
+    }
+
+    function getComputedStatus(item) {
+      if (item.status === "Approved" && item.review_date) {
+        const expiryDate = addMonths(item.review_date, 12);
+        if (expiryDate && expiryDate < new Date()) {
+          return "Expired";
+        }
+      }
+
+      return item.status || "Under Review";
+    }
+
+    function getBadgeClass(status) {
+      if (status === "Approved") return "approved";
+      if (status === "Under Review") return "review";
+      if (status === "Expired") return "expired";
+      if (status === "Rejected") return "rejected";
+      return "review";
+    }
+
+    function getExpiryText(item) {
+      if (item.status !== "Approved" || !item.review_date) return "-";
+
+      const expiryDate = addMonths(item.review_date, 12);
+      if (!expiryDate) return "-";
+
+      return expiryDate.toLocaleDateString("en-GB");
+    }
+
+    function uniqueSortedValues(items) {
+      return [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b));
+    }
+
+    function populateFilters(rows) {
+      const contractorValues = uniqueSortedValues(rows.map(r => r.contractor_name));
+
+      const areaValues = uniqueSortedValues(
+        rows.flatMap(r => Array.isArray(r.areas) ? r.areas : [])
+      );
+
+      const riskValues = uniqueSortedValues(
+        rows.flatMap(r => Array.isArray(r.risks) ? r.risks : [])
+      );
+
+      contractorFilter.innerHTML =
+        `<option value="">All Contractors</option>` +
+        contractorValues.map(v => `<option value="${v}">${v}</option>`).join("");
+
+      areaFilter.innerHTML =
+        `<option value="">All Areas</option>` +
+        areaValues.map(v => `<option value="${v}">${v}</option>`).join("");
+
+      riskFilter.innerHTML =
+        `<option value="">All Risk Types</option>` +
+        riskValues.map(v => `<option value="${v}">${v}</option>`).join("");
+    }
+
+    function renderTable(rows) {
+      registerTableBody.innerHTML = "";
+
+      if (!rows.length) {
+        registerTableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="empty-row">No RAMS records found.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      rows.forEach(item => {
+        const computedStatus = getComputedStatus(item);
+
+        const areaText = Array.isArray(item.areas) && item.areas.length
+          ? item.areas.join(", ")
+          : "-";
+
+        const riskText = Array.isArray(item.risks) && item.risks.length
+          ? item.risks.join(", ")
+          : "-";
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${item.contractor_name || "-"}</td>
+          <td>${areaText}</td>
+          <td>${riskText}</td>
+          <td><span class="badge ${getBadgeClass(computedStatus)}">${computedStatus}</span></td>
+          <td>${item.approved_by_name || "-"}</td>
+          <td>${getExpiryText(item)}</td>
+          <td><a class="view-link" href="/rams/results.html?id=${item.id}">View Record</a></td>
+        `;
+
+        registerTableBody.appendChild(row);
+      });
+    }
+
+    function applyFilters() {
+      const searchTerm = searchInput.value.trim().toLowerCase();
+      const contractorValue = contractorFilter.value;
+      const areaValue = areaFilter.value;
+      const riskValue = riskFilter.value;
+      const statusValue = statusFilter.value;
+
+      const filtered = allRams.filter(item => {
+        const computedStatus = getComputedStatus(item);
+        const contractorText = (item.contractor_name || "").toLowerCase();
+        const reviewerText = (item.approved_by_name || "").toLowerCase();
+        const areaText = (Array.isArray(item.areas) ? item.areas.join(" ") : "").toLowerCase();
+        const riskText = (Array.isArray(item.risks) ? item.risks.join(" ") : "").toLowerCase();
+
+        const matchesSearch =
+          !searchTerm ||
+          contractorText.includes(searchTerm) ||
+          reviewerText.includes(searchTerm) ||
+          areaText.includes(searchTerm) ||
+          riskText.includes(searchTerm);
+
+        const matchesContractor =
+          !contractorValue || item.contractor_name === contractorValue;
+
+        const matchesArea =
+          !areaValue || (Array.isArray(item.areas) && item.areas.includes(areaValue));
+
+        const matchesRisk =
+          !riskValue || (Array.isArray(item.risks) && item.risks.includes(riskValue));
+
+        const matchesStatus =
+          !statusValue || computedStatus === statusValue;
+
+        return matchesSearch && matchesContractor && matchesArea && matchesRisk && matchesStatus;
+      });
+
+      renderTable(filtered);
+    }
+
+    async function loadRegister() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return;
+      }
+
+      currentProfile = profile;
+
+      if (profile.role === "admin" && adminNavLink) {
+        adminNavLink.style.display = "block";
+      }
+
+      let query = client
+        .from("rams_reviews")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+      if (profile.role !== "admin" && profile.role !== "reviewer") {
+        query = query.eq("user_id", currentUser.id);
+      }
+
+      const { data, error } = await query;
+
+      if (error) {
+        alert("Failed to load RAMS register: " + error.message);
+        return;
+      }
+
+      allRams = data || [];
+      populateFilters(allRams);
+      applyFilters();
+    }
+
+    searchInput.addEventListener("input", applyFilters);
+    contractorFilter.addEventListener("change", applyFilters);
+    areaFilter.addEventListener("change", applyFilters);
+    riskFilter.addEventListener("change", applyFilters);
+    statusFilter.addEventListener("change", applyFilters);
+
+    loadRegister();
+  </script>
 </body>
 </html>
