@@ -449,49 +449,89 @@
       };
     }
 
-    function renderPlanner(items, weekStart, weekEnd) {
-      plannerBody.innerHTML = "";
+function renderPlanner(items, weekStart, weekEnd) {
+  plannerBody.innerHTML = "";
+  nextWeekPlannerBody.innerHTML = "";
 
-      const approvedItems = items.filter(item => item.status === "Approved");
+  const approvedItems = items.filter(item => item.status === "Approved");
 
-      const thisWeekItems = approvedItems
-        .filter(item => {
-          const start = new Date(item.startDate);
-          const end = new Date(item.endDate || item.startDate);
-          return rangesOverlap(start, end, weekStart, weekEnd);
-        })
-        .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+  const thisWeekItems = approvedItems
+    .filter(item => {
+      const start = new Date(item.startDate);
+      const end = new Date(item.endDate || item.startDate);
+      return rangesOverlap(start, end, weekStart, weekEnd);
+    })
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
 
-      if (!thisWeekItems.length) {
-        plannerBody.innerHTML = `
-          <tr>
-            <td colspan="6">No contractor works planned for this week.</td>
-          </tr>
-        `;
-        return;
+  const nextWeekStart = addDays(weekStart, 7);
+  const nextWeekEnd = addDays(weekEnd, 7);
+
+  const nextWeekItems = approvedItems
+    .filter(item => {
+      const start = new Date(item.startDate);
+      const end = new Date(item.endDate || item.startDate);
+      return rangesOverlap(start, end, nextWeekStart, nextWeekEnd);
+    })
+    .sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
+
+  if (!thisWeekItems.length) {
+    plannerBody.innerHTML = `
+      <tr>
+        <td colspan="6">No contractor works planned for this week.</td>
+      </tr>
+    `;
+  } else {
+    thisWeekItems.forEach(item => {
+      const row = document.createElement("tr");
+
+      if (item.clash === true) {
+        row.classList.add("clash-row");
       }
 
-      thisWeekItems.forEach(item => {
-        const row = document.createElement("tr");
+      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
 
-        if (item.clash === true) {
-          row.classList.add("clash-row");
-        }
+      row.innerHTML = `
+        <td>${formatDate(item.startDate)}</td>
+        <td>${item.contractorName || "-"}</td>
+        <td>${areaText}</td>
+        <td>${item.jobTitle || "-"}</td>
+        <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
+        <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+      `;
 
-        const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
+      plannerBody.appendChild(row);
+    });
+  }
 
-        row.innerHTML = `
-          <td>${formatDate(item.startDate)}</td>
-          <td>${item.contractorName || "-"}</td>
-          <td>${areaText}</td>
-          <td>${item.jobTitle || "-"}</td>
-          <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
-          <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
-        `;
+  if (!nextWeekItems.length) {
+    nextWeekPlannerBody.innerHTML = `
+      <tr>
+        <td colspan="6">No contractor works planned for next week.</td>
+      </tr>
+    `;
+  } else {
+    nextWeekItems.forEach(item => {
+      const row = document.createElement("tr");
 
-        plannerBody.appendChild(row);
-      });
-    }
+      if (item.clash === true) {
+        row.classList.add("clash-row");
+      }
+
+      const areaText = Array.isArray(item.areas) ? item.areas.join(", ") : "-";
+
+      row.innerHTML = `
+        <td>${formatDate(item.startDate)}</td>
+        <td>${item.contractorName || "-"}</td>
+        <td>${areaText}</td>
+        <td>${item.jobTitle || "-"}</td>
+        <td><span class="status ${getStatusClass(item.status)}">${item.status || "-"}</span></td>
+        <td>${item.clash === true ? '<span class="alert-badge">CLASH</span>' : '-'}</td>
+      `;
+
+      nextWeekPlannerBody.appendChild(row);
+    });
+  }
+}
 
     function renderTodayOnSite(items, todayStart, todayEnd) {
       todayOnSite.innerHTML = "";
