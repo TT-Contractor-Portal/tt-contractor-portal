@@ -280,6 +280,53 @@ select {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/rams-storage.js"></script>
 <script>
+  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  let currentUser = null;
+  let currentUserProfile = null;
+
+  async function protectPage() {
+    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+    if (sessionError || !sessionData.session) {
+      window.location.href = "/login.html";
+      return false;
+    }
+
+    currentUser = sessionData.session.user;
+
+    const { data: profile, error: profileError } = await client
+      .from("user_profiles")
+      .select("*")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (profileError || !profile) {
+      alert("Profile not found.");
+      window.location.href = "/login.html";
+      return false;
+    }
+
+    if (profile.is_active === false) {
+      alert("Your account has been deactivated. Please contact an administrator.");
+      await client.auth.signOut();
+      window.location.href = "/login.html";
+      return false;
+    }
+
+    currentUserProfile = profile;
+
+    const adminNavLink = document.getElementById("adminNavLink");
+    if (profile.role === "admin" && adminNavLink) {
+      adminNavLink.style.display = "block";
+    }
+
+    return true;
+  }
+
   function getSelectedValues(containerId) {
     const container = document.getElementById(containerId);
 
