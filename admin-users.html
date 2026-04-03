@@ -387,6 +387,62 @@ if (myProfile.role === "admin") {
   });
 });
 
+document.querySelectorAll(".changeRoleBtn").forEach((btn) => {
+  btn.addEventListener("click", async () => {
+    const userId = btn.getAttribute("data-id");
+    const newRole = btn.getAttribute("data-role");
+
+    if (userId === user.id) {
+      message.textContent = "You cannot change your own admin role.";
+      return;
+    }
+
+    let updates = {};
+
+    if (newRole === "admin") {
+      updates = {
+        role: "admin",
+        reviewer_requested: true,
+        reviewer_approved: true,
+        can_review: true
+      };
+    } else if (newRole === "reviewer") {
+      updates = {
+        role: "reviewer",
+        reviewer_requested: true,
+        reviewer_approved: true,
+        can_review: true
+      };
+    } else if (newRole === "view_only") {
+      updates = {
+        role: "view_only",
+        reviewer_approved: false,
+        can_review: false
+      };
+    }
+
+    const { error: updateError } = await client
+      .from("user_profiles")
+      .update(updates)
+      .eq("id", userId);
+
+    if (updateError) {
+      message.textContent = updateError.message;
+      return;
+    }
+
+    if (newRole === "admin") {
+      message.textContent = "User upgraded to admin.";
+    } else if (newRole === "reviewer") {
+      message.textContent = "User changed to reviewer.";
+    } else {
+      message.textContent = "User changed to view only.";
+    }
+
+    loadUsers();
+  });
+});
+      
      document.querySelectorAll(".toggleActiveBtn").forEach((btn) => {
   btn.addEventListener("click", async () => {
     const userId = btn.getAttribute("data-id");
