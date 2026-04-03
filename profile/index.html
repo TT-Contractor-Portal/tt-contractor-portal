@@ -209,5 +209,127 @@
 </p>
     </div>
   </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+  const SUPABASE_ANON_KEY = "YOUR_ANON_KEY_HERE";
+
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const profileName = document.getElementById("profileName");
+  const profileEmail = document.getElementById("profileEmail");
+  const profileRole = document.getElementById("profileRole");
+  const profileCreated = document.getElementById("profileCreated");
+  const profileMessage = document.getElementById("profileMessage");
+  const reviewerRequestBtn = document.getElementById("reviewerRequestBtn");
+  const inductionCheck = document.getElementById("inductionCheck");
+  const ptwCheck = document.getElementById("ptwCheck");
+  const adminNavLink = document.getElementById("adminNavLink");
+
+  function formatDateTime(dateStr) {
+    if (!dateStr) return "-";
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return "-";
+    return d.toLocaleDateString("en-GB");
+  }
+
+  function getRoleLabel(role) {
+    if (role === "admin") return "Admin";
+    if (role === "reviewer") return "Reviewer";
+    return "View Only";
+  }
+
+  function getRoleClass(role) {
+    if (role === "admin") return "admin";
+    if (role === "reviewer") return "reviewer";
+    return "viewonly";
+  }
+
+  async function loadProfile() {
+    const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+    if (sessionError || !sessionData.session) {
+      window.location.href = "/login.html";
+      return;
+    }
+
+    const user = sessionData.session.user;
+
+    const { data: profile, error: profileError } = await client
+      .from("user_profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      alert("Profile not found.");
+      window.location.href = "/login.html";
+      return;
+    }
+
+    profileName.textContent = profile.full_name || "-";
+    profileEmail.textContent = profile.email || user.email || "-";
+    profileRole.textContent = getRoleLabel(profile.role);
+    profileRole.className = "role-badge " + getRoleClass(profile.role);
+    profileCreated.textContent = formatDateTime(profile.created_at);
+
+    if (profile.role === "admin") {
+      adminNavLink.style.display = "block";
+      reviewerRequestBtn.style.display = "none";
+      inductionCheck.disabled = true;
+      ptwCheck.disabled = true;
+      profileMessage.textContent = "Your account already has admin access.";
+      return;
+    }
+
+    if (profile.role === "reviewer") {
+      adminNavLink.style.display = "none";
+      reviewerRequestBtn.style.display = "none";
+      inductionCheck.disabled = true;
+      ptwCheck.disabled = true;
+      profileMessage.textContent = "Your account already has reviewer access.";
+      return;
+    }
+
+    if (profile.reviewer_requested === true) {
+      reviewerRequestBtn.style.display = "none";
+      inductionCheck.checked = !!profile.induction_complete;
+      ptwCheck.checked = !!profile.ptw_complete;
+      inductionCheck.disabled = true;
+      ptwCheck.disabled = true;
+      profileMessage.textContent = "Reviewer access request already submitted and awaiting admin approval.";
+      return;
+    }
+
+    reviewerRequestBtn.addEventListener("click", async () => {
+      if (!inductionCheck.checked || !ptwCheck.checked) {
+        profileMessage.textContent = "Please tick both training declarations before submitting.";
+        return;
+      }
+
+      const { error: updateError } = await client
+        .from("user_profiles")
+        .update({
+          induction_complete: true,
+          ptw_complete: true,
+          reviewer_requested: true
+        })
+        .eq("id", user.id);
+
+      if (updateError) {
+        profileMessage.textContent = updateError.message;
+        return;
+      }
+
+      profileMessage.textContent = "Reviewer request submitted successfully.";
+      reviewerRequestBtn.style.display = "none";
+      inductionCheck.disabled = true;
+      ptwCheck.disabled = true;
+    });
+  }
+
+  loadProfile();
+</script>
 </body>
 </html>
