@@ -281,7 +281,7 @@ async function saveReviewWithStatus(status) {
     summary: draft.summary || "",
     missingItems: draft.missingItems || [],
     weakItems: draft.weakItems || [],
-    reviewer: "Admin",
+   reviewer: reviewCurrentProfile?.full_name || reviewCurrentUser?.email || "Unknown",
     reviewerNotes,
     status,
     reviewDate: new Date().toISOString()
