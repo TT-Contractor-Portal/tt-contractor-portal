@@ -387,29 +387,6 @@ if (myProfile.role === "admin") {
   });
 });
 
-     document.querySelectorAll(".makeAdminBtn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const userId = btn.getAttribute("data-id");
-
-    const { error: updateError } = await client
-      .from("user_profiles")
-      .update({
-        role: "admin",
-        reviewer_approved: true,
-        can_review: true
-      })
-      .eq("id", userId);
-
-    if (updateError) {
-      message.textContent = updateError.message;
-      return;
-    }
-
-    message.textContent = "User upgraded to admin.";
-    loadUsers();
-  });
-});
-
      document.querySelectorAll(".toggleActiveBtn").forEach((btn) => {
   btn.addEventListener("click", async () => {
     const userId = btn.getAttribute("data-id");
