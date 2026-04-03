@@ -6,83 +6,103 @@ console.log("review-results.js loaded");
 const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-let client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 let currentUser = null;
 let currentProfile = null;
 let currentReview = null;
 
 // ==========================
-// AUTH
+// AUTH / USER
 // ==========================
 async function loadUser() {
-  const { data: sessionData } = await client.auth.getSession();
+  const { data: sessionData, error: sessionError } = await client.auth.getSession();
 
-  if (!sessionData.session) {
+  if (sessionError || !sessionData.session) {
     window.location.href = "/login.html";
     return false;
   }
 
   currentUser = sessionData.session.user;
 
-  const { data: profile } = await client
+  const { data: profile, error: profileError } = await client
     .from("user_profiles")
     .select("*")
     .eq("id", currentUser.id)
     .single();
 
+  if (profileError || !profile) {
+    alert("Profile not found.");
+    window.location.href = "/login.html";
+    return false;
+  }
+
+  if (profile.is_active === false) {
+    alert("Your account has been deactivated. Please contact an administrator.");
+    await client.auth.signOut();
+    window.location.href = "/login.html";
+    return false;
+  }
+
   currentProfile = profile;
+
+  const adminNavLink = document.getElementById("adminNavLink");
+  if (profile.role === "admin" && adminNavLink) {
+    adminNavLink.style.display = "block";
+  }
+
+  const canApprove = profile.role === "reviewer" || profile.role === "admin";
+
+  const approveBtn = document.getElementById("approveBtn");
+  const underReviewBtn = document.getElementById("underReviewBtn");
+  const rejectBtn = document.getElementById("rejectBtn");
+  const reviewerNotes = document.getElementById("reviewerNotes");
+
+  if (!canApprove) {
+    if (approveBtn) {
+      approveBtn.disabled = true;
+      approveBtn.textContent = "Approval requires Reviewer/Admin access";
+    }
+    if (underReviewBtn) underReviewBtn.disabled = true;
+    if (rejectBtn) rejectBtn.disabled = true;
+    if (reviewerNotes) reviewerNotes.disabled = true;
+  }
 
   return true;
 }
 
 // ==========================
-// LOAD FROM URL (THIS IS THE FIX)
+// HELPERS
 // ==========================
 function getIdFromUrl() {
   const params = new URLSearchParams(window.location.search);
   return params.get("id");
 }
 
-async function loadReviewFromSupabase(id) {
-  const { data, error } = await client
-    .from("rams_reviews")
-    .select("*")
-    .eq("id", id)
-    .single();
+function getFallbackSupabaseId() {
+  const draft = typeof getDraftRamsReview === "function" ? getDraftRamsReview() : null;
+  if (draft?.supabaseId) return draft.supabaseId;
 
-  if (error || !data) {
-    alert("Failed to load RAMS");
-    return null;
-  }
+  const current = typeof getCurrentRamsReview === "function" ? getCurrentRamsReview() : null;
+  if (current?.supabaseId) return current.supabaseId;
 
-  return {
-    id: data.id,
-    supabaseId: data.id,
-    contractorName: data.contractor_name,
-    jobTitle: data.job_title,
-    location: data.location,
-    areas: data.areas || [],
-    risks: data.risks || [],
-    detectedAreas: data.detected_areas || [],
-    detectedRisks: data.detected_risks || [],
-    recommendedPermits: data.recommended_permits || [],
-    startDate: data.start_date,
-    endDate: data.end_date,
-    summary: data.summary,
-    missingItems: data.missing_items || [],
-    weakItems: data.weak_items || [],
-    reviewer: data.approved_by_name || "",
-    reviewDate: data.review_date,
-    clash: data.clash || false,
-    clashAcknowledged: false,
-    status: data.status
-  };
+  return null;
 }
 
-// ==========================
-// RENDER
-// ==========================
+function formatDate(dateString) {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString("en-GB");
+}
+
+function formatDateTime(dateString) {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleString("en-GB");
+}
+
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value || "-";
@@ -112,40 +132,202 @@ function renderList(id, items) {
   el.innerHTML = items.map(i => `<li>${i}</li>`).join("");
 }
 
-function renderReview(r) {
-  setText("resultId", r.id);
-  setText("resultContractor", r.contractorName);
-  setText("resultJobTitle", r.jobTitle);
-  setText("resultLocation", r.location);
-  setText("resultStartDate", new Date(r.startDate).toLocaleDateString("en-GB"));
-  setText("resultEndDate", new Date(r.endDate).toLocaleDateString("en-GB"));
-  setText("resultReviewer", r.reviewer);
-  setText("resultReviewDate", r.reviewDate);
-  setText("resultSummary", r.summary);
+// ==========================
+// LOAD REVIEW FROM SUPABASE
+// ==========================
+async function loadReviewFromSupabase(id) {
+  const { data, error } = await client
+    .from("rams_reviews")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  renderTags("resultAreas", r.areas);
-  renderTags("resultRisks", r.risks);
-  renderTags("resultDetectedAreas", r.detectedAreas);
-  renderTags("resultDetectedRisks", r.detectedRisks);
-  renderTags("resultPermits", r.recommendedPermits);
+  if (error || !data) {
+    alert("Failed to load RAMS.");
+    return null;
+  }
 
-  renderList("resultMissingItems", r.missingItems);
-  renderList("resultWeakItems", r.weakItems);
+  return {
+    id: data.id,
+    supabaseId: data.id,
+    userId: data.user_id || null,
+    contractorName: data.contractor_name || "",
+    jobTitle: data.job_title || "",
+    location: data.location || "",
+    areas: data.areas || [],
+    risks: data.risks || [],
+    detectedAreas: data.detected_areas || [],
+    detectedRisks: data.detected_risks || [],
+    recommendedPermits: data.recommended_permits || [],
+    uploadedFileName: data.uploaded_file_name || "",
+    startDate: data.start_date || "",
+    endDate: data.end_date || "",
+    duration: data.duration || 1,
+    durationUnit: data.duration_unit || "days",
+    summary: data.summary || "",
+    missingItems: data.missing_items || [],
+    weakItems: data.weak_items || [],
+    reviewer: data.approved_by_name || "",
+    reviewerNotes: data.reviewer_notes || "",
+    reviewDate: data.review_date || "",
+    clash: !!data.clash,
+    clashAcknowledged: false,
+    status: data.status || "Under Review"
+  };
 }
 
 // ==========================
-// UPDATE (THIS NOW WORKS)
+// CLASH LOOKUP FROM SUPABASE
+// ==========================
+async function getClashingReviews(currentReview) {
+  const { data, error } = await client
+    .from("rams_reviews")
+    .select("*")
+    .eq("status", "Approved");
+
+  if (error || !data) {
+    console.warn("Could not load clash records from Supabase.");
+    return [];
+  }
+
+  return data
+    .filter(r => r.id !== currentReview.supabaseId)
+    .filter(r => {
+      const aStart = new Date(currentReview.startDate);
+      const aEnd = new Date(currentReview.endDate || currentReview.startDate);
+      const bStart = new Date(r.start_date);
+      const bEnd = new Date(r.end_date || r.start_date);
+
+      const overlap = aStart <= bEnd && bStart <= aEnd;
+      if (!overlap) return false;
+
+      const currentAreas = currentReview.areas || [];
+      const otherAreas = Array.isArray(r.areas) ? r.areas : [];
+
+      return currentAreas.some(area => otherAreas.includes(area));
+    })
+    .map(r => ({
+      contractorName: r.contractor_name || "",
+      areas: r.areas || [],
+      startDate: r.start_date || "",
+      endDate: r.end_date || "",
+      reviewer: r.approved_by_name || "Unknown"
+    }));
+}
+
+// ==========================
+// RENDER
+// ==========================
+async function renderReview(review) {
+  setText("resultStatus", review.status || "RAMS Review Result");
+  setText("resultId", review.id || "-");
+  setText("resultContractor", review.contractorName || "-");
+  setText("resultJobTitle", review.jobTitle || "-");
+  setText("resultLocation", review.location || "-");
+  setText("resultStartDate", formatDate(review.startDate));
+  setText("resultEndDate", formatDate(review.endDate));
+  setText("resultReviewer", review.reviewer || "-");
+  setText("resultReviewDate", formatDateTime(review.reviewDate));
+  setText("resultSummary", review.summary || "-");
+  setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`);
+
+  const clashText = review.clash === true
+    ? (review.clashAcknowledged ? "Yes" : "No")
+    : "No clash detected";
+
+  setText("resultClashAck", clashText);
+
+  renderTags("resultAreas", review.areas);
+  renderTags("resultRisks", review.risks);
+  renderTags("resultDetectedAreas", review.detectedAreas);
+  renderTags("resultDetectedRisks", review.detectedRisks);
+  renderTags("resultPermits", review.recommendedPermits);
+
+  renderList("resultMissingItems", review.missingItems);
+  renderList("resultWeakItems", review.weakItems);
+
+  const reviewerNotes = document.getElementById("reviewerNotes");
+  if (reviewerNotes) {
+    reviewerNotes.value = review.reviewerNotes || "";
+  }
+
+  const clashWarning = document.getElementById("clashWarning");
+  const clashAcknowledgement = document.getElementById("clashAcknowledgement");
+  const clashConfirm = document.getElementById("clashConfirm");
+  const clashDetails = document.getElementById("clashDetails");
+  const approveBtn = document.getElementById("approveBtn");
+
+  if (review.clash === true) {
+    if (clashWarning) clashWarning.style.display = "block";
+    if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
+    if (clashConfirm) clashConfirm.checked = false;
+    if (approveBtn && (currentProfile.role === "reviewer" || currentProfile.role === "admin")) {
+      approveBtn.disabled = true;
+    }
+
+    const clashes = await getClashingReviews(review);
+
+    if (clashDetails && clashes.length) {
+      clashDetails.innerHTML = clashes.map(c => {
+        return `
+          <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
+            <strong>${c.contractorName || "-"}</strong><br>
+            Area: ${(c.areas || []).join(", ") || "-"}<br>
+            Dates: ${formatDate(c.startDate)} to ${formatDate(c.endDate)}<br>
+            Approved by: ${c.reviewer || "Unknown"}
+          </div>
+        `;
+      }).join("");
+    } else if (clashDetails) {
+      clashDetails.innerHTML = `<p>No other approved clashes found.</p>`;
+    }
+  } else {
+    if (clashWarning) clashWarning.style.display = "none";
+    if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
+    if (approveBtn && (currentProfile.role === "reviewer" || currentProfile.role === "admin")) {
+      approveBtn.disabled = false;
+    }
+    if (clashDetails) clashDetails.innerHTML = "";
+  }
+}
+
+// ==========================
+// UPDATE STATUS IN SUPABASE
 // ==========================
 async function updateStatus(status) {
-  const notes = document.getElementById("reviewerNotes").value;
+  if (!currentReview?.supabaseId) {
+    alert("No Supabase RAMS record found.");
+    return;
+  }
+
+  const reviewerNotes = document.getElementById("reviewerNotes")?.value.trim() || "";
+  const clashConfirm = document.getElementById("clashConfirm");
+
+  if (currentReview.clash === true && status === "Approved") {
+    if (!clashConfirm?.checked) {
+      alert("You must confirm the clash has been reviewed and control measures are in place before approving.");
+      return;
+    }
+  }
+
+  const nowIso = new Date().toISOString();
 
   const updates = {
-    status,
-    reviewer_notes: notes,
-    review_date: new Date().toISOString(),
-    approved_by: currentUser.id,
-    approved_by_name: currentProfile.full_name || currentUser.email
+    status: status,
+    reviewer_notes: reviewerNotes,
+    review_date: nowIso,
+    clash: !!currentReview.clash
   };
+
+  if (status === "Approved") {
+    updates.approved_by = currentUser.id;
+    updates.approved_by_name = currentProfile.full_name || currentUser.email;
+    updates.approved_at = nowIso;
+  } else {
+    updates.approved_by = null;
+    updates.approved_by_name = null;
+    updates.approved_at = null;
+  }
 
   const { error } = await client
     .from("rams_reviews")
@@ -167,24 +349,46 @@ document.addEventListener("DOMContentLoaded", async () => {
   const ok = await loadUser();
   if (!ok) return;
 
-  const id = getIdFromUrl();
+  const idFromUrl = getIdFromUrl();
+  const reviewId = idFromUrl || getFallbackSupabaseId();
 
-  if (id) {
-    // ✅ OPENED FROM REGISTER
-    currentReview = await loadReviewFromSupabase(id);
-  } else {
-    // ✅ OPENED FROM NEW RAMS FLOW
-    currentReview = getDraftRamsReview() || getCurrentRamsReview();
-  }
-
-  if (!currentReview) {
-    alert("No RAMS found");
+  if (!reviewId) {
+    alert("No RAMS found.");
     return;
   }
 
-  renderReview(currentReview);
+  currentReview = await loadReviewFromSupabase(reviewId);
 
-  document.getElementById("approveBtn").onclick = () => updateStatus("Approved");
-  document.getElementById("underReviewBtn").onclick = () => updateStatus("Under Review");
-  document.getElementById("rejectBtn").onclick = () => updateStatus("Rejected");
+  if (!currentReview) {
+    alert("No RAMS found.");
+    return;
+  }
+
+  await renderReview(currentReview);
+
+  const clashConfirm = document.getElementById("clashConfirm");
+  const approveBtn = document.getElementById("approveBtn");
+
+  clashConfirm?.addEventListener("change", () => {
+    if (!approveBtn) return;
+    if (!(currentProfile.role === "reviewer" || currentProfile.role === "admin")) return;
+
+    if (clashConfirm.checked) {
+      approveBtn.disabled = false;
+    } else if (currentReview.clash === true) {
+      approveBtn.disabled = true;
+    }
+  });
+
+  document.getElementById("approveBtn")?.addEventListener("click", async () => {
+    await updateStatus("Approved");
+  });
+
+  document.getElementById("underReviewBtn")?.addEventListener("click", async () => {
+    await updateStatus("Under Review");
+  });
+
+  document.getElementById("rejectBtn")?.addEventListener("click", async () => {
+    await updateStatus("Rejected");
+  });
 });
