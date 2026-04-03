@@ -1,366 +1,190 @@
 console.log("review-results.js loaded");
 
+// ==========================
+// SUPABASE SETUP
+// ==========================
 const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-let reviewClient = null;
-let reviewCurrentUser = null;
-let reviewCurrentProfile = null;
+let client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function getReviewClient() {
-  if (!reviewClient) {
-    reviewClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  }
-  return reviewClient;
-}
+let currentUser = null;
+let currentProfile = null;
+let currentReview = null;
 
-async function loadReviewerContext() {
-  const client = getReviewClient();
+// ==========================
+// AUTH
+// ==========================
+async function loadUser() {
+  const { data: sessionData } = await client.auth.getSession();
 
-  const { data: sessionData, error: sessionError } = await client.auth.getSession();
-
-  if (sessionError || !sessionData.session) {
+  if (!sessionData.session) {
     window.location.href = "/login.html";
     return false;
   }
 
-  reviewCurrentUser = sessionData.session.user;
+  currentUser = sessionData.session.user;
 
-  const { data: profile, error: profileError } = await client
+  const { data: profile } = await client
     .from("user_profiles")
     .select("*")
-    .eq("id", reviewCurrentUser.id)
+    .eq("id", currentUser.id)
     .single();
 
-  if (profileError || !profile) {
-    alert("Profile not found.");
-    window.location.href = "/login.html";
-    return false;
-  }
+  currentProfile = profile;
 
-  reviewCurrentProfile = profile;
   return true;
 }
 
-function formatDate(dateString) {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  return date.toLocaleDateString("en-GB");
+// ==========================
+// LOAD FROM URL (THIS IS THE FIX)
+// ==========================
+function getIdFromUrl() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
 }
 
-function formatDateTime(dateString) {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return dateString;
-  return date.toLocaleString("en-GB");
+async function loadReviewFromSupabase(id) {
+  const { data, error } = await client
+    .from("rams_reviews")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  if (error || !data) {
+    alert("Failed to load RAMS");
+    return null;
+  }
+
+  return {
+    id: data.id,
+    supabaseId: data.id,
+    contractorName: data.contractor_name,
+    jobTitle: data.job_title,
+    location: data.location,
+    areas: data.areas || [],
+    risks: data.risks || [],
+    detectedAreas: data.detected_areas || [],
+    detectedRisks: data.detected_risks || [],
+    recommendedPermits: data.recommended_permits || [],
+    startDate: data.start_date,
+    endDate: data.end_date,
+    summary: data.summary,
+    missingItems: data.missing_items || [],
+    weakItems: data.weak_items || [],
+    reviewer: data.approved_by_name || "",
+    reviewDate: data.review_date,
+    clash: data.clash || false,
+    clashAcknowledged: false,
+    status: data.status
+  };
 }
 
+// ==========================
+// RENDER
+// ==========================
 function setText(id, value) {
   const el = document.getElementById(id);
-  if (el) el.textContent = value;
+  if (el) el.textContent = value || "-";
 }
 
-function renderTags(containerId, items) {
-  const container = document.getElementById(containerId);
-  if (!container) return;
+function renderTags(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
 
   if (!items || !items.length) {
-    container.innerHTML = `<span class="tag muted">None</span>`;
+    el.innerHTML = `<span class="tag muted">None</span>`;
     return;
   }
 
-  container.innerHTML = items.map(item => `<span class="tag">${item}</span>`).join("");
+  el.innerHTML = items.map(i => `<span class="tag">${i}</span>`).join("");
 }
 
-function renderList(listId, items) {
-  const list = document.getElementById(listId);
-  if (!list) return;
+function renderList(id, items) {
+  const el = document.getElementById(id);
+  if (!el) return;
 
   if (!items || !items.length) {
-    list.innerHTML = `<li>None</li>`;
+    el.innerHTML = `<li>None</li>`;
     return;
   }
 
-  list.innerHTML = items.map(item => `<li>${item}</li>`).join("");
+  el.innerHTML = items.map(i => `<li>${i}</li>`).join("");
 }
 
-function getDraftReviewData() {
-  return getDraftRamsReview();
+function renderReview(r) {
+  setText("resultId", r.id);
+  setText("resultContractor", r.contractorName);
+  setText("resultJobTitle", r.jobTitle);
+  setText("resultLocation", r.location);
+  setText("resultStartDate", new Date(r.startDate).toLocaleDateString("en-GB"));
+  setText("resultEndDate", new Date(r.endDate).toLocaleDateString("en-GB"));
+  setText("resultReviewer", r.reviewer);
+  setText("resultReviewDate", r.reviewDate);
+  setText("resultSummary", r.summary);
+
+  renderTags("resultAreas", r.areas);
+  renderTags("resultRisks", r.risks);
+  renderTags("resultDetectedAreas", r.detectedAreas);
+  renderTags("resultDetectedRisks", r.detectedRisks);
+  renderTags("resultPermits", r.recommendedPermits);
+
+  renderList("resultMissingItems", r.missingItems);
+  renderList("resultWeakItems", r.weakItems);
 }
 
-function getClashingReviews(currentReview) {
-  const all = getRamsReviews();
-
-  return all.filter(r => {
-    if (r.id === currentReview.id) return false;
-    if ((r.status || "").toLowerCase() !== "approved") return false;
-
-    const aStart = new Date(currentReview.startDate);
-    const aEnd = new Date(currentReview.endDate);
-    const bStart = new Date(r.startDate);
-    const bEnd = new Date(r.endDate);
-
-    const overlap = aStart <= bEnd && bStart <= aEnd;
-    if (!overlap) return false;
-
-    const sameArea = (currentReview.areas || []).some(area =>
-      (r.areas || []).includes(area)
-    );
-
-    return sameArea;
-  });
-}
-
-function renderReview(review) {
-  setText("resultStatus", review.status || "RAMS Review Result");
-  setText("resultId", review.id || "-");
-  setText("resultContractor", review.contractorName || "-");
-  setText("resultJobTitle", review.jobTitle || "-");
-  setText("resultLocation", review.location || "-");
-  setText("resultStartDate", formatDate(review.startDate));
-  setText("resultEndDate", formatDate(review.endDate));
-  setText("resultReviewer", review.reviewer || "-");
-  setText("resultReviewDate", formatDateTime(review.reviewDate));
-  setText("resultSummary", review.summary || "-");
-
-  let clashText = "No clash detected";
-
-  if (review.clash === true) {
-    clashText = review.clashAcknowledged ? "Yes" : "No";
-  }
-
-  setText("resultClashAck", clashText);
-
-  renderTags("resultAreas", review.areas);
-  renderTags("resultRisks", review.risks);
-  renderTags("resultDetectedAreas", review.detectedAreas);
-  renderTags("resultDetectedRisks", review.detectedRisks);
-  renderTags("resultPermits", review.recommendedPermits);
-
-  renderList("resultMissingItems", review.missingItems);
-  renderList("resultWeakItems", review.weakItems);
-
-  setText("topbarSummary", `${review.contractorName || "-"} / ${review.jobTitle || "-"}`);
-
-  const clashWarning = document.getElementById("clashWarning");
-  const clashAcknowledgement = document.getElementById("clashAcknowledgement");
-  const clashConfirm = document.getElementById("clashConfirm");
-  const approveBtn = document.getElementById("approveBtn");
-
-   const clashDetails = document.getElementById("clashDetails");
-
-  if (review.clash === true) {
-    if (clashWarning) clashWarning.style.display = "block";
-    if (clashAcknowledgement) clashAcknowledgement.style.display = "block";
-    if (clashConfirm) clashConfirm.checked = false;
-    if (approveBtn) approveBtn.disabled = true;
-
-    const clashes = getClashingReviews(review);
-
-    if (clashDetails && clashes.length) {
-      clashDetails.innerHTML = clashes.map(c => {
-        return `
-          <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
-            <strong>${c.contractorName || "-"}</strong><br>
-            Area: ${(c.areas || []).join(", ") || "-"}<br>
-            Dates: ${formatDate(c.startDate)} to ${formatDate(c.endDate)}<br>
-            Approved by: ${c.reviewer || "Unknown"}
-          </div>
-        `;
-      }).join("");
-    }
-
-  } else {
-    if (clashWarning) clashWarning.style.display = "none";
-    if (clashAcknowledgement) clashAcknowledgement.style.display = "none";
-    if (approveBtn) approveBtn.disabled = false;
-    if (clashDetails) clashDetails.innerHTML = "";
-  }
-}
-
-async function updateSupabaseReview(review, status) {
-  if (!review?.supabaseId) {
-    console.warn("No supabaseId found on review draft. Skipping Supabase update.");
-    return true;
-  }
-
-  const client = getReviewClient();
+// ==========================
+// UPDATE (THIS NOW WORKS)
+// ==========================
+async function updateStatus(status) {
+  const notes = document.getElementById("reviewerNotes").value;
 
   const updates = {
-    reviewer_notes: review.reviewerNotes || "",
-    review_date: review.reviewDate || new Date().toISOString(),
-    status: status,
-    clash: !!review.clash
+    status,
+    reviewer_notes: notes,
+    review_date: new Date().toISOString(),
+    approved_by: currentUser.id,
+    approved_by_name: currentProfile.full_name || currentUser.email
   };
-
-  if (status === "Approved") {
-    updates.approved_at = new Date().toISOString();
-    updates.approved_by = reviewCurrentUser?.id || null;
-    updates.approved_by_name = reviewCurrentProfile?.full_name || reviewCurrentUser?.email || "";
-  } else {
-    updates.approved_at = null;
-    updates.approved_by = null;
-    updates.approved_by_name = null;
-  }
 
   const { error } = await client
     .from("rams_reviews")
     .update(updates)
-    .eq("id", review.supabaseId);
+    .eq("id", currentReview.supabaseId);
 
   if (error) {
-    alert("Failed to update Supabase RAMS record: " + error.message);
-    return false;
-  }
-
-  return true;
-}
-
-function updateClashesForAll() {
-  const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
-
-  const approved = stored.filter(r => (r.status || "").toLowerCase() === "approved");
-
-  // reset
-  approved.forEach(r => r.clash = false);
-
-  for (let i = 0; i < approved.length; i++) {
-    for (let j = i + 1; j < approved.length; j++) {
-      const a = approved[i];
-      const b = approved[j];
-
-      const aStart = new Date(a.startDate);
-      const aEnd = new Date(a.endDate);
-      const bStart = new Date(b.startDate);
-      const bEnd = new Date(b.endDate);
-
-      const overlap = aStart <= bEnd && bStart <= aEnd;
-      if (!overlap) continue;
-
-      const sameArea = (a.areas || []).some(area =>
-        (b.areas || []).includes(area)
-      );
-
-      if (sameArea) {
-        a.clash = true;
-        b.clash = true;
-      }
-    }
-  }
-
-  localStorage.setItem("ramsReviews", JSON.stringify(stored));
-}
-
-async function saveReviewWithStatus(status) {
- const draft = getDraftReviewData() || getCurrentRamsReview();
-  const reviewerNotes = document.getElementById("reviewerNotes")?.value.trim() || "";
-
-  if (!draft) {
-    alert("No draft RAMS review found.");
+    alert("Update failed: " + error.message);
     return;
   }
-
-  const review = {
-    id: draft.id || generateRamsId(),
-    supabaseId: draft.supabaseId || null,
-    userId: draft.userId || null,
-    contractorName: draft.contractorName,
-    jobTitle: draft.jobTitle,
-    location: draft.location,
-    areas: draft.areas || [],
-    risks: draft.risks || [],
-    detectedAreas: draft.detectedAreas || [],
-    detectedRisks: draft.detectedRisks || [],
-    recommendedPermits: draft.recommendedPermits || [],
-    uploadedFileName: draft.uploadedFileName || "",
-    startDate: draft.startDate,
-    duration: draft.duration || 1,
-    durationUnit: draft.durationUnit || "days",
-    endDate: draft.endDate,
-    clash: !!draft.clash,
-    clashAcknowledged: !!draft.clashAcknowledged,
-    summary: draft.summary || "",
-    missingItems: draft.missingItems || [],
-    weakItems: draft.weakItems || [],
-   reviewer: reviewCurrentProfile?.full_name || reviewCurrentUser?.email || "Unknown",
-    reviewerNotes,
-    status,
-    reviewDate: new Date().toISOString()
-  };
-
-   const reviews = getRamsReviews();
-  reviews.push(review);
-  saveRamsReviews(reviews);
-
-  updateClashesForAll();
-
-  saveCurrentRamsReview(review);
-
-  const supabaseOk = await updateSupabaseReview(review, status);
-  if (!supabaseOk) {
-    return;
-  }
-
-  clearDraftRamsReview();
-
-  console.log("Review saved:", review);
-  console.log("All reviews:", getRamsReviews());
 
   window.location.href = "/index.html";
 }
 
+// ==========================
+// INIT
+// ==========================
 document.addEventListener("DOMContentLoaded", async () => {
-  const contextOk = await loadReviewerContext();
-  if (!contextOk) return;
+  const ok = await loadUser();
+  if (!ok) return;
 
-  const currentReview = getCurrentRamsReview();
-  const draftReview = getDraftReviewData();
-  const reviewToRender = draftReview || currentReview;
+  const id = getIdFromUrl();
 
-  if (!reviewToRender) {
-    console.warn("No current or draft RAMS review found");
+  if (id) {
+    // ✅ OPENED FROM REGISTER
+    currentReview = await loadReviewFromSupabase(id);
+  } else {
+    // ✅ OPENED FROM NEW RAMS FLOW
+    currentReview = getDraftRamsReview() || getCurrentRamsReview();
+  }
+
+  if (!currentReview) {
+    alert("No RAMS found");
     return;
   }
 
-  renderReview(reviewToRender);
+  renderReview(currentReview);
 
-  const clashConfirm = document.getElementById("clashConfirm");
-  const approveBtn = document.getElementById("approveBtn");
-
-  clashConfirm?.addEventListener("change", () => {
-    if (!approveBtn) return;
-
-    if (clashConfirm.checked) {
-      approveBtn.disabled = false;
-    } else {
-      approveBtn.disabled = true;
-    }
-  });
-
-  document.getElementById("approveBtn")?.addEventListener("click", async () => {
-    const review = getDraftReviewData() || getCurrentRamsReview();
-    const clashConfirm = document.getElementById("clashConfirm");
-
-    if (review?.clash === true) {
-      if (!clashConfirm?.checked) {
-        alert("You must confirm the clash has been reviewed and control measures are in place before approving.");
-        return;
-      }
-
-      review.clashAcknowledged = true;
-      saveDraftRamsReview(review);
-      saveCurrentRamsReview(review);
-    }
-
-    await saveReviewWithStatus("Approved");
-  });
-
-  document.getElementById("underReviewBtn")?.addEventListener("click", async () => {
-    await saveReviewWithStatus("Under Review");
-  });
-
-  document.getElementById("rejectBtn")?.addEventListener("click", async () => {
-    await saveReviewWithStatus("Rejected");
-  });
+  document.getElementById("approveBtn").onclick = () => updateStatus("Approved");
+  document.getElementById("underReviewBtn").onclick = () => updateStatus("Under Review");
+  document.getElementById("rejectBtn").onclick = () => updateStatus("Rejected");
 });
