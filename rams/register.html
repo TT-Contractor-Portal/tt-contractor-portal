@@ -260,12 +260,19 @@
     const riskFilter = document.getElementById("riskFilter");
     const statusFilter = document.getElementById("statusFilter");
 
-    function addMonths(dateString, months) {
-      const date = new Date(dateString);
-      if (Number.isNaN(date.getTime())) return null;
-      date.setMonth(date.getMonth() + months);
-      return date;
-    }
+function formatDate(dateString) {
+  if (!dateString) return "-";
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return "-";
+  return date.toLocaleDateString("en-GB");
+}
+
+function addMonths(dateString, months) {
+  const date = new Date(dateString);
+  if (Number.isNaN(date.getTime())) return null;
+  date.setMonth(date.getMonth() + months);
+  return date;
+}
 
     function getComputedStatus(item) {
       if (item.status === "Approved" && item.review_date) {
