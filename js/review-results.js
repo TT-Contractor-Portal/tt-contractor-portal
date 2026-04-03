@@ -291,6 +291,66 @@ async function renderReview(review) {
   }
 }
 
+async function recalculateSupabaseClashes() {
+  const { data, error } = await client
+    .from("rams_reviews")
+    .select("*")
+    .order("start_date", { ascending: true });
+
+  if (error) {
+    alert("Failed to recalculate clashes: " + error.message);
+    return false;
+  }
+
+  const rows = data || [];
+  const approvedRows = rows.filter(r => r.status === "Approved");
+
+  const clashMap = {};
+  approvedRows.forEach(r => {
+    clashMap[r.id] = false;
+  });
+
+  for (let i = 0; i < approvedRows.length; i++) {
+    for (let j = i + 1; j < approvedRows.length; j++) {
+      const a = approvedRows[i];
+      const b = approvedRows[j];
+
+      const aStart = new Date(a.start_date);
+      const aEnd = new Date(a.end_date || a.start_date);
+      const bStart = new Date(b.start_date);
+      const bEnd = new Date(b.end_date || b.start_date);
+
+      const overlap = aStart <= bEnd && bStart <= aEnd;
+      if (!overlap) continue;
+
+      const aAreas = Array.isArray(a.areas) ? a.areas : [];
+      const bAreas = Array.isArray(b.areas) ? b.areas : [];
+
+      const sameArea = aAreas.some(area => bAreas.includes(area));
+      if (!sameArea) continue;
+
+      clashMap[a.id] = true;
+      clashMap[b.id] = true;
+    }
+  }
+
+  for (const row of rows) {
+    const newClashValue = row.status === "Approved" ? !!clashMap[row.id] : false;
+
+    const { error: updateError } = await client
+      .from("rams_reviews")
+      .update({ clash: newClashValue })
+      .eq("id", row.id);
+
+    if (updateError) {
+      alert("Failed to update clash flags: " + updateError.message);
+      return false;
+    }
+  }
+
+  return true;
+}
+
 // ==========================
 // UPDATE STATUS IN SUPABASE
 // ==========================
