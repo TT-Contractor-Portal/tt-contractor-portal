@@ -317,10 +317,23 @@ if (myProfile.role === "admin") {
       ? `<button data-id="${profile.id}" class="approveBtn approve-btn">Approve Reviewer</button>`
       : `<button disabled>Nothing to do</button>`;
 
-  const makeAdminButton =
-    profile.role !== "admin"
-      ? `<button data-id="${profile.id}" class="makeAdminBtn make-admin-btn">Make Admin</button>`
-      : `<button disabled>Already Admin</button>`;
+    let roleActionButton = "";
+
+  if (profile.id === user.id) {
+    roleActionButton = `<button disabled>Your Account</button>`;
+  } else if (profile.role === "admin") {
+    roleActionButton = `<button data-id="${profile.id}" data-role="reviewer" class="changeRoleBtn role-action-btn make-reviewer">Make Reviewer</button>`;
+  } else if (profile.role === "reviewer") {
+    roleActionButton = `
+      <button data-id="${profile.id}" data-role="admin" class="changeRoleBtn make-admin-btn">Make Admin</button>
+      <button data-id="${profile.id}" data-role="view_only" class="changeRoleBtn role-action-btn make-view-only">Make View Only</button>
+    `;
+  } else {
+    roleActionButton = `
+      <button data-id="${profile.id}" data-role="reviewer" class="changeRoleBtn role-action-btn make-reviewer">Make Reviewer</button>
+      <button data-id="${profile.id}" data-role="admin" class="changeRoleBtn make-admin-btn">Make Admin</button>
+    `;
+  }
 
   const toggleActiveButton =
     profile.is_active === false
