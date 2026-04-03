@@ -252,7 +252,7 @@ function updateClashesForAll() {
   localStorage.setItem("ramsReviews", JSON.stringify(stored));
 }
 
-function saveReviewWithStatus(status) {
+async function saveReviewWithStatus(status) {
  const draft = getDraftReviewData() || getCurrentRamsReview();
   const reviewerNotes = document.getElementById("reviewerNotes")?.value.trim() || "";
 
