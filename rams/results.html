@@ -386,9 +386,14 @@
       return;
     }
 
-    const canApprove = profile.role === "reviewer" || profile.role === "admin";
+   const canApprove = profile.role === "reviewer" || profile.role === "admin";
 
-    const approveBtn = document.getElementById("approveBtn");
+const adminNavLink = document.getElementById("adminNavLink");
+if (profile.role === "admin" && adminNavLink) {
+  adminNavLink.style.display = "block";
+}
+
+const approveBtn = document.getElementById("approveBtn");
 
     if (approveBtn && !canApprove) {
       approveBtn.disabled = true;
