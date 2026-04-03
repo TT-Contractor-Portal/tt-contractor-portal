@@ -178,6 +178,45 @@ function renderReview(review) {
     if (clashDetails) clashDetails.innerHTML = "";
   }
 }
+
+async function updateSupabaseReview(review, status) {
+  if (!review?.supabaseId) {
+    console.warn("No supabaseId found on review draft. Skipping Supabase update.");
+    return true;
+  }
+
+  const client = getReviewClient();
+
+  const updates = {
+    reviewer_notes: review.reviewerNotes || "",
+    review_date: review.reviewDate || new Date().toISOString(),
+    status: status,
+    clash: !!review.clash
+  };
+
+  if (status === "Approved") {
+    updates.approved_at = new Date().toISOString();
+    updates.approved_by = reviewCurrentUser?.id || null;
+    updates.approved_by_name = reviewCurrentProfile?.full_name || reviewCurrentUser?.email || "";
+  } else {
+    updates.approved_at = null;
+    updates.approved_by = null;
+    updates.approved_by_name = null;
+  }
+
+  const { error } = await client
+    .from("rams_reviews")
+    .update(updates)
+    .eq("id", review.supabaseId);
+
+  if (error) {
+    alert("Failed to update Supabase RAMS record: " + error.message);
+    return false;
+  }
+
+  return true;
+}
+
 function updateClashesForAll() {
   const stored = JSON.parse(localStorage.getItem("ramsReviews") || "[]");
 
