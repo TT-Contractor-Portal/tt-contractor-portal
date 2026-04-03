@@ -527,23 +527,35 @@ async function saveDraftToSupabase(draftReview) {
   return data;
 }
   
-  function runRamsReview() {
-    const draftReview = buildDraftReview();
-    if (!draftReview) return;
+async function runRamsReview() {
+  const pageOk = await protectPage();
+  if (!pageOk) return;
 
-        const clashFound = hasClash(draftReview);
+  const draftReview = buildDraftReview();
+  if (!draftReview) return;
 
-    draftReview.clash = clashFound;
-    draftReview.clashAcknowledged = false;
-    saveDraftRamsReview(draftReview);
+  const clashFound = hasClash(draftReview);
 
-    if (clashFound) {
-      document.getElementById("clashModal").style.display = "flex";
-      return;
-    }
+  draftReview.clash = clashFound;
+  draftReview.clashAcknowledged = false;
+  draftReview.userId = currentUser.id;
+  draftReview.submittedByName = currentUserProfile?.full_name || "";
+  draftReview.submittedByEmail = currentUser.email || "";
 
-    goToResults(false);
+  const savedRecord = await saveDraftToSupabase(draftReview);
+  if (!savedRecord) return;
+
+  draftReview.supabaseId = savedRecord.id;
+
+  saveDraftRamsReview(draftReview);
+
+  if (clashFound) {
+    document.getElementById("clashModal").style.display = "flex";
+    return;
   }
+
+  goToResults(false);
+}
 
   function closeModal(shouldContinue) {
     document.getElementById("clashModal").style.display = "none";
