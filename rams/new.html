@@ -577,6 +577,13 @@ if (file) {
       draftReview.clash = clashFound;
       draftReview.clashAcknowledged = false;
       draftReview.userId = currentUser.id;
+if (uploadedFile) {
+  draftReview.filePath = uploadedFile.path;
+  draftReview.fileName = uploadedFile.name;
+  draftReview.fileType = uploadedFile.type;
+  draftReview.fileSize = uploadedFile.size;
+}
+      
       draftReview.submittedByName = currentUserProfile?.full_name || "";
       draftReview.submittedByEmail = currentUser.email || "";
 
