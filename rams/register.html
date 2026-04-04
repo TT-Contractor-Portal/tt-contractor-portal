@@ -87,7 +87,7 @@
 
     table {
       width: 100%;
-      min-width: 1000px;
+      min-width: 1150px;
       border-collapse: collapse;
     }
 
@@ -225,16 +225,17 @@
     <div class="table-wrap">
       <table>
         <thead>
-         <tr>
-  <th>Contractor</th>
-  <th>Area</th>
-  <th>Risk Type</th>
-  <th>Start Date</th>
-  <th>Status</th>
-  <th>Approved By</th>
-  <th>Expiry</th>
-  <th>Action</th>
-</tr>
+          <tr>
+            <th>Contractor</th>
+            <th>Area</th>
+            <th>Risk Type</th>
+            <th>Start Date</th>
+            <th>Status</th>
+            <th>Approved By</th>
+            <th>Expiry</th>
+            <th>Document</th>
+            <th>Action</th>
+          </tr>
         </thead>
         <tbody id="registerTableBody"></tbody>
       </table>
@@ -260,19 +261,19 @@
     const riskFilter = document.getElementById("riskFilter");
     const statusFilter = document.getElementById("statusFilter");
 
-function formatDate(dateString) {
-  if (!dateString) return "-";
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return "-";
-  return date.toLocaleDateString("en-GB");
-}
+    function formatDate(dateString) {
+      if (!dateString) return "-";
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return "-";
+      return date.toLocaleDateString("en-GB");
+    }
 
-function addMonths(dateString, months) {
-  const date = new Date(dateString);
-  if (Number.isNaN(date.getTime())) return null;
-  date.setMonth(date.getMonth() + months);
-  return date;
-}
+    function addMonths(dateString, months) {
+      const date = new Date(dateString);
+      if (Number.isNaN(date.getTime())) return null;
+      date.setMonth(date.getMonth() + months);
+      return date;
+    }
 
     function getComputedStatus(item) {
       if (item.status === "Approved" && item.review_date) {
@@ -306,6 +307,45 @@ function addMonths(dateString, months) {
       return [...new Set(items.filter(Boolean))].sort((a, b) => a.localeCompare(b));
     }
 
+    function getStartDateDisplay(dateString) {
+      if (!dateString) return "-";
+
+      const today = new Date();
+      const start = new Date(dateString);
+
+      today.setHours(0, 0, 0, 0);
+      start.setHours(0, 0, 0, 0);
+
+      const diffDays = Math.floor((start - today) / (1000 * 60 * 60 * 24));
+
+      if (diffDays === 0) return `<strong>Today</strong>`;
+      if (diffDays === 1) return `<strong>Tomorrow</strong>`;
+
+      if (diffDays < 0) {
+        return `<span style="color:#b42318;">${formatDate(dateString)}</span>`;
+      }
+
+      return formatDate(dateString);
+    }
+
+    async function openRegisterDocument(filePath) {
+      if (!filePath) {
+        alert("No document attached to this RAMS.");
+        return;
+      }
+
+      const { data, error } = await client.storage
+        .from("rams-files")
+        .createSignedUrl(filePath, 300);
+
+      if (error || !data?.signedUrl) {
+        alert("Could not open document: " + (error?.message || "Unknown error"));
+        return;
+      }
+
+      window.open(data.signedUrl, "_blank");
+    }
+
     function populateFilters(rows) {
       const contractorValues = uniqueSortedValues(rows.map(r => r.contractor_name));
 
@@ -334,11 +374,11 @@ function addMonths(dateString, months) {
       registerTableBody.innerHTML = "";
 
       if (!rows.length) {
-    registerTableBody.innerHTML = `
-  <tr>
-    <td colspan="8" class="empty-row">No RAMS records found.</td>
-  </tr>
-`;
+        registerTableBody.innerHTML = `
+          <tr>
+            <td colspan="9" class="empty-row">No RAMS records found.</td>
+          </tr>
+        `;
         return;
       }
 
@@ -353,19 +393,33 @@ function addMonths(dateString, months) {
           ? item.risks.join(", ")
           : "-";
 
+        const hasDocument = !!item.file_path;
+        const documentCell = hasDocument
+          ? `<a href="#" class="view-link view-document-link" data-file-path="${item.file_path}">View File</a>`
+          : `<span style="color:#999;">None</span>`;
+
         const row = document.createElement("tr");
-      row.innerHTML = `
-  <td>${item.contractor_name || "-"}</td>
-  <td>${areaText}</td>
-  <td>${riskText}</td>
- <td>${getStartDateDisplay(item.start_date)}</td>
-  <td><span class="badge ${getBadgeClass(computedStatus)}">${computedStatus}</span></td>
-  <td>${item.approved_by_name || "-"}</td>
-  <td>${getExpiryText(item)}</td>
-  <td><a class="view-link" href="/rams/results.html?id=${item.id}">View Record</a></td>
-`;
+        row.innerHTML = `
+          <td>${item.contractor_name || "-"}</td>
+          <td>${areaText}</td>
+          <td>${riskText}</td>
+          <td>${getStartDateDisplay(item.start_date)}</td>
+          <td><span class="badge ${getBadgeClass(computedStatus)}">${computedStatus}</span></td>
+          <td>${item.approved_by_name || "-"}</td>
+          <td>${getExpiryText(item)}</td>
+          <td>${documentCell}</td>
+          <td><a class="view-link" href="/rams/results.html?id=${item.id}">View Record</a></td>
+        `;
 
         registerTableBody.appendChild(row);
+      });
+
+      document.querySelectorAll(".view-document-link").forEach(link => {
+        link.addEventListener("click", async (event) => {
+          event.preventDefault();
+          const filePath = event.currentTarget.getAttribute("data-file-path");
+          await openRegisterDocument(filePath);
+        });
       });
     }
 
@@ -407,8 +461,6 @@ function addMonths(dateString, months) {
 
       renderTable(filtered);
     }
-
-
 
     async function loadRegister() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
@@ -473,27 +525,6 @@ function addMonths(dateString, months) {
     statusFilter.addEventListener("change", applyFilters);
 
     loadRegister();
-
-function getStartDateDisplay(dateString) {
-  if (!dateString) return "-";
-
-  const today = new Date();
-  const start = new Date(dateString);
-
-  today.setHours(0,0,0,0);
-  start.setHours(0,0,0,0);
-
-  const diffDays = Math.floor((start - today) / (1000 * 60 * 60 * 24));
-
-  if (diffDays === 0) return `<strong>Today</strong>`;
-  if (diffDays === 1) return `<strong>Tomorrow</strong>`;
-
-  if (diffDays < 0) {
-    return `<span style="color:#b42318;">${formatDate(dateString)}</span>`;
-  }
-
-  return formatDate(dateString);
-}
   </script>
 </body>
 </html>
