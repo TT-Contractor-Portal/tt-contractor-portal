@@ -554,6 +554,19 @@ async function uploadFileToSupabase(file) {
       if (runReviewBtn) runReviewBtn.disabled = true;
 
       const draftReview = buildDraftReview();
+      const fileInput = document.getElementById("ramsfile");
+const file = fileInput?.files?.[0];
+
+let uploadedFile = null;
+
+if (file) {
+  uploadedFile = await uploadFileToSupabase(file);
+
+  if (!uploadedFile) {
+    if (runReviewBtn) runReviewBtn.disabled = false;
+    return;
+  }
+}
       if (!draftReview) {
         if (runReviewBtn) runReviewBtn.disabled = false;
         return;
