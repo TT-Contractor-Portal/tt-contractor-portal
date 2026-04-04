@@ -383,9 +383,9 @@ if (myProfile.role === "admin") {
     <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
     <td>${lastSignInText}</td>
     <td>${createdText}</td>
-    <td>${approveButton}</td>
-    <td>${roleActionButton}</td>
-    <td>${toggleActiveButton}</td>
+   <td class="action-cell"><div class="action-stack">${approveButton}</div></td>
+<td class="action-cell"><div class="action-stack">${roleActionButton}</div></td>
+<td class="action-cell"><div class="action-stack">${toggleActiveButton}</div></td>
   `;
 
   tbody.appendChild(row);
