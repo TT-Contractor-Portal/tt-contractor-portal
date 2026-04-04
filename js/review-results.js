@@ -103,6 +103,15 @@ function formatDateTime(dateString) {
   return date.toLocaleString("en-GB");
 }
 
+function formatFileSize(bytes) {
+  if (!bytes || Number.isNaN(Number(bytes))) return "";
+  const size = Number(bytes);
+
+  if (size < 1024) return `${size} bytes`;
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value || "-";
@@ -160,6 +169,10 @@ async function loadReviewFromSupabase(id) {
     detectedRisks: data.detected_risks || [],
     recommendedPermits: data.recommended_permits || [],
     uploadedFileName: data.uploaded_file_name || "",
+    fileName: data.file_name || "",
+    filePath: data.file_path || "",
+    fileType: data.file_type || "",
+    fileSize: data.file_size || null,
     startDate: data.start_date || "",
     endDate: data.end_date || "",
     duration: data.duration || 1,
@@ -173,6 +186,53 @@ async function loadReviewFromSupabase(id) {
     clash: !!data.clash,
     clashAcknowledged: false,
     status: data.status || "Under Review"
+  };
+}
+
+// ==========================
+// DOCUMENT VIEW
+// ==========================
+async function openRamsDocument() {
+  if (!currentReview?.filePath) {
+    alert("No document is attached to this RAMS.");
+    return;
+  }
+
+  const { data, error } = await client.storage
+    .from("rams-files")
+    .createSignedUrl(currentReview.filePath, 300);
+
+  if (error || !data?.signedUrl) {
+    alert("Could not open document: " + (error?.message || "Unknown error"));
+    return;
+  }
+
+  window.open(data.signedUrl, "_blank");
+}
+
+function renderDocumentSection(review) {
+  const documentPanel = document.getElementById("documentPanel");
+  const documentName = document.getElementById("documentName");
+  const documentMeta = document.getElementById("documentMeta");
+  const viewDocumentBtn = document.getElementById("viewDocumentBtn");
+
+  if (!documentPanel || !documentName || !documentMeta || !viewDocumentBtn) return;
+
+  if (!review.filePath) {
+    documentPanel.style.display = "none";
+    return;
+  }
+
+  documentPanel.style.display = "block";
+  documentName.textContent = review.fileName || review.uploadedFileName || "Uploaded RAMS document";
+
+  const metaParts = [];
+  if (review.fileType) metaParts.push(review.fileType);
+  if (review.fileSize) metaParts.push(formatFileSize(review.fileSize));
+  documentMeta.textContent = metaParts.join(" • ");
+
+  viewDocumentBtn.onclick = async () => {
+    await openRamsDocument();
   };
 }
 
@@ -245,6 +305,8 @@ async function renderReview(review) {
 
   renderList("resultMissingItems", review.missingItems);
   renderList("resultWeakItems", review.weakItems);
+
+  renderDocumentSection(review);
 
   const reviewerNotes = document.getElementById("reviewerNotes");
   if (reviewerNotes) {
@@ -389,7 +451,7 @@ async function updateStatus(status) {
     updates.approved_at = null;
   }
 
-    const { error } = await client
+  const { error } = await client
     .from("rams_reviews")
     .update(updates)
     .eq("id", currentReview.supabaseId);
