@@ -481,6 +481,30 @@
       });
     }
 
+async function uploadFileToSupabase(file) {
+  if (!file) return null;
+
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `rams/${fileName}`;
+
+  const { data, error } = await client.storage
+    .from("rams-files")
+    .upload(filePath, file);
+
+  if (error) {
+    alert("File upload failed: " + error.message);
+    return null;
+  }
+
+  return {
+    path: filePath,
+    name: file.name,
+    type: file.type,
+    size: file.size
+  };
+}
+    
     async function saveDraftToSupabase(draftReview) {
       if (!currentUser) {
         alert("You must be logged in to save a RAMS.");
