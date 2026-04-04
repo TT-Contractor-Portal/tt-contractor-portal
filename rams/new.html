@@ -511,27 +511,33 @@ async function uploadFileToSupabase(file) {
         return null;
       }
 
-      const payload = {
-        user_id: currentUser.id,
-        contractor_name: draftReview.contractorName,
-        job_title: draftReview.jobTitle,
-        location: draftReview.location,
-        areas: draftReview.areas || [],
-        risks: draftReview.risks || [],
-        detected_areas: draftReview.detectedAreas || [],
-        detected_risks: draftReview.detectedRisks || [],
-        recommended_permits: draftReview.recommendedPermits || [],
-        uploaded_file_name: draftReview.uploadedFileName || "",
-        start_date: draftReview.startDate || null,
-        end_date: draftReview.endDate || null,
-        duration: draftReview.duration || 1,
-        duration_unit: draftReview.durationUnit || "days",
-        review_date: draftReview.reviewDate || null,
-        reviewer_notes: draftReview.reviewerNotes || "",
-        status: draftReview.status || "Under Review",
-        clash: !!draftReview.clash
-      };
+  const payload = {
+  user_id: currentUser.id,
+  contractor_name: draftReview.contractorName,
+  job_title: draftReview.jobTitle,
+  location: draftReview.location,
+  areas: draftReview.areas || [],
+  risks: draftReview.risks || [],
+  detected_areas: draftReview.detectedAreas || [],
+  detected_risks: draftReview.detectedRisks || [],
+  recommended_permits: draftReview.recommendedPermits || [],
+  uploaded_file_name: draftReview.uploadedFileName || "",
 
+  // 🔽 NEW FILE FIELDS
+  file_name: draftReview.fileName || null,
+  file_path: draftReview.filePath || null,
+  file_type: draftReview.fileType || null,
+  file_size: draftReview.fileSize || null,
+
+  start_date: draftReview.startDate || null,
+  end_date: draftReview.endDate || null,
+  duration: draftReview.duration || 1,
+  duration_unit: draftReview.durationUnit || "days",
+  review_date: draftReview.reviewDate || null,
+  reviewer_notes: draftReview.reviewerNotes || "",
+  status: draftReview.status || "Under Review",
+  clash: !!draftReview.clash
+};
       const { data, error } = await client
         .from("rams_reviews")
         .insert([payload])
