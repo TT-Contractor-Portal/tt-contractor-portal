@@ -828,6 +828,24 @@ area_ppe_snapshot: draftReview.areaPpeSnapshot || []
       return data;
     }
 
+async function runAiReviewForRecord(ramsReviewId) {
+  const response = await fetch("/.netlify/functions/review-rams-document", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ ramsReviewId })
+  });
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(result.error || "AI review failed.");
+  }
+
+  return result;
+}
+    
     async function runRamsReview() {
       const pageOk = await protectPage();
       if (!pageOk) return;
