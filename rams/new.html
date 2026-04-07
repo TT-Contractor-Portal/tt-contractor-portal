@@ -889,13 +889,19 @@ async function runAiReviewForRecord(ramsReviewId) {
       draftReview.submittedByName = currentUserProfile?.full_name || "";
       draftReview.submittedByEmail = currentUser.email || "";
 
-      const savedRecord = await saveDraftToSupabase(draftReview);
-      if (!savedRecord) {
-        if (runReviewBtn) runReviewBtn.disabled = false;
-        return;
-      }
+     const savedRecord = await saveDraftToSupabase(draftReview);
+if (!savedRecord) {
+  if (runReviewBtn) runReviewBtn.disabled = false;
+  return;
+}
 
-      pendingSupabaseId = savedRecord.id;
+try {
+  await runAiReviewForRecord(savedRecord.id);
+} catch (error) {
+  alert("RAMS was saved, but AI review failed: " + error.message);
+}
+
+pendingSupabaseId = savedRecord.id;
 
       if (clashFound) {
         const clashModalDetails = document.getElementById("clashModalDetails");
