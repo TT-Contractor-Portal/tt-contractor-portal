@@ -911,9 +911,12 @@ if (!savedRecord) {
   return;
 }
 
+let aiReviewFailed = false;
+
 try {
   await runAiReviewForRecord(savedRecord.id);
 } catch (error) {
+  aiReviewFailed = true;
   alert("RAMS was saved, but AI review failed: " + error.message);
 }
 
