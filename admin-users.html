@@ -4,221 +4,213 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Users - TT Contractor Portal</title>
-<style>
-  body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f5f5f5;
-    color: #222;
-  }
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
 
-  .sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 240px;
-    height: 100vh;
-    background: #035740;
-    color: white;
-    padding: 24px 20px;
-    box-sizing: border-box;
-  }
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
 
-  .sidebar h1 {
-    font-size: 22px;
-    margin: 0 0 30px 0;
-    line-height: 1.3;
-  }
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+      line-height: 1.3;
+    }
 
-  .sidebar a {
-    display: block;
-    color: white;
-    text-decoration: none;
-    margin: 14px 0;
-    font-size: 16px;
-  }
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
 
-  .main {
-    margin-left: 240px;
-    padding: 30px;
-  }
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
 
-  .topbar {
-    background: white;
-    padding: 18px 24px;
-    border-radius: 12px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    margin-bottom: 24px;
-  }
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
 
-  .panel {
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  }
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
 
-  .panel h2 {
-    margin: 0 0 18px 0;
-    font-size: 22px;
-  }
+    .panel h2 {
+      margin: 0 0 18px 0;
+      font-size: 22px;
+    }
 
-  .table-wrap {
-  width: 100%;
-  overflow-x: auto;
-  margin-top: 16px;
-}
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      margin-top: 16px;
+    }
 
-table {
-  width: 100%;
-  min-width: 0;
-  border-collapse: collapse;
-}
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+    }
 
-th,
-td {
-  text-align: left;
-  padding: 10px 6px;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 13px;
-  vertical-align: middle;
-  white-space: normal;
-}
+    th,
+    td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
 
-  th {
-    background: #f8fafc;
-    font-weight: 700;
-  }
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+    }
 
-button {
-  display: inline-block;
-  margin-top: 0;
-  padding: 8px 10px;
-  background: #005f47;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 1.2;
-  cursor: pointer;
-}
+    button {
+      display: inline-block;
+      margin-top: 0;
+      padding: 8px 12px;
+      background: #005f47;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 1.2;
+      cursor: pointer;
+    }
 
-button:hover {
-  opacity: 0.92;
-}
+    button:hover {
+      opacity: 0.92;
+    }
 
-button:disabled {
-  opacity: 0.55;
-  cursor: not-allowed;
-}
-td button {
-  white-space: nowrap;
-}
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
 
-td:nth-child(9),
-td:nth-child(10),
-td:nth-child(11),
-th:nth-child(9),
-th:nth-child(10),
-th:nth-child(11) {
-  width: 120px;
-}
-  
-.status-pill {
-  display: inline-block;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 700;
-}
+    .status-pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-.status-pill.active {
-  background: #dcfce7;
-  color: #166534;
-}
+    .status-pill.active {
+      background: #dcfce7;
+      color: #166534;
+    }
 
-.status-pill.inactive {
-  background: #fee2e2;
-  color: #991b1b;
-}
+    .status-pill.inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
 
-.approve-btn {
-  background: #005f47;
-}
+    .approve-btn {
+      background: #005f47;
+    }
 
-.make-admin-btn {
-  background: #1d4ed8;
-}
+    .toggle-active-btn.deactivate {
+      background: #b91c1c;
+    }
 
-.toggle-active-btn.deactivate {
-  background: #b91c1c;
-}
+    .toggle-active-btn.activate {
+      background: #166534;
+    }
 
-.toggle-active-btn.activate {
-  background: #166534;
-}
+    .name-cell {
+      min-width: 180px;
+    }
 
-#message {
-  margin-top: 16px;
-  min-height: 20px;
-  font-weight: 600;
-}
+    .name-link {
+      color: #035740;
+      text-decoration: none;
+      font-weight: 600;
+    }
 
-.name-cell {
-  white-space: normal;
-  min-width: 120px;
-}
+    .name-link:hover {
+      text-decoration: underline;
+    }
 
-.email-cell {
-  min-width: 190px;
-}
+    .action-cell {
+      min-width: 170px;
+    }
 
-td button {
-  white-space: nowrap;
-}
+    .action-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-start;
+    }
 
-.role-action-btn.make-reviewer {
-  background: #7c3aed;
-}
+    .role-action-wrap {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
 
-.role-action-btn.make-view-only {
-  background: #6b7280;
-}
+    .role-select {
+      min-width: 130px;
+      padding: 8px 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 13px;
+      background: white;
+      color: #222;
+    }
 
-@media (max-width: 700px) {
-  .sidebar {
-    position: static;
-    width: 100%;
-    height: auto;
-  }
+    .apply-role-btn {
+      background: #1d4ed8;
+    }
 
-  .main {
-    margin-left: 0;
-  }
+    #message {
+      margin-top: 16px;
+      min-height: 20px;
+      font-weight: 600;
+    }
 
-.action-cell {
-  min-width: 120px;
-}
+    @media (max-width: 700px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
 
-.action-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-start;
-}
-  td:nth-child(7),
-td:nth-child(8),
-th:nth-child(7),
-th:nth-child(8) {
-  width: 120px;
-}
-}
-</style>
+      .main {
+        margin-left: 0;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="sidebar">
-   <h1>TT Contractor<br>Portal</h1>
+    <h1>TT Contractor<br>Portal</h1>
     <a href="/index.html">Dashboard</a>
     <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
     <a href="/rams/register.html">RAMS</a>
@@ -229,55 +221,67 @@ th:nth-child(8) {
     <a href="/sop/index.html">SOP / SSW</a>
   </div>
 
- <div class="main">
-  <div class="topbar">
-    <strong id="welcomeText">Welcome</strong>
+  <div class="main">
+    <div class="topbar">
+      <strong id="welcomeText">Welcome</strong>
+    </div>
+
+    <div class="panel">
+      <h2>Admin User Management</h2>
+
+      <div class="table-wrap">
+        <table id="usersTable">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Role</th>
+              <th>Status</th>
+              <th>Reviewer Action</th>
+              <th>Role Action</th>
+              <th>Account Action</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <div id="message"></div>
+    </div>
   </div>
 
-  <div class="panel">
-    <h2>Admin User Management</h2>
-
-   <div class="table-wrap">
-  <table id="usersTable">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Email</th>
-        <th>Role</th>
-        <th>Status</th>
-        <th>Requested Reviewer</th>
-        <th>Approved</th>
-        <th>Last Sign In</th>
-        <th>Created</th>
-        <th>Reviewer Action</th>
-        <th>Role Action</th>
-        <th>Account Action</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-
-    <div id="message"></div>
-  </div>
-</div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzZWYiLCJyZWYiOiJyZmN3ZmJkY2RuanBheHd6dHZmciIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzc0Mzg0OTc1LCJleHAiOjIwODk5NjA5NzV9.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const tbody = document.querySelector("#usersTable tbody");
     const message = document.getElementById("message");
 
+    function getRoleLabel(role) {
+      if (role === "admin") return "Admin";
+      if (role === "reviewer") return "Reviewer";
+      return "View Only";
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
     async function loadUsers() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
 
-   if (sessionError || !sessionData.session) {
-  window.location.href = "/login.html";
-  return;
-}
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
       const user = sessionData.session.user;
 
       const { data: myProfile, error: myProfileError } = await client
@@ -286,37 +290,38 @@ th:nth-child(8) {
         .eq("id", user.id)
         .single();
 
-    if (myProfileError || !myProfile) {
-  alert("Profile not found");
-  window.location.href = "/login.html";
-  return;
-}
+      if (myProfileError || !myProfile) {
+        alert("Profile not found");
+        window.location.href = "/login.html";
+        return;
+      }
 
-   if (myProfile.role !== "admin") {
-  alert("Admin access only");
-  window.location.href = "/index.html";
-  return;
-}
+      if (myProfile.role !== "admin") {
+        alert("Admin access only");
+        window.location.href = "/index.html";
+        return;
+      }
 
-let roleLabel = "View Only";
+      let roleLabel = "View Only";
 
-if (myProfile.role === "admin") {
-  roleLabel = "Admin";
-} else if (myProfile.role === "reviewer") {
-  roleLabel = "Reviewer";
-}
+      if (myProfile.role === "admin") {
+        roleLabel = "Admin";
+      } else if (myProfile.role === "reviewer") {
+        roleLabel = "Reviewer";
+      }
 
-const firstName = myProfile.full_name
-  ? myProfile.full_name.split(" ")[0]
-  : "User";
+      const firstName = myProfile.full_name
+        ? myProfile.full_name.split(" ")[0]
+        : "User";
 
-const welcomeText = document.getElementById("welcomeText");
-welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+      const welcomeText = document.getElementById("welcomeText");
+      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
 
-const adminNavLink = document.getElementById("adminNavLink");
-if (myProfile.role === "admin") {
-  adminNavLink.style.display = "block";
-}
+      const adminNavLink = document.getElementById("adminNavLink");
+      if (myProfile.role === "admin") {
+        adminNavLink.style.display = "block";
+      }
+
       const { data: users, error: usersError } = await client
         .from("user_profiles")
         .select("*")
@@ -329,190 +334,201 @@ if (myProfile.role === "admin") {
 
       tbody.innerHTML = "";
 
-   users.forEach((profile) => {
-  const row = document.createElement("tr");
+      users.forEach((profile) => {
+        const row = document.createElement("tr");
 
-  const roleText =
-    profile.role === "admin"
-      ? "Admin"
-      : profile.role === "reviewer"
-      ? "Reviewer"
-      : "View Only";
+        const roleText = getRoleLabel(profile.role);
 
-  const statusPill = profile.is_active === false
-    ? `<span class="status-pill inactive">Inactive</span>`
-    : `<span class="status-pill active">Active</span>`;
+        const statusPill = profile.is_active === false
+          ? `<span class="status-pill inactive">Inactive</span>`
+          : `<span class="status-pill active">Active</span>`;
 
-  const approveButton =
-    profile.reviewer_requested === true && profile.role !== "reviewer" && profile.role !== "admin"
-      ? `<button data-id="${profile.id}" class="approveBtn approve-btn">Approve Reviewer</button>`
-      : `<button disabled>Nothing to do</button>`;
+        const reviewerAction =
+          profile.reviewer_requested === true &&
+          profile.role !== "reviewer" &&
+          profile.role !== "admin"
+            ? `<button data-id="${profile.id}" class="approveBtn approve-btn">Approve Reviewer</button>`
+            : `<button disabled>Nothing to do</button>`;
 
-    let roleActionButton = "";
+        let roleAction = "";
 
-  if (profile.id === user.id) {
-    roleActionButton = `<button disabled>Your Account</button>`;
-  } else if (profile.role === "admin") {
-    roleActionButton = `<button data-id="${profile.id}" data-role="reviewer" class="changeRoleBtn role-action-btn make-reviewer">Make Reviewer</button>`;
-  } else if (profile.role === "reviewer") {
-    roleActionButton = `
-      <button data-id="${profile.id}" data-role="admin" class="changeRoleBtn make-admin-btn">Make Admin</button>
-      <button data-id="${profile.id}" data-role="view_only" class="changeRoleBtn role-action-btn make-view-only">Make View Only</button>
-    `;
-  } else {
-    roleActionButton = `
-      <button data-id="${profile.id}" data-role="reviewer" class="changeRoleBtn role-action-btn make-reviewer">Make Reviewer</button>
-      <button data-id="${profile.id}" data-role="admin" class="changeRoleBtn make-admin-btn">Make Admin</button>
-    `;
-  }
-
-  const toggleActiveButton =
-    profile.is_active === false
-      ? `<button data-id="${profile.id}" data-active="false" class="toggleActiveBtn toggle-active-btn activate">Activate</button>`
-      : `<button data-id="${profile.id}" data-active="true" class="toggleActiveBtn toggle-active-btn deactivate">Deactivate</button>`;
-
-  const lastSignInText = profile.last_sign_in_at
-    ? new Date(profile.last_sign_in_at).toLocaleString("en-GB")
-    : "Never";
-
-  const createdText = profile.created_at
-    ? new Date(profile.created_at).toLocaleString("en-GB")
-    : "-";
-
-  row.innerHTML = `
-   <td class="name-cell">${profile.full_name || ""}</td>
-   <td class="email-cell">${profile.email || ""}</td>
-    <td>${roleText}</td>
-    <td>${statusPill}</td>
-    <td>${profile.reviewer_requested ? "Yes" : "No"}</td>
-    <td>${profile.reviewer_approved ? "Yes" : "No"}</td>
-    <td>${lastSignInText}</td>
-    <td>${createdText}</td>
-   <td class="action-cell"><div class="action-stack">${approveButton}</div></td>
-<td class="action-cell"><div class="action-stack">${roleActionButton}</div></td>
-<td class="action-cell"><div class="action-stack">${toggleActiveButton}</div></td>
-  `;
-
-  tbody.appendChild(row);
-});
-    document.querySelectorAll(".approveBtn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const userId = btn.getAttribute("data-id");
-
-    const { error: updateError } = await client
-      .from("user_profiles")
-      .update({
-        reviewer_approved: true,
-        can_review: true,
-        role: "reviewer"
-      })
-      .eq("id", userId);
-
-    if (updateError) {
-      message.textContent = updateError.message;
-      return;
-    }
-
-    message.textContent = "Reviewer approved.";
-    loadUsers();
-  });
-});
-
-document.querySelectorAll(".changeRoleBtn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const userId = btn.getAttribute("data-id");
-    const newRole = btn.getAttribute("data-role");
-
-    if (userId === user.id) {
-      message.textContent = "You cannot change your own admin role.";
-      return;
-    }
-
-    let updates = {};
-
-    if (newRole === "admin") {
-      updates = {
-        role: "admin",
-        reviewer_requested: true,
-        reviewer_approved: true,
-        can_review: true
-      };
-    } else if (newRole === "reviewer") {
-      updates = {
-        role: "reviewer",
-        reviewer_requested: true,
-        reviewer_approved: true,
-        can_review: true
-      };
-    } else if (newRole === "view_only") {
-      updates = {
-        role: "view_only",
-        reviewer_approved: false,
-        can_review: false
-      };
-    }
-
-    const { error: updateError } = await client
-      .from("user_profiles")
-      .update(updates)
-      .eq("id", userId);
-
-    if (updateError) {
-      message.textContent = updateError.message;
-      return;
-    }
-
-    if (newRole === "admin") {
-      message.textContent = "User upgraded to admin.";
-    } else if (newRole === "reviewer") {
-      message.textContent = "User changed to reviewer.";
-    } else {
-      message.textContent = "User changed to view only.";
-    }
-
-    loadUsers();
-  });
-});
-      
-     document.querySelectorAll(".toggleActiveBtn").forEach((btn) => {
-  btn.addEventListener("click", async () => {
-    const userId = btn.getAttribute("data-id");
-    const currentlyActive = btn.getAttribute("data-active") === "true";
-
-    if (userId === user.id) {
-      message.textContent = "You cannot deactivate your own admin account.";
-      return;
-    }
-
-    const updates = currentlyActive
-      ? {
-          is_active: false,
-          deactivated_at: new Date().toISOString(),
-          deactivated_by: user.id
+        if (profile.id === user.id) {
+          roleAction = `
+            <div class="role-action-wrap">
+              <select class="role-select" disabled>
+                <option>${roleText}</option>
+              </select>
+              <button class="apply-role-btn" disabled>Apply</button>
+            </div>
+          `;
+        } else {
+          roleAction = `
+            <div class="role-action-wrap">
+              <select class="roleSelect role-select" data-id="${profile.id}">
+                <option value="">Select role</option>
+                <option value="view_only" ${profile.role === "view_only" ? "selected" : ""}>View Only</option>
+                <option value="reviewer" ${profile.role === "reviewer" ? "selected" : ""}>Reviewer</option>
+                <option value="admin" ${profile.role === "admin" ? "selected" : ""}>Admin</option>
+              </select>
+              <button data-id="${profile.id}" class="applyRoleBtn apply-role-btn">Apply</button>
+            </div>
+          `;
         }
-      : {
-          is_active: true,
-          deactivated_at: null,
-          deactivated_by: null
-        };
 
-    const { error: updateError } = await client
-      .from("user_profiles")
-      .update(updates)
-      .eq("id", userId);
+        const accountAction =
+          profile.id === user.id
+            ? `<button disabled>Your Account</button>`
+            : profile.is_active === false
+              ? `<button data-id="${profile.id}" data-active="false" class="toggleActiveBtn toggle-active-btn activate">Activate</button>`
+              : `<button data-id="${profile.id}" data-active="true" class="toggleActiveBtn toggle-active-btn deactivate">Deactivate</button>`;
 
-    if (updateError) {
-      message.textContent = updateError.message;
-      return;
-    }
+        row.innerHTML = `
+          <td class="name-cell">
+            <a class="name-link" href="/admin-user-profile.html?id=${encodeURIComponent(profile.id)}">
+              ${escapeHtml(profile.full_name || "Unnamed User")}
+            </a>
+          </td>
+          <td>${roleText}</td>
+          <td>${statusPill}</td>
+          <td class="action-cell">
+            <div class="action-stack">${reviewerAction}</div>
+          </td>
+          <td class="action-cell">
+            <div class="action-stack">${roleAction}</div>
+          </td>
+          <td class="action-cell">
+            <div class="action-stack">${accountAction}</div>
+          </td>
+        `;
 
-    message.textContent = currentlyActive
-      ? "User deactivated."
-      : "User activated.";
+        tbody.appendChild(row);
+      });
 
-    loadUsers();
-  });
-}); 
+      document.querySelectorAll(".approveBtn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const userId = btn.getAttribute("data-id");
+
+          const { error: updateError } = await client
+            .from("user_profiles")
+            .update({
+              reviewer_approved: true,
+              can_review: true,
+              role: "reviewer"
+            })
+            .eq("id", userId);
+
+          if (updateError) {
+            message.textContent = updateError.message;
+            return;
+          }
+
+          message.textContent = "Reviewer approved.";
+          loadUsers();
+        });
+      });
+
+      document.querySelectorAll(".applyRoleBtn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const userId = btn.getAttribute("data-id");
+
+          if (userId === user.id) {
+            message.textContent = "You cannot change your own admin role.";
+            return;
+          }
+
+          const select = document.querySelector(`.roleSelect[data-id="${userId}"]`);
+          const newRole = select ? select.value : "";
+
+          if (!newRole) {
+            message.textContent = "Please select a role first.";
+            return;
+          }
+
+          let updates = {};
+
+          if (newRole === "admin") {
+            updates = {
+              role: "admin",
+              reviewer_requested: true,
+              reviewer_approved: true,
+              can_review: true
+            };
+          } else if (newRole === "reviewer") {
+            updates = {
+              role: "reviewer",
+              reviewer_requested: true,
+              reviewer_approved: true,
+              can_review: true
+            };
+          } else if (newRole === "view_only") {
+            updates = {
+              role: "view_only",
+              reviewer_approved: false,
+              can_review: false
+            };
+          }
+
+          const { error: updateError } = await client
+            .from("user_profiles")
+            .update(updates)
+            .eq("id", userId);
+
+          if (updateError) {
+            message.textContent = updateError.message;
+            return;
+          }
+
+          if (newRole === "admin") {
+            message.textContent = "User upgraded to admin.";
+          } else if (newRole === "reviewer") {
+            message.textContent = "User changed to reviewer.";
+          } else {
+            message.textContent = "User changed to view only.";
+          }
+
+          loadUsers();
+        });
+      });
+
+      document.querySelectorAll(".toggleActiveBtn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const userId = btn.getAttribute("data-id");
+          const currentlyActive = btn.getAttribute("data-active") === "true";
+
+          if (userId === user.id) {
+            message.textContent = "You cannot deactivate your own admin account.";
+            return;
+          }
+
+          const updates = currentlyActive
+            ? {
+                is_active: false,
+                deactivated_at: new Date().toISOString(),
+                deactivated_by: user.id
+              }
+            : {
+                is_active: true,
+                deactivated_at: null,
+                deactivated_by: null
+              };
+
+          const { error: updateError } = await client
+            .from("user_profiles")
+            .update(updates)
+            .eq("id", userId);
+
+          if (updateError) {
+            message.textContent = updateError.message;
+            return;
+          }
+
+          message.textContent = currentlyActive
+            ? "User deactivated."
+            : "User activated.";
+
+          loadUsers();
+        });
+      });
     }
 
     loadUsers();
