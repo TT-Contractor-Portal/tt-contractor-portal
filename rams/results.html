@@ -616,7 +616,8 @@ function showStatusMessage(message, type = "success") {
     }
 
     function renderReview(review) {
-      const ruleSnapshot = normaliseRuleSnapshot(review.area_rule_snapshot);
+   const ruleSnapshot = normaliseArraySnapshot(review.area_rule_snapshot);
+const ppeSnapshot = normaliseArraySnapshot(review.area_ppe_snapshot);
       const permits = buildRecommendedPermits(review);
 
       document.getElementById("topbarSummary").textContent = review.job_title || "RAMS review";
