@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>User Profile - Admin</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      max-width: 700px;
+    }
+
+    .panel h2 {
+      margin-bottom: 20px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .label {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 4px;
+    }
+
+    .value {
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .status-pill {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .active {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .inactive {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 10px 14px;
+      background: #005f47;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <h1>TT Contractor<br>Portal</h1>
+  <a href="/index.html">Dashboard</a>
+  <a href="/admin-users.html">Admin</a>
+  <a href="/rams/register.html">RAMS</a>
+  <a href="/rams/new.html">New RAMS</a>
+</div>
+
+<div class="main">
+
+  <div class="topbar">
+    <strong id="welcomeText">Loading...</strong>
+  </div>
+
+  <div class="panel">
+    <h2>User Profile</h2>
+
+    <div id="profileContent">Loading...</div>
+
+    <button onclick="window.history.back()">← Back</button>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_KEY_HERE";
+
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const profileContent = document.getElementById("profileContent");
+
+function getParam(name) {
+  return new URLSearchParams(window.location.search).get(name);
+}
+
+async function loadProfile() {
+  const userId = getParam("id");
+
+  if (!userId) {
+    profileContent.innerHTML = "No user ID provided.";
+    return;
+  }
+
+  const { data: sessionData } = await client.auth.getSession();
+
+  if (!sessionData.session) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  const currentUser = sessionData.session.user;
+
+  const { data: myProfile } = await client
+    .from("user_profiles")
+    .select("*")
+    .eq("id", currentUser.id)
+    .single();
+
+  if (!myProfile || myProfile.role !== "admin") {
+    alert("Admin access only");
+    window.location.href = "/index.html";
+    return;
+  }
+
+  const welcomeText = document.getElementById("welcomeText");
+  welcomeText.textContent = `Welcome, ${myProfile.full_name.split(" ")[0]} — Admin`;
+
+  const { data: profile, error } = await client
+    .from("user_profiles")
+    .select("*")
+    .eq("id", userId)
+    .single();
+
+  if (error || !profile) {
+    profileContent.innerHTML = "User not found.";
+    return;
+  }
+
+  const roleText =
+    profile.role === "admin"
+      ? "Admin"
+      : profile.role === "reviewer"
+      ? "Reviewer"
+      : "View Only";
+
+  const status = profile.is_active === false
+    ? `<span class="status-pill inactive">Inactive</span>`
+    : `<span class="status-pill active">Active</span>`;
+
+  profileContent.innerHTML = `
+    <div class="field">
+      <div class="label">Full Name</div>
+      <div class="value">${profile.full_name || "-"}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Email</div>
+      <div class="value">${profile.email || "-"}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Role</div>
+      <div class="value">${roleText}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Status</div>
+      <div class="value">${status}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Reviewer Requested</div>
+      <div class="value">${profile.reviewer_requested ? "Yes" : "No"}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Reviewer Approved</div>
+      <div class="value">${profile.reviewer_approved ? "Yes" : "No"}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Created</div>
+      <div class="value">${new Date(profile.created_at).toLocaleString("en-GB")}</div>
+    </div>
+
+    <div class="field">
+      <div class="label">Last Sign In</div>
+      <div class="value">
+        ${profile.last_sign_in_at 
+          ? new Date(profile.last_sign_in_at).toLocaleString("en-GB") 
+          : "Never"}
+      </div>
+    </div>
+  `;
+}
+
+loadProfile();
+</script>
+
+</body>
+</html>
