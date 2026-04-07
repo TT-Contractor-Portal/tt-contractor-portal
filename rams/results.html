@@ -757,7 +757,7 @@ function showStatusMessage(message, type = "success") {
         alert("No RAMS review loaded.");
         return;
       }
-
+showStatusMessage(`RAMS updated to ${newStatus}`);
       const reviewerNotes = document.getElementById("reviewerNotes").value.trim();
       const reviewerName = currentUserProfile?.full_name || currentUser.email || "Reviewer";
 
