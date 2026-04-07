@@ -474,14 +474,16 @@
       return new URLSearchParams(window.location.search).get(name);
     }
 
-    function formatDate(value) {
-      if (!value) return "-";
-      try {
-        return new Date(value).toLocaleDateString("en-GB");
-      } catch {
-        return value;
-      }
-    }
+   function formatDate(value) {
+  if (!value) return "-";
+  try {
+    return new Date(value).toLocaleDateString("en-GB", {
+      timeZone: "Europe/London"
+    });
+  } catch {
+    return value;
+  }
+}
 
     function formatDateTime(value) {
   if (!value) return "-";
