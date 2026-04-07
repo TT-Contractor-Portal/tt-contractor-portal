@@ -484,13 +484,15 @@
     }
 
     function formatDateTime(value) {
-      if (!value) return "-";
-      try {
-        return new Date(value).toLocaleString("en-GB");
-      } catch {
-        return value;
-      }
-    }
+  if (!value) return "-";
+  try {
+    return new Date(value).toLocaleString("en-GB", {
+      timeZone: "Europe/London"
+    });
+  } catch {
+    return value;
+  }
+}
 
     function renderTags(elementId, items) {
       const el = document.getElementById(elementId);
