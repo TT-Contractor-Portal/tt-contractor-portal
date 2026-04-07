@@ -611,7 +611,17 @@
       const selectedAreaIds = selectedAreaObjects.map(a => a.id);
       const selectedRisks = getSelectedValues("risks");
       const fileInput = document.getElementById("ramsfile");
+const file = fileInput?.files?.[0];
 
+if (!file) {
+  alert("Please upload a RAMS document before running the review.");
+  return null;
+}
+
+if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
+  alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
+  return null;
+}
       if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
         alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
         return null;
