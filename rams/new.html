@@ -607,19 +607,19 @@
       const duration = parseInt(document.getElementById("duration").value, 10);
       const durationUnit = document.getElementById("durationUnit").value;
       const selectedAreaObjects = getSelectedAreas();
-      const selectedAreas = selectedAreaObjects.map(a => a.name);
-      const selectedAreaIds = selectedAreaObjects.map(a => a.id);
-      const selectedRisks = getSelectedValues("risks");
-      const fileInput = document.getElementById("ramsfile");
+     const selectedAreas = selectedAreaObjects.map(a => a.name);
+const selectedAreaIds = selectedAreaObjects.map(a => a.id);
+const selectedRisks = getSelectedValues("risks");
+const fileInput = document.getElementById("ramsfile");
 const file = fileInput?.files?.[0];
-
-if (!file) {
-  alert("Please upload a RAMS document before running the review.");
-  return null;
-}
 
 if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
   alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
+  return null;
+}
+
+if (!file) {
+  alert("Please upload a RAMS document before running the review.");
   return null;
 }
 
@@ -628,28 +628,24 @@ const maxSize = 10 * 1024 * 1024; // 10MB
 if (file.size > maxSize) {
   alert("File must be under 10MB.");
   return null;
-}      
-      if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
-        alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
-        return null;
-      }
+}
 
-      const uploadedFileName = fileInput?.files?.length ? fileInput.files[0].name : "";
-      const combinedAreaData = getCombinedAreaData(selectedAreaIds);
+const uploadedFileName = file.name;
+const combinedAreaData = getCombinedAreaData(selectedAreaIds);
 
-      const recommendedPermits = ["P1 General Work Permit"];
+const recommendedPermits = ["P1 General Work Permit"];
 
-      if (selectedRisks.includes("Hot Work")) {
-        recommendedPermits.push("P2 Hot Work Permit");
-      }
+if (selectedRisks.includes("Hot Work")) {
+  recommendedPermits.push("P2 Hot Work Permit");
+}
 
-      if (selectedRisks.includes("Confined Space")) {
-        recommendedPermits.push("P3 Confined Space Permit");
-      }
+if (selectedRisks.includes("Confined Space")) {
+  recommendedPermits.push("P3 Confined Space Permit");
+}
 
-      if (selectedRisks.includes("Working at Height")) {
-        recommendedPermits.push("P4 Working at Height Permit");
-      }
+if (selectedRisks.includes("Working at Height")) {
+  recommendedPermits.push("P4 Working at Height Permit");
+}
 
       return {
         contractorName,
