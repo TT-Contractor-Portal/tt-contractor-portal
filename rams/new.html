@@ -870,26 +870,25 @@ async function runAiReviewForRecord(ramsReviewId) {
       const runReviewBtn = document.getElementById("runReviewBtn");
       if (runReviewBtn) runReviewBtn.disabled = true;
 
-      const draftReview = buildDraftReview();
-      const fileInput = document.getElementById("ramsfile");
-      const file = fileInput?.files?.[0];
+     const draftReview = buildDraftReview();
+if (!draftReview) {
+  if (runReviewBtn) runReviewBtn.disabled = false;
+  return;
+}
 
-      let uploadedFile = null;
+const fileInput = document.getElementById("ramsfile");
+const file = fileInput?.files?.[0];
 
-      if (file) {
-        uploadedFile = await uploadFileToSupabase(file);
+let uploadedFile = null;
 
-        if (!uploadedFile) {
-          if (runReviewBtn) runReviewBtn.disabled = false;
-          return;
-        }
-      }
+if (file) {
+  uploadedFile = await uploadFileToSupabase(file);
 
-      if (!draftReview) {
-        if (runReviewBtn) runReviewBtn.disabled = false;
-        return;
-      }
-
+  if (!uploadedFile) {
+    if (runReviewBtn) runReviewBtn.disabled = false;
+    return;
+  }
+}
       const clashFound = await hasClash(draftReview);
 
       draftReview.clash = clashFound;
