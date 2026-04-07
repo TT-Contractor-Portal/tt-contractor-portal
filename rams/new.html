@@ -43,7 +43,8 @@
       padding: 30px;
     }
 
-    .topbar, .panel {
+    .topbar,
+    .panel {
       background: white;
       border-radius: 12px;
       box-shadow: 0 2px 10px rgba(0,0,0,0.06);
@@ -152,6 +153,58 @@
       font-size: 14px;
     }
 
+    .area-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .summary-card {
+      background: #f8fafc;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .summary-card h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      color: #035740;
+    }
+
+    .summary-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .summary-card li {
+      margin-bottom: 8px;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .empty-state {
+      color: #666;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+
+    .loading-note {
+      font-size: 14px;
+      color: #666;
+      padding: 12px;
+      border: 1px dashed #ccc;
+      border-radius: 8px;
+      background: #fafafa;
+    }
+
+    @media (max-width: 900px) {
+      .area-summary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 700px) {
       .sidebar {
         position: static;
@@ -191,30 +244,28 @@
     <div class="panel">
       <h2>Submit RAMS for Review</h2>
 
-   <div class="field">
-  <label for="ramsfile">Upload RAMS file</label>
-  <input type="file" id="ramsfile" accept=".pdf,.doc,.docx" />
-  <div class="helper">Accepted formats: PDF and DOCX. Max file size: 10MB.</div>
-</div>
+      <div class="field">
+        <label for="ramsfile">Upload RAMS file</label>
+        <input type="file" id="ramsfile" accept=".pdf,.doc,.docx" />
+        <div class="helper">Accepted formats: PDF and DOCX. Max file size: 10MB.</div>
+      </div>
+
       <div class="field">
         <label>Area(s) working in</label>
 
         <div id="areas" class="checkbox-grid">
-          <label><input type="checkbox" value="Brewery"> Brewery</label>
-          <label><input type="checkbox" value="Brewhouse"> Brewhouse</label>
-          <label><input type="checkbox" value="Boiler House"> Boiler House</label>
-          <label><input type="checkbox" value="Packaging"> Packaging</label>
-          <label><input type="checkbox" value="Cellars / FV Areas"> Cellars / FV Areas</label>
-          <label><input type="checkbox" value="Effluent Plant"> Effluent Plant</label>
-          <label><input type="checkbox" value="Utilities"> Utilities</label>
-          <label><input type="checkbox" value="Roof Areas"> Roof Areas</label>
-          <label><input type="checkbox" value="Yard / External"> Yard / External</label>
-          <label><input type="checkbox" value="Workshop"> Workshop</label>
-          <label><input type="checkbox" value="Warehouse"> Warehouse</label>
-          <label><input type="checkbox" value="Offices"> Offices</label>
+          <div class="loading-note">Loading Timothy Taylor’s areas...</div>
         </div>
 
         <div class="helper">Select all areas the contractor will be working in.</div>
+      </div>
+
+      <div class="field">
+        <label>Area Hazards / Rules / PPE</label>
+
+        <div id="areaSummary" class="info-box">
+          Select one or more areas to load the site-specific hazards, rules and PPE.
+        </div>
       </div>
 
       <div class="field">
@@ -290,13 +341,6 @@
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJIUzI1NiIsInR5cCI6IkpXVCJ9";
-  </script>
-  <script>
-    // Replace the line above with your real anon key if needed.
-    // Keeping the full script separate here so the page is easy to edit.
-
     const client = supabase.createClient(
       "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
@@ -305,6 +349,11 @@
     let currentUser = null;
     let currentUserProfile = null;
     let pendingSupabaseId = null;
+
+    let siteAreas = [];
+    let areaHazards = [];
+    let areaRules = [];
+    let areaPpe = [];
 
     async function protectPage() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
@@ -345,10 +394,199 @@
       return true;
     }
 
+    async function loadAreaData() {
+      const areasBox = document.getElementById("areas");
+
+      const [
+        { data: areasData, error: areasError },
+        { data: hazardsData, error: hazardsError },
+        { data: rulesData, error: rulesError },
+        { data: ppeData, error: ppeError }
+      ] = await Promise.all([
+        client
+          .from("site_areas")
+          .select("id, name, description, sort_order")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .order("name", { ascending: true }),
+
+        client
+          .from("area_hazards")
+          .select("id, area_id, hazard_name, hazard_description, sort_order")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .order("hazard_name", { ascending: true }),
+
+        client
+          .from("area_rules")
+          .select("id, area_id, rule_text, rule_type, is_mandatory, sort_order")
+          .eq("is_active", true)
+          .order("sort_order", { ascending: true })
+          .order("rule_text", { ascending: true }),
+
+        client
+          .from("area_ppe")
+          .select("id, area_id, ppe_item, is_mandatory, sort_order")
+          .order("sort_order", { ascending: true })
+          .order("ppe_item", { ascending: true })
+      ]);
+
+      if (areasError || hazardsError || rulesError || ppeError) {
+        areasBox.innerHTML = `<div class="loading-note">Could not load site area data.</div>`;
+        console.error("Area data load error:", { areasError, hazardsError, rulesError, ppeError });
+        return;
+      }
+
+      siteAreas = areasData || [];
+      areaHazards = hazardsData || [];
+      areaRules = rulesData || [];
+      areaPpe = ppeData || [];
+
+      renderAreaCheckboxes();
+      renderAreaSummary();
+    }
+
+    function renderAreaCheckboxes() {
+      const areasBox = document.getElementById("areas");
+
+      if (!siteAreas.length) {
+        areasBox.innerHTML = `<div class="loading-note">No active site areas found.</div>`;
+        return;
+      }
+
+      areasBox.innerHTML = siteAreas.map(area => `
+        <label>
+          <input type="checkbox" value="${escapeHtml(area.name)}" data-area-id="${area.id}">
+          ${escapeHtml(area.name)}
+        </label>
+      `).join("");
+
+      areasBox.querySelectorAll("input[type='checkbox']").forEach(cb => {
+        cb.addEventListener("change", renderAreaSummary);
+      });
+    }
+
+    function escapeHtml(value) {
+      return String(value || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function getSelectedAreas() {
+      const checkboxes = document.querySelectorAll("#areas input[type='checkbox']:checked");
+
+      return Array.from(checkboxes).map(cb => {
+        const areaId = cb.getAttribute("data-area-id");
+        const areaName = cb.value;
+        const area = siteAreas.find(a => a.id === areaId);
+
+        return {
+          id: areaId,
+          name: areaName,
+          description: area?.description || ""
+        };
+      });
+    }
+
     function getSelectedValues(containerId) {
       const container = document.getElementById(containerId);
       const checkboxes = container.querySelectorAll("input[type='checkbox']:checked");
       return Array.from(checkboxes).map(cb => cb.value);
+    }
+
+    function getCombinedAreaData(selectedAreaIds) {
+      const hazards = areaHazards.filter(item => selectedAreaIds.includes(item.area_id));
+      const rules = areaRules.filter(item => selectedAreaIds.includes(item.area_id));
+      const ppe = areaPpe.filter(item => selectedAreaIds.includes(item.area_id));
+
+      const uniqueHazards = [];
+      const uniqueRules = [];
+      const uniquePpe = [];
+
+      const seenHazards = new Set();
+      const seenRules = new Set();
+      const seenPpe = new Set();
+
+      hazards.forEach(item => {
+        const key = (item.hazard_name || "").trim().toLowerCase();
+        if (key && !seenHazards.has(key)) {
+          seenHazards.add(key);
+          uniqueHazards.push(item.hazard_name);
+        }
+      });
+
+      rules.forEach(item => {
+        const key = (item.rule_text || "").trim().toLowerCase();
+        if (key && !seenRules.has(key)) {
+          seenRules.add(key);
+          uniqueRules.push(item.rule_text);
+        }
+      });
+
+      ppe.forEach(item => {
+        const key = (item.ppe_item || "").trim().toLowerCase();
+        if (key && !seenPpe.has(key)) {
+          seenPpe.add(key);
+          uniquePpe.push(item.ppe_item);
+        }
+      });
+
+      return {
+        hazards: uniqueHazards,
+        rules: uniqueRules,
+        ppe: uniquePpe
+      };
+    }
+
+    function renderAreaSummary() {
+      const areaSummary = document.getElementById("areaSummary");
+      const selectedAreas = getSelectedAreas();
+
+      if (!selectedAreas.length) {
+        areaSummary.innerHTML = "Select one or more areas to load the site-specific hazards, rules and PPE.";
+        return;
+      }
+
+      const selectedAreaIds = selectedAreas.map(a => a.id);
+      const combined = getCombinedAreaData(selectedAreaIds);
+
+      areaSummary.innerHTML = `
+        <div style="margin-bottom: 10px;">
+          <strong>Selected Areas:</strong> ${selectedAreas.map(a => escapeHtml(a.name)).join(", ")}
+        </div>
+
+        <div class="area-summary-grid">
+          <div class="summary-card">
+            <h3>Hazards</h3>
+            ${
+              combined.hazards.length
+                ? `<ul>${combined.hazards.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+                : `<div class="empty-state">No hazards found for the selected areas.</div>`
+            }
+          </div>
+
+          <div class="summary-card">
+            <h3>Rules</h3>
+            ${
+              combined.rules.length
+                ? `<ul>${combined.rules.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+                : `<div class="empty-state">No rules found for the selected areas.</div>`
+            }
+          </div>
+
+          <div class="summary-card">
+            <h3>PPE</h3>
+            ${
+              combined.ppe.length
+                ? `<ul>${combined.ppe.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`
+                : `<div class="empty-state">No PPE found for the selected areas.</div>`
+            }
+          </div>
+        </div>
+      `;
     }
 
     function addDays(dateString, daysToAdd) {
@@ -368,7 +606,9 @@
       const startDate = document.getElementById("startDate").value;
       const duration = parseInt(document.getElementById("duration").value, 10);
       const durationUnit = document.getElementById("durationUnit").value;
-      const selectedAreas = getSelectedValues("areas");
+      const selectedAreaObjects = getSelectedAreas();
+      const selectedAreas = selectedAreaObjects.map(a => a.name);
+      const selectedAreaIds = selectedAreaObjects.map(a => a.id);
       const selectedRisks = getSelectedValues("risks");
       const fileInput = document.getElementById("ramsfile");
 
@@ -378,6 +618,7 @@
       }
 
       const uploadedFileName = fileInput?.files?.length ? fileInput.files[0].name : "";
+      const combinedAreaData = getCombinedAreaData(selectedAreaIds);
 
       const recommendedPermits = ["P1 General Work Permit"];
 
@@ -398,6 +639,8 @@
         jobTitle,
         location: selectedAreas.join(", "),
         areas: selectedAreas,
+        areaIds: selectedAreaIds,
+        primaryAreaId: selectedAreaIds[0] || null,
         risks: selectedRisks,
         detectedAreas: [],
         detectedRisks: [],
@@ -414,7 +657,10 @@
         reviewer: "",
         reviewerNotes: "",
         status: "Under Review",
-        reviewDate: ""
+        reviewDate: "",
+        areaHazardSnapshot: combinedAreaData.hazards,
+        areaRuleSnapshot: combinedAreaData.rules,
+        areaPpeSnapshot: combinedAreaData.ppe
       };
     }
 
@@ -481,63 +727,67 @@
       });
     }
 
-async function uploadFileToSupabase(file) {
-  if (!file) return null;
+    async function uploadFileToSupabase(file) {
+      if (!file) return null;
 
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `rams/${fileName}`;
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+      const filePath = `rams/${fileName}`;
 
-  const { data, error } = await client.storage
-    .from("rams-files")
-    .upload(filePath, file);
+      const { error } = await client.storage
+        .from("rams-files")
+        .upload(filePath, file);
 
-  if (error) {
-    alert("File upload failed: " + error.message);
-    return null;
-  }
+      if (error) {
+        alert("File upload failed: " + error.message);
+        return null;
+      }
 
-  return {
-    path: filePath,
-    name: file.name,
-    type: file.type,
-    size: file.size
-  };
-}
-    
+      return {
+        path: filePath,
+        name: file.name,
+        type: file.type,
+        size: file.size
+      };
+    }
+
     async function saveDraftToSupabase(draftReview) {
       if (!currentUser) {
         alert("You must be logged in to save a RAMS.");
         return null;
       }
 
-  const payload = {
-  user_id: currentUser.id,
-  contractor_name: draftReview.contractorName,
-  job_title: draftReview.jobTitle,
-  location: draftReview.location,
-  areas: draftReview.areas || [],
-  risks: draftReview.risks || [],
-  detected_areas: draftReview.detectedAreas || [],
-  detected_risks: draftReview.detectedRisks || [],
-  recommended_permits: draftReview.recommendedPermits || [],
-  uploaded_file_name: draftReview.uploadedFileName || "",
+      const payload = {
+        user_id: currentUser.id,
+        contractor_name: draftReview.contractorName,
+        job_title: draftReview.jobTitle,
+        location: draftReview.location,
+        areas: draftReview.areas || [],
+        risks: draftReview.risks || [],
+        detected_areas: draftReview.detectedAreas || [],
+        detected_risks: draftReview.detectedRisks || [],
+        recommended_permits: draftReview.recommendedPermits || [],
+        uploaded_file_name: draftReview.uploadedFileName || "",
+        file_name: draftReview.fileName || null,
+        file_path: draftReview.filePath || null,
+        file_type: draftReview.fileType || null,
+        file_size: draftReview.fileSize || null,
+        start_date: draftReview.startDate || null,
+        end_date: draftReview.endDate || null,
+        duration: draftReview.duration || 1,
+        duration_unit: draftReview.durationUnit || "days",
+        review_date: draftReview.reviewDate || null,
+        reviewer_notes: draftReview.reviewerNotes || "",
+        status: draftReview.status || "Under Review",
+        clash: !!draftReview.clash,
+        primary_area_id: draftReview.primaryAreaId || null,
+        area_hazard_snapshot: draftReview.areaHazardSnapshot || [],
+        area_rule_snapshot: {
+          rules: draftReview.areaRuleSnapshot || [],
+          ppe: draftReview.areaPpeSnapshot || []
+        }
+      };
 
-  // 🔽 NEW FILE FIELDS
-  file_name: draftReview.fileName || null,
-  file_path: draftReview.filePath || null,
-  file_type: draftReview.fileType || null,
-  file_size: draftReview.fileSize || null,
-
-  start_date: draftReview.startDate || null,
-  end_date: draftReview.endDate || null,
-  duration: draftReview.duration || 1,
-  duration_unit: draftReview.durationUnit || "days",
-  review_date: draftReview.reviewDate || null,
-  reviewer_notes: draftReview.reviewerNotes || "",
-  status: draftReview.status || "Under Review",
-  clash: !!draftReview.clash
-};
       const { data, error } = await client
         .from("rams_reviews")
         .insert([payload])
@@ -547,6 +797,21 @@ async function uploadFileToSupabase(file) {
       if (error) {
         alert("Failed to save RAMS to Supabase: " + error.message);
         return null;
+      }
+
+      if (draftReview.areaIds && draftReview.areaIds.length) {
+        const linkRows = draftReview.areaIds.map(areaId => ({
+          rams_review_id: data.id,
+          area_id: areaId
+        }));
+
+        const { error: linkError } = await client
+          .from("rams_review_areas")
+          .insert(linkRows);
+
+        if (linkError) {
+          console.warn("RAMS saved but area links failed:", linkError.message);
+        }
       }
 
       return data;
@@ -561,18 +826,19 @@ async function uploadFileToSupabase(file) {
 
       const draftReview = buildDraftReview();
       const fileInput = document.getElementById("ramsfile");
-const file = fileInput?.files?.[0];
+      const file = fileInput?.files?.[0];
 
-let uploadedFile = null;
+      let uploadedFile = null;
 
-if (file) {
-  uploadedFile = await uploadFileToSupabase(file);
+      if (file) {
+        uploadedFile = await uploadFileToSupabase(file);
 
-  if (!uploadedFile) {
-    if (runReviewBtn) runReviewBtn.disabled = false;
-    return;
-  }
-}
+        if (!uploadedFile) {
+          if (runReviewBtn) runReviewBtn.disabled = false;
+          return;
+        }
+      }
+
       if (!draftReview) {
         if (runReviewBtn) runReviewBtn.disabled = false;
         return;
@@ -583,13 +849,14 @@ if (file) {
       draftReview.clash = clashFound;
       draftReview.clashAcknowledged = false;
       draftReview.userId = currentUser.id;
-if (uploadedFile) {
-  draftReview.filePath = uploadedFile.path;
-  draftReview.fileName = uploadedFile.name;
-  draftReview.fileType = uploadedFile.type;
-  draftReview.fileSize = uploadedFile.size;
-}
-      
+
+      if (uploadedFile) {
+        draftReview.filePath = uploadedFile.path;
+        draftReview.fileName = uploadedFile.name;
+        draftReview.fileType = uploadedFile.type;
+        draftReview.fileSize = uploadedFile.size;
+      }
+
       draftReview.submittedByName = currentUserProfile?.full_name || "";
       draftReview.submittedByEmail = currentUser.email || "";
 
@@ -611,10 +878,10 @@ if (uploadedFile) {
           } else {
             clashModalDetails.innerHTML = clashes.map(c => `
               <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
-                <strong>${c.contractor_name || "-"}</strong><br>
-                Area: ${(c.areas || []).join(", ") || "-"}<br>
-                Dates: ${c.start_date || "-"} to ${c.end_date || c.start_date || "-"}<br>
-                Approved by: ${c.approved_by_name || "Unknown"}
+                <strong>${escapeHtml(c.contractor_name || "-")}</strong><br>
+                Area: ${escapeHtml((c.areas || []).join(", ") || "-")}<br>
+                Dates: ${escapeHtml(c.start_date || "-")} to ${escapeHtml(c.end_date || c.start_date || "-")}<br>
+                Approved by: ${escapeHtml(c.approved_by_name || "Unknown")}
               </div>
             `).join("");
           }
@@ -656,7 +923,14 @@ if (uploadedFile) {
       window.location.href = url;
     }
 
-    protectPage();
+    async function initPage() {
+      const ok = await protectPage();
+      if (!ok) return;
+
+      await loadAreaData();
+    }
+
+    initPage();
   </script>
 </body>
 </html>
