@@ -863,92 +863,89 @@ async function runAiReviewForRecord(ramsReviewId) {
   return result;
 }
     
-    async function runRamsReview() {
-      const pageOk = await protectPage();
-      if (!pageOk) return;
+async function runRamsReview() {
+  const pageOk = await protectPage();
+  if (!pageOk) return;
 
-      const runReviewBtn = document.getElementById("runReviewBtn");
-      if (runReviewBtn) runReviewBtn.disabled = true;
+  const runReviewBtn = document.getElementById("runReviewBtn");
+  if (runReviewBtn) runReviewBtn.disabled = true;
 
-     const draftReview = buildDraftReview();
-if (!draftReview) {
-  if (runReviewBtn) runReviewBtn.disabled = false;
-  return;
-}
-
-const fileInput = document.getElementById("ramsfile");
-const file = fileInput?.files?.[0];
-
-let uploadedFile = null;
-
-if (file) {
-  uploadedFile = await uploadFileToSupabase(file);
-
-  if (!uploadedFile) {
+  const draftReview = buildDraftReview();
+  if (!draftReview) {
     if (runReviewBtn) runReviewBtn.disabled = false;
     return;
   }
-}
-      const clashFound = await hasClash(draftReview);
 
-      draftReview.clash = clashFound;
-      draftReview.clashAcknowledged = false;
-      draftReview.userId = currentUser.id;
+  const fileInput = document.getElementById("ramsfile");
+  const file = fileInput?.files?.[0];
 
-      if (uploadedFile) {
-        draftReview.filePath = uploadedFile.path;
-        draftReview.fileName = uploadedFile.name;
-        draftReview.fileType = uploadedFile.type;
-        draftReview.fileSize = uploadedFile.size;
+  let uploadedFile = null;
+
+  if (file) {
+    uploadedFile = await uploadFileToSupabase(file);
+
+    if (!uploadedFile) {
+      if (runReviewBtn) runReviewBtn.disabled = false;
+      return;
+    }
+  }
+
+  const clashFound = await hasClash(draftReview);
+
+  draftReview.clash = clashFound;
+  draftReview.clashAcknowledged = false;
+  draftReview.userId = currentUser.id;
+
+  if (uploadedFile) {
+    draftReview.filePath = uploadedFile.path;
+    draftReview.fileName = uploadedFile.name;
+    draftReview.fileType = uploadedFile.type;
+    draftReview.fileSize = uploadedFile.size;
+  }
+
+  draftReview.submittedByName = currentUserProfile?.full_name || "";
+  draftReview.submittedByEmail = currentUser.email || "";
+
+  const savedRecord = await saveDraftToSupabase(draftReview);
+  if (!savedRecord) {
+    if (runReviewBtn) runReviewBtn.disabled = false;
+    return;
+  }
+
+  try {
+    await runAiReviewForRecord(savedRecord.id);
+  } catch (error) {
+    alert("RAMS was saved, but AI review failed: " + error.message);
+  }
+
+  pendingSupabaseId = savedRecord.id;
+
+  if (clashFound) {
+    const clashModalDetails = document.getElementById("clashModalDetails");
+    const clashes = await getClashSummary(draftReview);
+
+    if (clashModalDetails) {
+      if (!clashes.length) {
+        clashModalDetails.innerHTML = `<p>No further clash detail available.</p>`;
+      } else {
+        clashModalDetails.innerHTML = clashes.map(c => `
+          <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
+            <strong>${escapeHtml(c.contractor_name || "-")}</strong><br>
+            Area: ${escapeHtml((c.areas || []).join(", ") || "-")}<br>
+            Dates: ${escapeHtml(c.start_date || "-")} to ${escapeHtml(c.end_date || c.start_date || "-")}<br>
+            Approved by: ${escapeHtml(c.approved_by_name || "Unknown")}
+          </div>
+        `).join("");
       }
-
-      draftReview.submittedByName = currentUserProfile?.full_name || "";
-      draftReview.submittedByEmail = currentUser.email || "";
-
-     const savedRecord = await saveDraftToSupabase(draftReview);
-if (!savedRecord) {
-  if (runReviewBtn) runReviewBtn.disabled = false;
-  return;
-}
-
-let aiReviewFailed = false;
-
-try {
-  await runAiReviewForRecord(savedRecord.id);
-} catch (error) {
-  aiReviewFailed = true;
-  alert("RAMS was saved, but AI review failed: " + error.message);
-}
-
-pendingSupabaseId = savedRecord.id;
-
-      if (clashFound) {
-        const clashModalDetails = document.getElementById("clashModalDetails");
-        const clashes = await getClashSummary(draftReview);
-
-        if (clashModalDetails) {
-          if (!clashes.length) {
-            clashModalDetails.innerHTML = `<p>No further clash detail available.</p>`;
-          } else {
-            clashModalDetails.innerHTML = clashes.map(c => `
-              <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
-                <strong>${escapeHtml(c.contractor_name || "-")}</strong><br>
-                Area: ${escapeHtml((c.areas || []).join(", ") || "-")}<br>
-                Dates: ${escapeHtml(c.start_date || "-")} to ${escapeHtml(c.end_date || c.start_date || "-")}<br>
-                Approved by: ${escapeHtml(c.approved_by_name || "Unknown")}
-              </div>
-            `).join("");
-          }
-        }
-
-        document.getElementById("clashModal").style.display = "flex";
-        if (runReviewBtn) runReviewBtn.disabled = false;
-        return;
-      }
-
-      goToResults(savedRecord.id, false);
     }
 
+    document.getElementById("clashModal").style.display = "flex";
+    if (runReviewBtn) runReviewBtn.disabled = false;
+    return;
+  }
+
+  goToResults(savedRecord.id, false);
+}
     async function closeModal(shouldContinue) {
       document.getElementById("clashModal").style.display = "none";
 
