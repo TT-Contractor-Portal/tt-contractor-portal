@@ -512,6 +512,29 @@
       };
     }
 
+function showStatusMessage(message, type = "success") {
+  const el = document.getElementById("statusMessage");
+
+  if (!el) return;
+
+  el.textContent = message;
+  el.style.display = "block";
+
+  // Optional: change colour for different types later
+  if (type === "error") {
+    el.style.background = "#fdecea";
+    el.style.color = "#b42318";
+  } else {
+    el.style.background = "#e6f4ea";
+    el.style.color = "#1e7e34";
+  }
+
+  // Auto hide after 4 seconds
+  setTimeout(() => {
+    el.style.display = "none";
+  }, 4000);
+}
+    
     function buildRecommendedPermits(review) {
       const permits = ["P1 General Work Permit"];
       const risks = Array.isArray(review.risks) ? review.risks : [];
