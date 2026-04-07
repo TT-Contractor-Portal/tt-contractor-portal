@@ -676,10 +676,9 @@ renderList(
   review.ai_covered_items || [],
   "No clearly covered items recorded."
 );
-      document.getElementById("resultSummary").innerHTML = escapeHtml(
-        review.summary || "RAMS submitted and ready for review."
-      ).replace(/\n/g, "<br>");
-
+     document.getElementById("resultSummary").innerHTML = escapeHtml(
+  review.ai_summary || review.summary || "RAMS submitted and ready for review."
+).replace(/\n/g, "<br>");
       renderDocumentPanel(review);
     }
 
