@@ -1,0 +1,11 @@
+{
+  "name": "tt-contractor-portal",
+  "version": "1.0.0",
+  "description": "TT Contractor Portal Functions",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0",
+    "openai": "^4.0.0",
+    "pdf-parse": "^1.1.1",
+    "mammoth": "^1.4.27"
+  }
+}
