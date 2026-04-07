@@ -751,14 +751,18 @@ renderList("resultAreaPpe", ppeSnapshot, "No area PPE saved.");
       const reviewerNotes = document.getElementById("reviewerNotes").value.trim();
       const reviewerName = currentUserProfile?.full_name || currentUser.email || "Reviewer";
 
-      const updates = {
-        status: newStatus,
-        reviewer_notes: reviewerNotes,
-        review_date: new Date().toISOString(),
-        reviewer: reviewerName,
-        approved_by_name: reviewerName,
-        clash_acknowledged: clashAcknowledged
-      };
+     const isApproved = newStatus === "Approved";
+
+const updates = {
+  status: newStatus,
+  reviewer_notes: reviewerNotes,
+  review_date: new Date().toISOString(),
+  reviewer: reviewerName,
+  approved_by_name: isApproved ? reviewerName : null,
+  approved_by: isApproved ? currentUser.id : null,
+  approved_at: isApproved ? new Date().toISOString() : null,
+  clash_acknowledged: clashAcknowledged
+};
 
       const { error } = await client
         .from("rams_reviews")
