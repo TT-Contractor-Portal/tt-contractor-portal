@@ -622,6 +622,13 @@ if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.le
   alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
   return null;
 }
+
+const maxSize = 10 * 1024 * 1024; // 10MB
+
+if (file.size > maxSize) {
+  alert("File must be under 10MB.");
+  return null;
+}      
       if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
         alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
         return null;
