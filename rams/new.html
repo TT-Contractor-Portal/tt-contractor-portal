@@ -607,11 +607,11 @@
       const duration = parseInt(document.getElementById("duration").value, 10);
       const durationUnit = document.getElementById("durationUnit").value;
       const selectedAreaObjects = getSelectedAreas();
-     const selectedAreas = selectedAreaObjects.map(a => a.name);
-const selectedAreaIds = selectedAreaObjects.map(a => a.id);
-const selectedRisks = getSelectedValues("risks");
-const fileInput = document.getElementById("ramsfile");
-const file = fileInput?.files?.[0];
+      const selectedAreas = selectedAreaObjects.map(a => a.name);
+      const selectedAreaIds = selectedAreaObjects.map(a => a.id);
+      const selectedRisks = getSelectedValues("risks");
+      const fileInput = document.getElementById("ramsfile");
+      const file = fileInput?.files?.[0];
 
 if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
   alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
