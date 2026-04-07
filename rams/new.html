@@ -782,10 +782,8 @@
         clash: !!draftReview.clash,
         primary_area_id: draftReview.primaryAreaId || null,
         area_hazard_snapshot: draftReview.areaHazardSnapshot || [],
-        area_rule_snapshot: {
-          rules: draftReview.areaRuleSnapshot || [],
-          ppe: draftReview.areaPpeSnapshot || []
-        }
+area_rule_snapshot: draftReview.areaRuleSnapshot || [],
+area_ppe_snapshot: draftReview.areaPpeSnapshot || []
       };
 
       const { data, error } = await client
