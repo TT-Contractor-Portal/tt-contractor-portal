@@ -646,7 +646,8 @@ const ppeSnapshot = normaliseArraySnapshot(review.area_ppe_snapshot);
       document.getElementById("resultClashAck").textContent = review.clash_acknowledged ? "Yes" : "No";
       document.getElementById("resultStatusBadge").textContent = review.status || "Under Review";
       document.getElementById("reviewerNotes").value = review.reviewer_notes || "";
-
+      document.getElementById("resultAiStatus").textContent = review.ai_review_status || "-";
+      
       renderTags("resultAreas", review.areas || []);
       renderTags("resultRisks", review.risks || []);
       renderTags("resultDetectedAreas", review.ai_detected_additional_areas || []);
