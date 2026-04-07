@@ -640,9 +640,9 @@ const ppeSnapshot = normaliseArraySnapshot(review.area_ppe_snapshot);
       renderTags("resultDetectedRisks", review.detected_risks || []);
       renderTags("resultPermits", permits);
 
-      renderList("resultAreaHazards", review.area_hazard_snapshot || [], "No area hazards saved.");
-      renderList("resultAreaRules", ruleSnapshot.rules || [], "No area rules saved.");
-      renderList("resultAreaPpe", ruleSnapshot.ppe || review.area_ppe_snapshot || [], "No area PPE saved.");
+     renderList("resultAreaHazards", review.area_hazard_snapshot || [], "No area hazards saved.");
+renderList("resultAreaRules", ruleSnapshot, "No area rules saved.");
+renderList("resultAreaPpe", ppeSnapshot, "No area PPE saved.");
 
       renderList("resultMissingItems", review.missing_items || review.missingItems || [], "No missing items flagged.");
       renderList("resultWeakItems", review.weak_items || review.weakItems || [], "No weak items flagged.");
