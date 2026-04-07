@@ -497,20 +497,9 @@
       el.innerHTML = safeItems.map(item => `<li>${escapeHtml(item)}</li>`).join("");
     }
 
-    function normaliseRuleSnapshot(snapshot) {
-      if (!snapshot) {
-        return { rules: [], ppe: [] };
-      }
-
-      if (Array.isArray(snapshot)) {
-        return { rules: snapshot, ppe: [] };
-      }
-
-      return {
-        rules: Array.isArray(snapshot.rules) ? snapshot.rules : [],
-        ppe: Array.isArray(snapshot.ppe) ? snapshot.ppe : []
-      };
-    }
+   function normaliseArraySnapshot(snapshot) {
+  return Array.isArray(snapshot) ? snapshot.filter(Boolean) : [];
+}
 
 function showStatusMessage(message, type = "success") {
   const el = document.getElementById("statusMessage");
