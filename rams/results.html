@@ -659,7 +659,23 @@ renderList("resultAreaPpe", ppeSnapshot, "No area PPE saved.");
 
       renderList("resultMissingItems", review.missing_items || review.missingItems || [], "No missing items flagged.");
       renderList("resultWeakItems", review.weak_items || review.weakItems || [], "No weak items flagged.");
+renderList(
+  "resultAiSiteMissingItems",
+  review.ai_site_missing_items || [],
+  "No site-specific missing items flagged."
+);
 
+renderList(
+  "resultAiJobRecommendations",
+  review.ai_job_recommendations || [],
+  "No additional job-based recommendations flagged."
+);
+
+renderList(
+  "resultAiCoveredItems",
+  review.ai_covered_items || [],
+  "No clearly covered items recorded."
+);
       document.getElementById("resultSummary").innerHTML = escapeHtml(
         review.summary || "RAMS submitted and ready for review."
       ).replace(/\n/g, "<br>");
