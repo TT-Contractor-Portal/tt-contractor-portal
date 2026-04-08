@@ -446,7 +446,7 @@
       renderAreaSummary();
     }
 
-    function renderAreaCheckboxes() {
+       function renderAreaCheckboxes() {
       const areasBox = document.getElementById("areas");
 
       if (!siteAreas.length) {
@@ -454,18 +454,26 @@
         return;
       }
 
-      areasBox.innerHTML = siteAreas.map(area => `
+      const allAreasHtml = `
+        <label>
+          <input type="checkbox" value="All Areas" data-area-id="ALL_AREAS">
+          All Areas
+        </label>
+      `;
+
+      const normalAreasHtml = siteAreas.map(area => `
         <label>
           <input type="checkbox" value="${escapeHtml(area.name)}" data-area-id="${area.id}">
           ${escapeHtml(area.name)}
         </label>
       `).join("");
 
+      areasBox.innerHTML = allAreasHtml + normalAreasHtml;
+
       areasBox.querySelectorAll("input[type='checkbox']").forEach(cb => {
-        cb.addEventListener("change", renderAreaSummary);
+        cb.addEventListener("change", handleAreaCheckboxChange);
       });
     }
-
     function escapeHtml(value) {
       return String(value || "")
         .replace(/&/g, "&amp;")
