@@ -123,11 +123,13 @@
       cursor: pointer;
       color: white;
       background: #035740;
+      text-decoration: none;
     }
 
     .green { background: #035740; }
     .amber { background: #c58a00; }
     .red { background: #b42318; }
+    .blue { background: #1d4ed8; }
 
     .panel.warning {
       border-left: 6px solid #ff0000;
@@ -332,13 +334,14 @@
     </div>
 
     <div class="panel">
-      <h2 class="section-title">Reviewer Notes</h2>
+      <h2 class="section-title">Reviewer Actions</h2>
       <textarea id="reviewerNotes" placeholder="Add reviewer notes here..."></textarea>
 
       <div class="button-row">
         <button id="approveBtn" class="button green">Approve</button>
         <button id="underReviewBtn" class="button amber">Keep Under Review</button>
         <button id="rejectBtn" class="button red">Reject</button>
+        <button id="uploadRevisionBtn" class="button blue" type="button">Upload Revised RAMS</button>
       </div>
     </div>
 
@@ -394,6 +397,16 @@
         <div class="detail-item">
           <strong>Status</strong>
           <span id="resultStatusBadge" class="status-badge">Under Review</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Revision Number</strong>
+          <span id="resultRevisionNumber">V1</span>
+        </div>
+
+        <div class="detail-item">
+          <strong>Current Revision</strong>
+          <span id="resultCurrentRevision">Yes</span>
         </div>
       </div>
     </div>
@@ -503,7 +516,7 @@
   <script>
     const client = supabase.createClient(
       "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
+      "YOUR_CURRENT_SUPABASE_ANON_KEY_HERE"
     );
 
     let currentUser = null;
@@ -606,7 +619,7 @@
 
       setTimeout(() => {
         el.style.display = "none";
-      }, 4000);
+      }, 2000);
     }
 
     function buildRecommendedPermits(review) {
@@ -813,6 +826,8 @@
       document.getElementById("resultStatusBadge").textContent = review.status || "Under Review";
       document.getElementById("reviewerNotes").value = review.reviewer_notes || "";
       document.getElementById("resultAiStatus").textContent = review.ai_review_status || "-";
+      document.getElementById("resultRevisionNumber").textContent = `V${Number(review.revision_number || 1)}`;
+      document.getElementById("resultCurrentRevision").textContent = review.is_current_revision ? "Yes" : "No";
 
       renderTags("resultAreas", review.areas || []);
       renderTags("resultRisks", review.risks || []);
@@ -850,6 +865,12 @@
       ).replace(/\n/g, "<br>");
 
       renderDocumentPanel();
+
+      const uploadRevisionBtn = document.getElementById("uploadRevisionBtn");
+      if (uploadRevisionBtn) {
+        uploadRevisionBtn.disabled = false;
+        uploadRevisionBtn.textContent = "Upload Revised RAMS";
+      }
     }
 
     async function renderClashInfo(review) {
@@ -869,7 +890,8 @@
       const { data, error } = await client
         .from("rams_reviews")
         .select("*")
-        .eq("status", "Approved");
+        .eq("status", "Approved")
+        .eq("is_current_revision", true);
 
       if (error || !data) {
         clashDetails.innerHTML = "<p>Could not load clash detail.</p>";
@@ -919,6 +941,12 @@
 
       const updates = {
         status: newStatus,
+        review_outcome:
+          newStatus === "Approved"
+            ? "acceptable"
+            : newStatus === "Rejected"
+              ? "rejected"
+              : "under_review",
         reviewer_notes: reviewerNotes,
         review_date: new Date().toISOString(),
         reviewer: reviewerName,
@@ -943,14 +971,18 @@
       }
 
       showStatusMessage(`RAMS updated to ${newStatus}`);
-      await loadReview();
+
+      setTimeout(() => {
+        window.location.href = "/rams/register.html";
+      }, 800);
     }
 
     async function markRelatedClashes(review) {
       const { data, error } = await client
         .from("rams_reviews")
         .select("*")
-        .eq("status", "Approved");
+        .eq("status", "Approved")
+        .eq("is_current_revision", true);
 
       if (error || !data) return;
 
@@ -1006,6 +1038,15 @@
       await saveStatus("Approved", true);
     }
 
+    function goToRevisionPage() {
+      if (!currentReview?.id) {
+        alert("No RAMS review loaded.");
+        return;
+      }
+
+      window.location.href = `/rams/new.html?revise=${encodeURIComponent(currentReview.id)}`;
+    }
+
     async function initButtons() {
       document.getElementById("approveBtn").addEventListener("click", async () => {
         if (currentReview?.clash) {
@@ -1022,6 +1063,10 @@
 
       document.getElementById("rejectBtn").addEventListener("click", async () => {
         await saveStatus("Rejected", false);
+      });
+
+      document.getElementById("uploadRevisionBtn").addEventListener("click", () => {
+        goToRevisionPage();
       });
     }
 
