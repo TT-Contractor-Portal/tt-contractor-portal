@@ -1041,11 +1041,15 @@ async function runRamsReview() {
       window.location.href = url;
     }
 
-    async function initPage() {
+       async function initPage() {
       const ok = await protectPage();
       if (!ok) return;
 
       await loadAreaData();
+
+      document.querySelectorAll('#risks input[type="checkbox"]').forEach(cb => {
+        cb.addEventListener("change", handleRiskCheckboxChange);
+      });
     }
 
     initPage();
