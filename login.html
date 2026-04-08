@@ -4,369 +4,203 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Login - TT Contractor Portal</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      background: #f4f6f8;
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    min-height: 100vh;
+    background: #f4f6f8;
+  }
+
+  /* LEFT SIDE IMAGE */
+  .login-bg {
+    flex: 1;
+    background: url("https://images.unsplash.com/photo-1600891964599-f61ba0e24092?q=80&w=1600&auto=format&fit=crop") center center / cover no-repeat;
+  }
+
+  /* RIGHT SIDE PANEL */
+  .login-container {
+    width: 100%;
+    max-width: 480px;
+    background: #f4f6f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    box-sizing: border-box;
+  }
+
+  .login-card {
+    width: 100%;
+    background: #fff;
+    padding: 32px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.08);
+    box-sizing: border-box;
+  }
+
+  .logo {
+    display: block;
+    margin: 0 auto 20px;
+    max-width: 140px;
+  }
+
+  h1 {
+    margin-top: 0;
+    margin-bottom: 8px;
+    color: #035740;
+    font-size: 24px;
+    text-align: center;
+  }
+
+  p {
+    margin-top: 0;
+    margin-bottom: 24px;
+    color: #555;
+    text-align: center;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: bold;
+    color: #222;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 16px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    background: #035740;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #024534;
+  }
+
+  #loginBtn {
+    background: #b59a55;
+  }
+
+  #loginBtn:hover {
+    background: #a38a49;
+  }
+
+  .form-links {
+    display: block;
+    margin-top: 4px;
+    margin-bottom: 18px;
+    text-align: right;
+  }
+
+  .form-links a {
+    color: #035740;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .form-links a:hover {
+    text-decoration: underline;
+  }
+
+  #message {
+    margin-top: 16px;
+    font-size: 14px;
+    min-height: 20px;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .login-bg {
+      display: none;
     }
 
-    .login-background {
-      flex: 1;
-      background:
-        linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.18)),
-        url("https://images.unsplash.com/photo-1516997121675-4c2d1684aa3e?q=80&w=1600&auto=format&fit=crop") center center / cover no-repeat;
-      min-height: 100vh;
+    .login-container {
+      max-width: 100%;
     }
-
-    .login-panel-wrap {
-      width: 100%;
-      max-width: 720px;
-      background: #f4f6f8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 36px 28px;
-      box-sizing: border-box;
-    }
-
-    .login-card {
-      width: 100%;
-      max-width: 620px;
-      background: #fff;
-      border-radius: 18px;
-      box-shadow: 0 10px 28px rgba(0,0,0,0.10);
-      padding: 34px 30px 28px;
-      box-sizing: border-box;
-      position: relative;
-    }
-
-    .logo-badge {
-      width: 240px;
-      max-width: 72%;
-      margin: -66px auto 18px;
-      background: #fff;
-      border-radius: 999px;
-      box-shadow: 0 4px 14px rgba(0,0,0,0.12);
-      padding: 16px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .logo-badge img {
-      max-width: 120px;
-      max-height: 58px;
-      display: block;
-    }
-
-    h1 {
-      margin: 0 0 8px;
-      font-size: 24px;
-      color: #1f2937;
-      text-align: center;
-    }
-
-    .subtitle {
-      margin: 0 0 28px;
-      color: #6b7280;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .section-title {
-      text-align: center;
-      font-size: 18px;
-      font-weight: 700;
-      color: #1f2937;
-      margin: 0 0 18px;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 6px;
-      font-weight: 700;
-      color: #222;
-      text-align: left;
-      font-size: 14px;
-    }
-
-    input,
-    select {
-      width: 100%;
-      padding: 13px 14px;
-      margin-bottom: 16px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
-      box-sizing: border-box;
-      font-size: 14px;
-      background: #fff;
-    }
-
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #035740;
-      box-shadow: 0 0 0 3px rgba(3,87,64,0.10);
-    }
-
-    .helper-text {
-      margin-top: -6px;
-      margin-bottom: 16px;
-      font-size: 12px;
-      line-height: 1.5;
-      color: #6b7280;
-      text-align: left;
-    }
-
-    .helper-text strong {
-      color: #b45309;
-    }
-
-    .button-row {
-      display: flex;
-      gap: 14px;
-      margin-top: 8px;
-    }
-
-    button {
-      border: none;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      padding: 13px 16px;
-    }
-
-    #loginBtn {
-      flex: 1;
-      background: #b59a55;
-      color: #fff;
-    }
-
-    #loginBtn:hover {
-      background: #a38a49;
-    }
-
-    #showSignupBtn {
-      width: 100%;
-      margin-top: 12px;
-      background: #035740;
-      color: #fff;
-    }
-
-    #showSignupBtn:hover,
-    #signupBtn:hover {
-      background: #024534;
-    }
-
-    #signupBtn {
-      width: 100%;
-      margin-top: 10px;
-      background: #035740;
-      color: #fff;
-    }
-
-    .form-links {
-      display: block;
-      margin-top: 2px;
-      margin-bottom: 18px;
-      text-align: right;
-    }
-
-    .form-links a,
-    #backToLogin {
-      color: #035740;
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .form-links a:hover,
-    #backToLogin:hover {
-      text-decoration: underline;
-    }
-
-    .divider {
-      text-align: center;
-      color: #9ca3af;
-      font-size: 14px;
-      margin: 16px 0 14px;
-    }
-
-    #backToLoginWrap {
-      margin-top: 12px;
-      text-align: center;
-      color: #4b5563;
-      font-size: 14px;
-    }
-
-    #message {
-      margin-top: 16px;
-      font-size: 14px;
-      min-height: 20px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .support-box {
-      margin-top: 28px;
-      padding-top: 24px;
-      border-top: 1px solid #e5e7eb;
-      text-align: center;
-      color: #6b7280;
-    }
-
-    .support-box h3 {
-      margin: 0 0 14px;
-      font-size: 18px;
-      color: #1f2937;
-    }
-
-    .support-item {
-      margin-bottom: 10px;
-      font-size: 14px;
-    }
-
-    .support-item a {
-      color: #3b82f6;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .support-item a:hover {
-      text-decoration: underline;
-    }
-
-    .powered-by {
-      margin-top: 18px;
-      font-size: 13px;
-      color: #9ca3af;
-    }
-
-    .powered-by strong {
-      color: #f97316;
-    }
-
-    @media (max-width: 1100px) {
-      .login-panel-wrap {
-        max-width: 620px;
-      }
-    }
-
-    @media (max-width: 900px) {
-      .login-background {
-        display: none;
-      }
-
-      .login-panel-wrap {
-        max-width: none;
-        padding: 24px 16px;
-      }
-
-      .login-card {
-        max-width: 520px;
-      }
-    }
-
-    @media (max-width: 600px) {
-      .login-card {
-        padding: 26px 18px 22px;
-      }
-
-      .logo-badge {
-        width: 200px;
-        margin-top: -54px;
-      }
-
-      .button-row {
-        flex-direction: column;
-      }
-    }
-  </style>
+  }
+</style>
 </head>
 <body>
-  <div class="login-background"></div>
 
-  <div class="login-panel-wrap">
-    <div class="login-card">
-      <div class="logo-badge">
-        <img src="/images/tt-logo.png" alt="Timothy Taylor logo">
+<div class="login-bg"></div>
+
+<div class="login-container">
+  <div class="login-card">
+
+    <img src="/images/tt-logo.png" class="logo" />
+
+    <h1>TT Contractor Portal</h1>
+    <p id="formSubtitle">Sign in to continue</p>
+
+    <form id="loginForm">
+      <label for="email">Email address</label>
+      <input type="email" id="email" required />
+
+      <label for="password">Password</label>
+      <input type="password" id="password" required />
+
+      <div id="signupFields" style="display:none; margin-top: 10px;">
+        <label for="fullName">Full name</label>
+        <input type="text" id="fullName" />
+
+        <label for="inductionComplete">Contractor induction training completed?</label>
+        <select id="inductionComplete">
+          <option value="">Select</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
+
+        <label for="ptwComplete">Permit to work training completed?</label>
+        <select id="ptwComplete">
+          <option value="">Select</option>
+          <option value="true">Yes</option>
+          <option value="false">No</option>
+        </select>
       </div>
 
-      <h1>Welcome To Your Portal</h1>
-      <p class="subtitle" id="formSubtitle">Sign in to continue</p>
-
-      <div class="section-title">Sign in</div>
-
-      <form id="loginForm">
-        <label for="email">Email address</label>
-        <input type="email" id="email" required />
-
-        <label for="password">Password</label>
-        <input type="password" id="password" required />
-
-        <div id="signupFields" style="display:none; margin-top: 10px;">
-          <label for="fullName">Full name</label>
-          <input type="text" id="fullName" />
-
-          <label for="inductionComplete">Contractor induction training completed?</label>
-          <select id="inductionComplete">
-            <option value="">Select</option>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </select>
-
-          <label for="ptwComplete">Permit to work training completed?</label>
-          <select id="ptwComplete">
-            <option value="">Select</option>
-            <option value="true">Yes</option>
-            <option value="false">No</option>
-          </select>
-        </div>
-
-        <div class="form-links" id="forgotPasswordWrap">
-          <a href="/forgot-password.html">Forgot password?</a>
-        </div>
-
-        <button type="submit" id="loginBtn">Sign in</button>
-
-        <div class="divider">OR</div>
-
-        <button type="button" id="showSignupBtn">
-          Create New Account
-        </button>
-
-        <button type="button" id="signupBtn" style="display:none;">
-          Create Account
-        </button>
-      </form>
-
-      <p id="backToLoginWrap" style="display:none;">
-        Already have an account? <a href="#" id="backToLogin">Log in</a>
-      </p>
-
-      <div id="message"></div>
-
-      <div class="support-box">
-        <h3>Need Help?</h3>
-        <div class="support-item">
-          <a href="tel:01482231733">01482 231 733</a>
-        </div>
-        <div class="support-item">
-          <a href="mailto:support@thepowerplusgroup.com">support@thepowerplusgroup.com</a>
-        </div>
-        <div class="support-item">
-          Mon - Fri 08:00 - 17:00
-        </div>
-        <div class="powered-by">
-          Powered by <strong>Power Plus Group</strong>
-        </div>
+      <div class="form-links" id="forgotPasswordWrap">
+        <a href="/forgot-password.html">Forgot password?</a>
       </div>
-    </div>
+
+      <button type="submit" id="loginBtn">Sign in</button>
+
+      <button type="button" id="showSignupBtn" style="margin-top:10px; background:#ccc; color:#000;">
+        Sign Up
+      </button>
+
+      <button type="button" id="signupBtn" style="display:none; margin-top:10px;">
+        Create Account
+      </button>
+    </form>
+
+    <p id="backToLoginWrap" style="display:none; margin-top:10px; text-align:center;">
+      Already have an account? <a href="#" id="backToLogin">Log in</a>
+    </p>
+
+    <div id="message"></div>
+
   </div>
+</div>
+
+</body>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
@@ -542,5 +376,5 @@
       }, 2000);
     });
   </script>
-</body>
+
 </html>
