@@ -130,10 +130,52 @@
     <h1>TT Contractor Portal</h1>
     <p id="formSubtitle">Sign in to continue</p>
 
-    <!-- KEEP YOUR FORM EXACTLY AS IT IS -->
-    <form id="loginForm">
-      ...
-    </form>
+   <form id="loginForm">
+  <label for="email">Email address</label>
+  <input type="email" id="email" required />
+
+  <label for="password">Password</label>
+  <input type="password" id="password" required />
+
+  <div id="signupFields" style="display:none; margin-top: 10px;">
+    <label for="fullName">Full name</label>
+    <input type="text" id="fullName" />
+
+    <label for="inductionComplete">Contractor induction training completed?</label>
+    <select id="inductionComplete">
+      <option value="">Select</option>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+
+    <label for="ptwComplete">Permit to work training completed?</label>
+    <select id="ptwComplete">
+      <option value="">Select</option>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+  </div>
+
+  <div class="form-links" id="forgotPasswordWrap">
+    <a href="/forgot-password.html">Forgot password?</a>
+  </div>
+
+  <button type="submit" id="loginBtn">Sign in</button>
+
+  <button type="button" id="showSignupBtn" style="margin-top:10px; background:#ccc; color:#000;">
+    Sign Up
+  </button>
+
+  <button type="button" id="signupBtn" style="display:none; margin-top:10px;">
+    Create Account
+  </button>
+</form>
+
+<p id="backToLoginWrap" style="display:none; margin-top:10px; text-align:center;">
+  Already have an account? <a href="#" id="backToLogin">Log in</a>
+</p>
+
+<div id="message"></div>
 
     <div id="message"></div>
 
