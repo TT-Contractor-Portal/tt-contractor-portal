@@ -676,7 +676,11 @@
       const selectedAreaObjects = getSelectedAreas();
       const selectedAreas = selectedAreaObjects.map(a => a.name);
       const selectedAreaIds = selectedAreaObjects.map(a => a.id);
-      const selectedRisks = getSelectedValues("risks");
+            let selectedRisks = getSelectedValues("risks");
+
+      if (selectedRisks.includes("None Applicable")) {
+        selectedRisks = ["None Applicable"];
+      }
       const fileInput = document.getElementById("ramsfile");
       const file = fileInput?.files?.[0];
 
