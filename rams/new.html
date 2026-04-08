@@ -245,9 +245,9 @@
       <h2>Submit RAMS for Review</h2>
 
       <div class="field">
-        <label for="ramsfile">Upload RAMS file</label>
-        <input type="file" id="ramsfile" accept=".pdf,.docx" />
-        <div class="helper">Accepted formats: PDF and DOCX. Max file size: 10MB.</div>
+        <label for="ramsfile">Upload RAMS document(s)</label>
+        <input type="file" id="ramsfile" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple />
+        <div class="helper">Accepted formats: PDF, DOC, DOCX, XLS and XLSX. Max file size: 10MB per file.</div>
       </div>
 
       <div class="field">
@@ -271,17 +271,17 @@
       <div class="field">
         <label>Risk type(s)</label>
 
-              <div id="risks" class="checkbox-grid">
-        <label><input type="checkbox" value="None Applicable"> None Applicable</label>
-        <label><input type="checkbox" value="Hot Work"> Hot Work</label>
-        <label><input type="checkbox" value="Working at Height"> Working at Height</label>
-        <label><input type="checkbox" value="Confined Space"> Confined Space</label>
-        <label><input type="checkbox" value="Electrical / Isolation"> Electrical / Isolation</label>
-        <label><input type="checkbox" value="COSHH / Chemicals"> COSHH / Chemicals</label>
-        <label><input type="checkbox" value="Lifting Operations"> Lifting Operations</label>
-        <label><input type="checkbox" value="Pressure Systems / Steam"> Pressure Systems / Steam</label>
-        <label><input type="checkbox" value="Traffic / Vehicle Movement"> Traffic / Vehicle Movement</label>
-      </div>
+        <div id="risks" class="checkbox-grid">
+          <label><input type="checkbox" value="None Applicable"> None Applicable</label>
+          <label><input type="checkbox" value="Hot Work"> Hot Work</label>
+          <label><input type="checkbox" value="Working at Height"> Working at Height</label>
+          <label><input type="checkbox" value="Confined Space"> Confined Space</label>
+          <label><input type="checkbox" value="Electrical / Isolation"> Electrical / Isolation</label>
+          <label><input type="checkbox" value="COSHH / Chemicals"> COSHH / Chemicals</label>
+          <label><input type="checkbox" value="Lifting Operations"> Lifting Operations</label>
+          <label><input type="checkbox" value="Pressure Systems / Steam"> Pressure Systems / Steam</label>
+          <label><input type="checkbox" value="Traffic / Vehicle Movement"> Traffic / Vehicle Movement</label>
+        </div>
 
         <div class="helper">Select all applicable risks.</div>
       </div>
@@ -344,7 +344,7 @@
   <script>
     const client = supabase.createClient(
       "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
+      "YOUR_CURRENT_SUPABASE_ANON_KEY_HERE"
     );
 
     let currentUser = null;
@@ -447,7 +447,7 @@
       renderAreaSummary();
     }
 
-       function renderAreaCheckboxes() {
+    function renderAreaCheckboxes() {
       const areasBox = document.getElementById("areas");
 
       if (!siteAreas.length) {
@@ -508,7 +508,7 @@
 
       renderAreaSummary();
     }
-    
+
     function escapeHtml(value) {
       return String(value || "")
         .replace(/&/g, "&amp;")
@@ -518,7 +518,7 @@
         .replace(/'/g, "&#039;");
     }
 
-      function getSelectedAreas() {
+    function getSelectedAreas() {
       const checkboxes = Array.from(
         document.querySelectorAll("#areas input[type='checkbox']:checked")
       );
@@ -563,7 +563,7 @@
         noneCheckbox.checked = false;
       }
     }
-    
+
     function getCombinedAreaData(selectedAreaIds) {
       const hazards = areaHazards.filter(item => selectedAreaIds.includes(item.area_id));
       const rules = areaRules.filter(item => selectedAreaIds.includes(item.area_id));
@@ -676,57 +676,59 @@
       const selectedAreaObjects = getSelectedAreas();
       const selectedAreas = selectedAreaObjects.map(a => a.name);
       const selectedAreaIds = selectedAreaObjects.map(a => a.id);
-            let selectedRisks = getSelectedValues("risks");
 
+      let selectedRisks = getSelectedValues("risks");
       if (selectedRisks.includes("None Applicable")) {
         selectedRisks = ["None Applicable"];
       }
+
       const fileInput = document.getElementById("ramsfile");
-      const file = fileInput?.files?.[0];
+      const files = Array.from(fileInput?.files || []);
 
-if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
-  alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
-  return null;
-}
+      if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
+        alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
+        return null;
+      }
 
-if (!file) {
-  alert("Please upload a RAMS document before running the review.");
-  return null;
-}
+      if (!files.length) {
+        alert("Please upload at least one RAMS document before running the review.");
+        return null;
+      }
 
-const maxSize = 10 * 1024 * 1024; // 10MB
+      const maxSize = 10 * 1024 * 1024;
+      const allowedExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
 
-const allowedTypes = [
-  "application/pdf",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-];
+      for (const file of files) {
+        const lowerName = String(file.name || "").toLowerCase();
+        const hasAllowedExtension = allowedExtensions.some(ext => lowerName.endsWith(ext));
 
-if (!allowedTypes.includes(file.type)) {
-  alert("Only PDF or DOCX files are allowed.");
-  return null;
-}
-      
-if (file.size > maxSize) {
-  alert("File must be under 10MB.");
-  return null;
-}
+        if (!hasAllowedExtension) {
+          alert("Only PDF, DOC, DOCX, XLS or XLSX files are allowed.");
+          return null;
+        }
 
-const uploadedFileName = file.name;
-const combinedAreaData = getCombinedAreaData(selectedAreaIds);
+        if (file.size > maxSize) {
+          alert(`File "${file.name}" must be under 10MB.`);
+          return null;
+        }
+      }
 
-const recommendedPermits = ["P1 General Work Permit"];
+      const uploadedFileName = files.map(file => file.name).join(", ");
+      const combinedAreaData = getCombinedAreaData(selectedAreaIds);
 
-if (selectedRisks.includes("Hot Work")) {
-  recommendedPermits.push("P2 Hot Work Permit");
-}
+      const recommendedPermits = ["P1 General Work Permit"];
 
-if (selectedRisks.includes("Confined Space")) {
-  recommendedPermits.push("P3 Confined Space Permit");
-}
+      if (selectedRisks.includes("Hot Work")) {
+        recommendedPermits.push("P2 Hot Work Permit");
+      }
 
-if (selectedRisks.includes("Working at Height")) {
-  recommendedPermits.push("P4 Working at Height Permit");
-}
+      if (selectedRisks.includes("Confined Space")) {
+        recommendedPermits.push("P3 Confined Space Permit");
+      }
+
+      if (selectedRisks.includes("Working at Height")) {
+        recommendedPermits.push("P4 Working at Height Permit");
+      }
 
       return {
         contractorName,
@@ -740,6 +742,7 @@ if (selectedRisks.includes("Working at Height")) {
         detectedRisks: [],
         recommendedPermits,
         uploadedFileName,
+        uploadedFiles: files,
         startDate,
         duration,
         durationUnit,
@@ -821,28 +824,61 @@ if (selectedRisks.includes("Working at Height")) {
       });
     }
 
-    async function uploadFileToSupabase(file) {
-      if (!file) return null;
+    async function uploadFilesToSupabase(files) {
+      if (!files || !files.length) return [];
 
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `rams/${fileName}`;
+      const uploadedFiles = [];
 
-      const { error } = await client.storage
-        .from("rams-files")
-        .upload(filePath, file);
+      for (const file of files) {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `rams/${fileName}`;
 
-      if (error) {
-        alert("File upload failed: " + error.message);
-        return null;
+        const { error } = await client.storage
+          .from("rams-files")
+          .upload(filePath, file);
+
+        if (error) {
+          alert(`File upload failed for "${file.name}": ${error.message}`);
+          return null;
+        }
+
+        uploadedFiles.push({
+          path: filePath,
+          name: file.name,
+          type: file.type,
+          size: file.size
+        });
       }
 
-      return {
-        path: filePath,
-        name: file.name,
-        type: file.type,
-        size: file.size
-      };
+      return uploadedFiles;
+    }
+
+    async function saveDocumentRows(ramsReviewId, uploadedFiles) {
+      if (!ramsReviewId || !uploadedFiles || !uploadedFiles.length || !currentUser) {
+        return true;
+      }
+
+      const rows = uploadedFiles.map((file, index) => ({
+        rams_review_id: ramsReviewId,
+        file_name: file.name,
+        file_path: file.path,
+        file_type: file.type || null,
+        file_size: file.size || null,
+        document_role: index === 0 ? "primary_rams" : "supporting_document",
+        uploaded_by: currentUser.id
+      }));
+
+      const { error } = await client
+        .from("rams_review_documents")
+        .insert(rows);
+
+      if (error) {
+        alert("RAMS saved, but document rows failed to save: " + error.message);
+        return false;
+      }
+
+      return true;
     }
 
     async function saveDraftToSupabase(draftReview) {
@@ -876,8 +912,8 @@ if (selectedRisks.includes("Working at Height")) {
         clash: !!draftReview.clash,
         primary_area_id: draftReview.primaryAreaId || null,
         area_hazard_snapshot: draftReview.areaHazardSnapshot || [],
-area_rule_snapshot: draftReview.areaRuleSnapshot || [],
-area_ppe_snapshot: draftReview.areaPpeSnapshot || []
+        area_rule_snapshot: draftReview.areaRuleSnapshot || [],
+        area_ppe_snapshot: draftReview.areaPpeSnapshot || []
       };
 
       const { data, error } = await client
@@ -909,114 +945,121 @@ area_ppe_snapshot: draftReview.areaPpeSnapshot || []
       return data;
     }
 
-async function runAiReviewForRecord(ramsReviewId) {
-  const response = await fetch("/.netlify/functions/review-rams-document", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ ramsReviewId })
-  });
+    async function runAiReviewForRecord(ramsReviewId) {
+      const response = await fetch("/.netlify/functions/review-rams-document", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ ramsReviewId })
+      });
 
-  const rawText = await response.text();
+      const rawText = await response.text();
 
-  let result = null;
-  try {
-    result = JSON.parse(rawText);
-  } catch (e) {
-    throw new Error(`Function did not return JSON. HTTP ${response.status}. Response starts: ${rawText.slice(0, 200)}`);
-  }
-
-  if (!response.ok) {
-    throw new Error(result.error || "AI review failed.");
-  }
-
-  return result;
-}
-    
-async function runRamsReview() {
-  const pageOk = await protectPage();
-  if (!pageOk) return;
-
-  const runReviewBtn = document.getElementById("runReviewBtn");
-  if (runReviewBtn) runReviewBtn.disabled = true;
-
-  const draftReview = buildDraftReview();
-  if (!draftReview) {
-    if (runReviewBtn) runReviewBtn.disabled = false;
-    return;
-  }
-
-  const fileInput = document.getElementById("ramsfile");
-  const file = fileInput?.files?.[0];
-
-  let uploadedFile = null;
-
-  if (file) {
-    uploadedFile = await uploadFileToSupabase(file);
-
-    if (!uploadedFile) {
-      if (runReviewBtn) runReviewBtn.disabled = false;
-      return;
-    }
-  }
-
-  const clashFound = await hasClash(draftReview);
-
-  draftReview.clash = clashFound;
-  draftReview.clashAcknowledged = false;
-  draftReview.userId = currentUser.id;
-
-  if (uploadedFile) {
-    draftReview.filePath = uploadedFile.path;
-    draftReview.fileName = uploadedFile.name;
-    draftReview.fileType = uploadedFile.type;
-    draftReview.fileSize = uploadedFile.size;
-  }
-
-  draftReview.submittedByName = currentUserProfile?.full_name || "";
-  draftReview.submittedByEmail = currentUser.email || "";
-
-  const savedRecord = await saveDraftToSupabase(draftReview);
-  if (!savedRecord) {
-    if (runReviewBtn) runReviewBtn.disabled = false;
-    return;
-  }
-
-  try {
-    await runAiReviewForRecord(savedRecord.id);
-  } catch (error) {
-    alert("RAMS was saved, but AI review failed: " + error.message);
-  }
-
-  pendingSupabaseId = savedRecord.id;
-
-  if (clashFound) {
-    const clashModalDetails = document.getElementById("clashModalDetails");
-    const clashes = await getClashSummary(draftReview);
-
-    if (clashModalDetails) {
-      if (!clashes.length) {
-        clashModalDetails.innerHTML = `<p>No further clash detail available.</p>`;
-      } else {
-        clashModalDetails.innerHTML = clashes.map(c => `
-          <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
-            <strong>${escapeHtml(c.contractor_name || "-")}</strong><br>
-            Area: ${escapeHtml((c.areas || []).join(", ") || "-")}<br>
-            Dates: ${escapeHtml(c.start_date || "-")} to ${escapeHtml(c.end_date || c.start_date || "-")}<br>
-            Approved by: ${escapeHtml(c.approved_by_name || "Unknown")}
-          </div>
-        `).join("");
+      let result = null;
+      try {
+        result = JSON.parse(rawText);
+      } catch (e) {
+        throw new Error(`Function did not return JSON. HTTP ${response.status}. Response starts: ${rawText.slice(0, 200)}`);
       }
+
+      if (!response.ok) {
+        throw new Error(result.error || "AI review failed.");
+      }
+
+      return result;
     }
 
-    document.getElementById("clashModal").style.display = "flex";
-    if (runReviewBtn) runReviewBtn.disabled = false;
-    return;
-  }
+    async function runRamsReview() {
+      const pageOk = await protectPage();
+      if (!pageOk) return;
 
-  goToResults(savedRecord.id, false);
-}
+      const runReviewBtn = document.getElementById("runReviewBtn");
+      if (runReviewBtn) runReviewBtn.disabled = true;
+
+      const draftReview = buildDraftReview();
+      if (!draftReview) {
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      const files = Array.from(document.getElementById("ramsfile")?.files || []);
+
+      let uploadedFiles = [];
+
+      if (files.length) {
+        uploadedFiles = await uploadFilesToSupabase(files);
+
+        if (!uploadedFiles) {
+          if (runReviewBtn) runReviewBtn.disabled = false;
+          return;
+        }
+      }
+
+      const clashFound = await hasClash(draftReview);
+
+      draftReview.clash = clashFound;
+      draftReview.clashAcknowledged = false;
+      draftReview.userId = currentUser.id;
+
+      if (uploadedFiles.length) {
+        draftReview.filePath = uploadedFiles[0].path;
+        draftReview.fileName = uploadedFiles[0].name;
+        draftReview.fileType = uploadedFiles[0].type;
+        draftReview.fileSize = uploadedFiles[0].size;
+        draftReview.uploadedFilesMeta = uploadedFiles;
+      }
+
+      draftReview.submittedByName = currentUserProfile?.full_name || "";
+      draftReview.submittedByEmail = currentUser.email || "";
+
+      const savedRecord = await saveDraftToSupabase(draftReview);
+      if (!savedRecord) {
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      const docsSaved = await saveDocumentRows(savedRecord.id, uploadedFiles);
+      if (!docsSaved) {
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      try {
+        await runAiReviewForRecord(savedRecord.id);
+      } catch (error) {
+        alert("RAMS was saved, but AI review failed: " + error.message);
+      }
+
+      pendingSupabaseId = savedRecord.id;
+
+      if (clashFound) {
+        const clashModalDetails = document.getElementById("clashModalDetails");
+        const clashes = await getClashSummary(draftReview);
+
+        if (clashModalDetails) {
+          if (!clashes.length) {
+            clashModalDetails.innerHTML = `<p>No further clash detail available.</p>`;
+          } else {
+            clashModalDetails.innerHTML = clashes.map(c => `
+              <div style="margin-top:10px; padding:10px; background:#fff; border:1px solid #f1b0b0; border-radius:8px;">
+                <strong>${escapeHtml(c.contractor_name || "-")}</strong><br>
+                Area: ${escapeHtml((c.areas || []).join(", ") || "-")}<br>
+                Dates: ${escapeHtml(c.start_date || "-")} to ${escapeHtml(c.end_date || c.start_date || "-")}<br>
+                Approved by: ${escapeHtml(c.approved_by_name || "Unknown")}
+              </div>
+            `).join("");
+          }
+        }
+
+        document.getElementById("clashModal").style.display = "flex";
+        if (runReviewBtn) runReviewBtn.disabled = false;
+        return;
+      }
+
+      goToResults(savedRecord.id, false);
+    }
+
     async function closeModal(shouldContinue) {
       document.getElementById("clashModal").style.display = "none";
 
@@ -1045,7 +1088,7 @@ async function runRamsReview() {
       window.location.href = url;
     }
 
-       async function initPage() {
+    async function initPage() {
       const ok = await protectPage();
       if (!ok) return;
 
