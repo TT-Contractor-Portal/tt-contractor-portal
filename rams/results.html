@@ -40,11 +40,11 @@
     }
 
     .main {
-  margin-left: 240px;
-  width: calc(100% - 240px);
-  padding: 30px;
-  box-sizing: border-box;
-}
+      margin-left: 240px;
+      width: calc(100% - 240px);
+      padding: 30px;
+      box-sizing: border-box;
+    }
 
     .topbar, .panel {
       background: white;
@@ -122,6 +122,7 @@
       font-size: 15px;
       cursor: pointer;
       color: white;
+      background: #035740;
     }
 
     .green { background: #035740; }
@@ -140,15 +141,8 @@
       cursor: not-allowed;
     }
 
-    .button {
-      background: #035740;
-      color: white;
-      opacity: 1;
-    }
-
     .button:not(:disabled) {
       opacity: 1 !important;
-      background: #035740 !important;
       cursor: pointer;
     }
 
@@ -170,7 +164,7 @@
       gap: 12px 24px;
     }
 
-     .detail-item {
+    .detail-item {
       background: #f8fafc;
       border: 1px solid #e5e7eb;
       border-radius: 10px;
@@ -227,6 +221,50 @@
       font-size: 14px;
     }
 
+    .document-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .document-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #f8fafc;
+      flex-wrap: wrap;
+    }
+
+    .document-row-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .document-row-meta {
+      font-size: 14px;
+      color: #666;
+      word-break: break-word;
+    }
+
+    .document-role {
+      display: inline-block;
+      margin-bottom: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: #e8f1ed;
+      color: #035740;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: capitalize;
+    }
+
     @media (max-width: 900px) {
       .three-col-grid {
         grid-template-columns: 1fr;
@@ -248,6 +286,11 @@
       .detail-grid {
         grid-template-columns: 1fr;
       }
+
+      .document-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -266,9 +309,8 @@
   </div>
 
   <div class="main">
-<div id="statusMessage" style="display:none; margin-bottom:16px; padding:14px 16px; border-radius:8px; background:#e6f4ea; color:#1e7e34; font-weight:500;">
-</div>
-    
+    <div id="statusMessage" style="display:none; margin-bottom:16px; padding:14px 16px; border-radius:8px; background:#e6f4ea; color:#1e7e34; font-weight:500;"></div>
+
     <div class="topbar">
       <strong>Review Results</strong> — <span id="topbarSummary">RAMS review</span>
     </div>
@@ -300,7 +342,7 @@
       </div>
     </div>
 
-        <div class="panel">
+    <div class="panel">
       <h2 id="resultStatus">RAMS Review Result</h2>
 
       <div class="detail-grid">
@@ -383,20 +425,22 @@
         </div>
       </div>
     </div>
-<div class="panel">
-  <h2 class="section-title">Site-Specific Missing Items</h2>
-  <ul id="resultAiSiteMissingItems" class="alert-list"></ul>
-</div>
 
-<div class="panel">
-  <h2 class="section-title">AI Job-Based Recommendations</h2>
-  <ul id="resultAiJobRecommendations" class="alert-list"></ul>
-</div>
+    <div class="panel">
+      <h2 class="section-title">Site-Specific Missing Items</h2>
+      <ul id="resultAiSiteMissingItems" class="alert-list"></ul>
+    </div>
 
-<div class="panel">
-  <h2 class="section-title">Items Clearly Covered</h2>
-  <ul id="resultAiCoveredItems" class="alert-list"></ul>
-</div>
+    <div class="panel">
+      <h2 class="section-title">AI Job-Based Recommendations</h2>
+      <ul id="resultAiJobRecommendations" class="alert-list"></ul>
+    </div>
+
+    <div class="panel">
+      <h2 class="section-title">Items Clearly Covered</h2>
+      <ul id="resultAiCoveredItems" class="alert-list"></ul>
+    </div>
+
     <div class="panel">
       <h2 class="section-title">AI Detected Additional Areas</h2>
       <div id="resultDetectedAreas" class="tag-wrap"></div>
@@ -428,16 +472,8 @@
     </div>
 
     <div class="panel" id="documentPanel" style="display:none;">
-      <h2 class="section-title">RAMS Document</h2>
-      <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
-        <div>
-          <div><strong id="documentName">No file uploaded</strong></div>
-          <div id="documentMeta" style="font-size:14px; color:#666; margin-top:6px;"></div>
-        </div>
-        <div class="button-row" style="margin-top:0;">
-          <button id="viewDocumentBtn" class="button green" type="button">View RAMS Document</button>
-        </div>
-      </div>
+      <h2 class="section-title">RAMS Documents</h2>
+      <div id="documentList" class="document-list"></div>
     </div>
   </div>
 
@@ -467,12 +503,13 @@
   <script>
     const client = supabase.createClient(
       "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
+      "YOUR_CURRENT_SUPABASE_ANON_KEY_HERE"
     );
 
     let currentUser = null;
     let currentUserProfile = null;
     let currentReview = null;
+    let currentReviewDocuments = [];
 
     function escapeHtml(value) {
       return String(value || "")
@@ -487,27 +524,42 @@
       return new URLSearchParams(window.location.search).get(name);
     }
 
-   function formatDate(value) {
-  if (!value) return "-";
-  try {
-    return new Date(value).toLocaleDateString("en-GB", {
-      timeZone: "Europe/London"
-    });
-  } catch {
-    return value;
-  }
-}
+    function formatDate(value) {
+      if (!value) return "-";
+      try {
+        return new Date(value).toLocaleDateString("en-GB", {
+          timeZone: "Europe/London"
+        });
+      } catch {
+        return value;
+      }
+    }
 
     function formatDateTime(value) {
-  if (!value) return "-";
-  try {
-    return new Date(value).toLocaleString("en-GB", {
-      timeZone: "Europe/London"
-    });
-  } catch {
-    return value;
-  }
-}
+      if (!value) return "-";
+      try {
+        return new Date(value).toLocaleString("en-GB", {
+          timeZone: "Europe/London"
+        });
+      } catch {
+        return value;
+      }
+    }
+
+    function formatFileSize(bytes) {
+      const size = Number(bytes || 0);
+      if (!size) return "";
+      if (size < 1024) return `${size} bytes`;
+      if (size < 1024 * 1024) return `${Math.round(size / 1024)} KB`;
+      return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function formatDocumentRole(role) {
+      if (!role) return "Document";
+      return String(role)
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, c => c.toUpperCase());
+    }
 
     function renderTags(elementId, items) {
       const el = document.getElementById(elementId);
@@ -533,33 +585,30 @@
       el.innerHTML = safeItems.map(item => `<li>${escapeHtml(item)}</li>`).join("");
     }
 
-   function normaliseArraySnapshot(snapshot) {
-  return Array.isArray(snapshot) ? snapshot.filter(Boolean) : [];
-}
+    function normaliseArraySnapshot(snapshot) {
+      return Array.isArray(snapshot) ? snapshot.filter(Boolean) : [];
+    }
 
-function showStatusMessage(message, type = "success") {
-  const el = document.getElementById("statusMessage");
+    function showStatusMessage(message, type = "success") {
+      const el = document.getElementById("statusMessage");
+      if (!el) return;
 
-  if (!el) return;
+      el.textContent = message;
+      el.style.display = "block";
 
-  el.textContent = message;
-  el.style.display = "block";
+      if (type === "error") {
+        el.style.background = "#fdecea";
+        el.style.color = "#b42318";
+      } else {
+        el.style.background = "#e6f4ea";
+        el.style.color = "#1e7e34";
+      }
 
-  // Optional: change colour for different types later
-  if (type === "error") {
-    el.style.background = "#fdecea";
-    el.style.color = "#b42318";
-  } else {
-    el.style.background = "#e6f4ea";
-    el.style.color = "#1e7e34";
-  }
+      setTimeout(() => {
+        el.style.display = "none";
+      }, 4000);
+    }
 
-  // Auto hide after 4 seconds
-  setTimeout(() => {
-    el.style.display = "none";
-  }, 4000);
-}
-    
     function buildRecommendedPermits(review) {
       const permits = ["P1 General Work Permit"];
       const risks = Array.isArray(review.risks) ? review.risks : [];
@@ -647,13 +696,108 @@ function showStatusMessage(message, type = "success") {
       }
 
       currentReview = data;
+
+      await loadReviewDocuments(data.id);
       renderReview(data);
       await renderClashInfo(data);
     }
 
+    async function loadReviewDocuments(reviewId) {
+      currentReviewDocuments = [];
+
+      const { data, error } = await client
+        .from("rams_review_documents")
+        .select("*")
+        .eq("rams_review_id", reviewId)
+        .order("uploaded_at", { ascending: true });
+
+      if (!error && Array.isArray(data) && data.length) {
+        currentReviewDocuments = data.map(doc => ({
+          id: doc.id,
+          file_name: doc.file_name,
+          file_path: doc.file_path,
+          file_type: doc.file_type,
+          file_size: doc.file_size,
+          document_role: doc.document_role,
+          uploaded_at: doc.uploaded_at
+        }));
+        return;
+      }
+
+      if (currentReview?.file_path) {
+        currentReviewDocuments = [
+          {
+            id: currentReview.id,
+            file_name: currentReview.file_name || currentReview.uploaded_file_name || "Uploaded RAMS document",
+            file_path: currentReview.file_path,
+            file_type: currentReview.file_type,
+            file_size: currentReview.file_size,
+            document_role: "primary_rams",
+            uploaded_at: currentReview.created_at || null
+          }
+        ];
+      }
+    }
+
+    async function openReviewDocument(filePath) {
+      if (!filePath) {
+        alert("No document path found.");
+        return;
+      }
+
+      const { data, error } = await client.storage
+        .from("rams-files")
+        .createSignedUrl(filePath, 60);
+
+      if (error || !data?.signedUrl) {
+        alert("Could not open RAMS document.");
+        return;
+      }
+
+      window.open(data.signedUrl, "_blank");
+    }
+
+    function renderDocumentPanel() {
+      const panel = document.getElementById("documentPanel");
+      const list = document.getElementById("documentList");
+
+      if (!panel || !list) return;
+
+      if (!currentReviewDocuments.length) {
+        panel.style.display = "none";
+        list.innerHTML = "";
+        return;
+      }
+
+      panel.style.display = "block";
+
+      list.innerHTML = currentReviewDocuments.map((doc, index) => {
+        const metaParts = [];
+        if (doc.file_type) metaParts.push(escapeHtml(doc.file_type));
+        if (doc.file_size) metaParts.push(escapeHtml(formatFileSize(doc.file_size)));
+        if (doc.uploaded_at) metaParts.push(`Uploaded ${escapeHtml(formatDateTime(doc.uploaded_at))}`);
+
+        const roleLabel = formatDocumentRole(doc.document_role || (index === 0 ? "primary_rams" : "supporting_document"));
+
+        return `
+          <div class="document-row">
+            <div>
+              <div class="document-role">${escapeHtml(roleLabel)}</div>
+              <div class="document-row-title">${escapeHtml(doc.file_name || "Unnamed document")}</div>
+              <div class="document-row-meta">${metaParts.join(" • ") || "No file details available"}</div>
+            </div>
+
+            <div class="button-row" style="margin-top:0;">
+              <button class="button green" type="button" onclick="openReviewDocument('${escapeHtml(doc.file_path).replace(/'/g, "\\'")}')">View Document</button>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
     function renderReview(review) {
-   const ruleSnapshot = normaliseArraySnapshot(review.area_rule_snapshot);
-const ppeSnapshot = normaliseArraySnapshot(review.area_ppe_snapshot);
+      const ruleSnapshot = normaliseArraySnapshot(review.area_rule_snapshot);
+      const ppeSnapshot = normaliseArraySnapshot(review.area_ppe_snapshot);
       const permits = buildRecommendedPermits(review);
 
       document.getElementById("topbarSummary").textContent = review.job_title || "RAMS review";
@@ -669,73 +813,43 @@ const ppeSnapshot = normaliseArraySnapshot(review.area_ppe_snapshot);
       document.getElementById("resultStatusBadge").textContent = review.status || "Under Review";
       document.getElementById("reviewerNotes").value = review.reviewer_notes || "";
       document.getElementById("resultAiStatus").textContent = review.ai_review_status || "-";
-      
+
       renderTags("resultAreas", review.areas || []);
       renderTags("resultRisks", review.risks || []);
       renderTags("resultDetectedAreas", review.ai_detected_additional_areas || []);
       renderTags("resultDetectedRisks", review.ai_detected_additional_risks || []);
       renderTags("resultPermits", permits);
 
-     renderList("resultAreaHazards", review.area_hazard_snapshot || [], "No area hazards saved.");
-renderList("resultAreaRules", ruleSnapshot, "No area rules saved.");
-renderList("resultAreaPpe", ppeSnapshot, "No area PPE saved.");
+      renderList("resultAreaHazards", review.area_hazard_snapshot || [], "No area hazards saved.");
+      renderList("resultAreaRules", ruleSnapshot, "No area rules saved.");
+      renderList("resultAreaPpe", ppeSnapshot, "No area PPE saved.");
 
       renderList("resultMissingItems", review.missing_items || review.missingItems || [], "No missing items flagged.");
       renderList("resultWeakItems", review.weak_items || review.weakItems || [], "No weak items flagged.");
-renderList(
-  "resultAiSiteMissingItems",
-  review.ai_site_missing_items || [],
-  "No site-specific missing items flagged."
-);
 
-renderList(
-  "resultAiJobRecommendations",
-  review.ai_job_recommendations || [],
-  "No additional job-based recommendations flagged."
-);
+      renderList(
+        "resultAiSiteMissingItems",
+        review.ai_site_missing_items || [],
+        "No site-specific missing items flagged."
+      );
 
-renderList(
-  "resultAiCoveredItems",
-  review.ai_covered_items || [],
-  "No clearly covered items recorded."
-);
-     document.getElementById("resultSummary").innerHTML = escapeHtml(
-  review.ai_summary || review.summary || "RAMS submitted and ready for review."
-).replace(/\n/g, "<br>");
-      renderDocumentPanel(review);
-    }
+      renderList(
+        "resultAiJobRecommendations",
+        review.ai_job_recommendations || [],
+        "No additional job-based recommendations flagged."
+      );
 
-    function renderDocumentPanel(review) {
-      const panel = document.getElementById("documentPanel");
-      const nameEl = document.getElementById("documentName");
-      const metaEl = document.getElementById("documentMeta");
-      const btn = document.getElementById("viewDocumentBtn");
+      renderList(
+        "resultAiCoveredItems",
+        review.ai_covered_items || [],
+        "No clearly covered items recorded."
+      );
 
-      if (!review.file_path) {
-        panel.style.display = "none";
-        return;
-      }
+      document.getElementById("resultSummary").innerHTML = escapeHtml(
+        review.ai_summary || review.summary || "RAMS submitted and ready for review."
+      ).replace(/\n/g, "<br>");
 
-      panel.style.display = "block";
-      nameEl.textContent = review.file_name || review.uploaded_file_name || "Uploaded RAMS document";
-
-      const metaParts = [];
-      if (review.file_type) metaParts.push(review.file_type);
-      if (review.file_size) metaParts.push(`${Math.round(review.file_size / 1024)} KB`);
-      metaEl.textContent = metaParts.join(" • ");
-
-      btn.onclick = async () => {
-        const { data, error } = await client.storage
-          .from("rams-files")
-          .createSignedUrl(review.file_path, 60);
-
-        if (error || !data?.signedUrl) {
-          alert("Could not open RAMS document.");
-          return;
-        }
-
-        window.open(data.signedUrl, "_blank");
-      };
+      renderDocumentPanel();
     }
 
     async function renderClashInfo(review) {
@@ -801,19 +915,18 @@ renderList(
 
       const reviewerNotes = document.getElementById("reviewerNotes").value.trim();
       const reviewerName = currentUserProfile?.full_name || currentUser.email || "Reviewer";
+      const isApproved = newStatus === "Approved";
 
-     const isApproved = newStatus === "Approved";
-
-const updates = {
-  status: newStatus,
-  reviewer_notes: reviewerNotes,
-  review_date: new Date().toISOString(),
-  reviewer: reviewerName,
-  approved_by_name: isApproved ? reviewerName : null,
-  approved_by: isApproved ? currentUser.id : null,
-  approved_at: isApproved ? new Date().toISOString() : null,
-  clash_acknowledged: clashAcknowledged
-};
+      const updates = {
+        status: newStatus,
+        reviewer_notes: reviewerNotes,
+        review_date: new Date().toISOString(),
+        reviewer: reviewerName,
+        approved_by_name: isApproved ? reviewerName : null,
+        approved_by: isApproved ? currentUser.id : null,
+        approved_at: isApproved ? new Date().toISOString() : null,
+        clash_acknowledged: clashAcknowledged
+      };
 
       const { error } = await client
         .from("rams_reviews")
@@ -828,7 +941,8 @@ const updates = {
       if (newStatus === "Approved") {
         await markRelatedClashes(currentReview);
       }
-showStatusMessage(`RAMS updated to ${newStatus}`);
+
+      showStatusMessage(`RAMS updated to ${newStatus}`);
       await loadReview();
     }
 
