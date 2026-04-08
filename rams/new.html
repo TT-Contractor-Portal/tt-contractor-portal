@@ -544,6 +544,26 @@
       return Array.from(checkboxes).map(cb => cb.value);
     }
 
+    function handleRiskCheckboxChange(event) {
+      const changed = event.target;
+      const riskCheckboxes = Array.from(
+        document.querySelectorAll('#risks input[type="checkbox"]')
+      );
+
+      const noneCheckbox = riskCheckboxes.find(cb => cb.value === "None Applicable");
+      const otherCheckboxes = riskCheckboxes.filter(cb => cb.value !== "None Applicable");
+
+      if (changed.value === "None Applicable" && changed.checked) {
+        otherCheckboxes.forEach(cb => {
+          cb.checked = false;
+        });
+      }
+
+      if (changed.value !== "None Applicable" && changed.checked && noneCheckbox) {
+        noneCheckbox.checked = false;
+      }
+    }
+    
     function getCombinedAreaData(selectedAreaIds) {
       const hazards = areaHazards.filter(item => selectedAreaIds.includes(item.area_id));
       const rules = areaRules.filter(item => selectedAreaIds.includes(item.area_id));
