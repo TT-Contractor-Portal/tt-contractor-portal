@@ -283,19 +283,21 @@
       }
 
       const user = sessionData.session.user;
+const { data: myProfile, error: myProfileError } = await client
+  .from("user_profiles")
+  .select("*")
+  .eq("id", user.id)
+  .maybeSingle();
 
-      const { data: myProfile, error: myProfileError } = await client
-        .from("user_profiles")
-        .select("*")
-        .eq("id", user.id)
-        .single();
+console.log("Auth user ID:", user.id);
+console.log("Profile result:", myProfile);
+console.log("Profile error:", myProfileError);
 
-      if (myProfileError || !myProfile) {
-        alert("Profile not found");
-        window.location.href = "/login.html";
-        return;
-      }
-
+if (myProfileError || !myProfile) {
+  alert("Profile not found. Open console (F12)");
+  return;
+}
+     
       if (myProfile.role !== "admin") {
         alert("Admin access only");
         window.location.href = "/index.html";
