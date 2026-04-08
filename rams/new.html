@@ -107,6 +107,19 @@
       cursor: not-allowed;
     }
 
+    .secondary-button {
+      background: #e8f1ed;
+      color: #035740;
+      border: 1px solid #cfe2d8;
+    }
+
+    .danger-button {
+      background: #b42318;
+      color: white;
+      padding: 8px 12px;
+      font-size: 13px;
+    }
+
     .info-box {
       background: #f8f8f8;
       border-left: 4px solid #035740;
@@ -199,6 +212,51 @@
       background: #fafafa;
     }
 
+    .file-picker-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+      flex-wrap: wrap;
+    }
+
+    .file-picker-row input[type="file"] {
+      flex: 1;
+      min-width: 280px;
+    }
+
+    .selected-files {
+      margin-top: 14px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #f8fafc;
+      padding: 12px;
+    }
+
+    .selected-file-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .selected-file-row:last-child {
+      border-bottom: none;
+    }
+
+    .selected-file-name {
+      font-weight: 600;
+      color: #222;
+      word-break: break-word;
+    }
+
+    .selected-file-meta {
+      font-size: 13px;
+      color: #666;
+      margin-top: 4px;
+    }
+
     @media (max-width: 900px) {
       .area-summary-grid {
         grid-template-columns: 1fr;
@@ -218,6 +276,15 @@
 
       .checkbox-grid {
         grid-template-columns: 1fr;
+      }
+
+      .file-picker-row {
+        flex-direction: column;
+      }
+
+      .selected-file-row {
+        flex-direction: column;
+        align-items: flex-start;
       }
     }
   </style>
@@ -245,9 +312,16 @@
       <h2>Submit RAMS for Review</h2>
 
       <div class="field">
-        <label for="ramsfile">Upload RAMS document(s)</label>
-        <input type="file" id="ramsfile" accept=".pdf,.doc,.docx,.xls,.xlsx" multiple />
+        <label for="ramsfile">Add RAMS document</label>
+        <div class="file-picker-row">
+          <input type="file" id="ramsfile" accept=".pdf,.doc,.docx,.xls,.xlsx" />
+          <button type="button" class="button secondary-button" id="addFileBtn">Add Document</button>
+        </div>
         <div class="helper">Accepted formats: PDF, DOC, DOCX, XLS and XLSX. Max file size: 10MB per file.</div>
+
+        <div id="selectedFilesBox" class="selected-files" style="display:none;">
+          <div id="selectedFilesList"></div>
+        </div>
       </div>
 
       <div class="field">
@@ -355,6 +429,7 @@
     let areaHazards = [];
     let areaRules = [];
     let areaPpe = [];
+    let selectedFiles = [];
 
     async function protectPage() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
@@ -393,6 +468,84 @@
       }
 
       return true;
+    }
+
+    function formatFileSize(bytes) {
+      const size = Number(bytes || 0);
+      if (!size) return "";
+      if (size < 1024) return `${size} bytes`;
+      if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`;
+      return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+    }
+
+    function renderSelectedFiles() {
+      const box = document.getElementById("selectedFilesBox");
+      const list = document.getElementById("selectedFilesList");
+
+      if (!box || !list) return;
+
+      if (!selectedFiles.length) {
+        box.style.display = "none";
+        list.innerHTML = "";
+        return;
+      }
+
+      box.style.display = "block";
+      list.innerHTML = selectedFiles.map((file, index) => `
+        <div class="selected-file-row">
+          <div>
+            <div class="selected-file-name">${escapeHtml(file.name)}</div>
+            <div class="selected-file-meta">${escapeHtml(file.type || "Unknown type")} • ${escapeHtml(formatFileSize(file.size))}</div>
+          </div>
+          <button type="button" class="button danger-button" onclick="removeSelectedFile(${index})">Remove</button>
+        </div>
+      `).join("");
+    }
+
+    function removeSelectedFile(index) {
+      selectedFiles.splice(index, 1);
+      renderSelectedFiles();
+    }
+
+    function addSelectedFile() {
+      const fileInput = document.getElementById("ramsfile");
+      const file = fileInput?.files?.[0];
+
+      if (!file) {
+        alert("Please choose a document first.");
+        return;
+      }
+
+      const maxSize = 10 * 1024 * 1024;
+      const allowedExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
+      const lowerName = String(file.name || "").toLowerCase();
+      const hasAllowedExtension = allowedExtensions.some(ext => lowerName.endsWith(ext));
+
+      if (!hasAllowedExtension) {
+        alert("Only PDF, DOC, DOCX, XLS or XLSX files are allowed.");
+        return;
+      }
+
+      if (file.size > maxSize) {
+        alert(`File "${file.name}" must be under 10MB.`);
+        return;
+      }
+
+      const alreadyAdded = selectedFiles.some(existing =>
+        existing.name === file.name &&
+        existing.size === file.size &&
+        existing.lastModified === file.lastModified
+      );
+
+      if (alreadyAdded) {
+        alert("That document has already been added.");
+        fileInput.value = "";
+        return;
+      }
+
+      selectedFiles.push(file);
+      renderSelectedFiles();
+      fileInput.value = "";
     }
 
     async function loadAreaData() {
@@ -682,38 +835,17 @@
         selectedRisks = ["None Applicable"];
       }
 
-      const fileInput = document.getElementById("ramsfile");
-      const files = Array.from(fileInput?.files || []);
-
       if (!contractorName || !jobTitle || !startDate || !duration || !selectedAreas.length || !selectedRisks.length) {
         alert("Please complete contractor name, task description, area, risk, start date and duration before running the RAMS review.");
         return null;
       }
 
-      if (!files.length) {
-        alert("Please upload at least one RAMS document before running the review.");
+      if (!selectedFiles.length) {
+        alert("Please add at least one RAMS document before running the review.");
         return null;
       }
 
-      const maxSize = 10 * 1024 * 1024;
-      const allowedExtensions = [".pdf", ".doc", ".docx", ".xls", ".xlsx"];
-
-      for (const file of files) {
-        const lowerName = String(file.name || "").toLowerCase();
-        const hasAllowedExtension = allowedExtensions.some(ext => lowerName.endsWith(ext));
-
-        if (!hasAllowedExtension) {
-          alert("Only PDF, DOC, DOCX, XLS or XLSX files are allowed.");
-          return null;
-        }
-
-        if (file.size > maxSize) {
-          alert(`File "${file.name}" must be under 10MB.`);
-          return null;
-        }
-      }
-
-      const uploadedFileName = files.map(file => file.name).join(", ");
+      const uploadedFileName = selectedFiles.map(file => file.name).join(", ");
       const combinedAreaData = getCombinedAreaData(selectedAreaIds);
 
       const recommendedPermits = ["P1 General Work Permit"];
@@ -742,7 +874,7 @@
         detectedRisks: [],
         recommendedPermits,
         uploadedFileName,
-        uploadedFiles: files,
+        uploadedFiles: [...selectedFiles],
         startDate,
         duration,
         durationUnit,
@@ -983,7 +1115,7 @@
         return;
       }
 
-      const files = Array.from(document.getElementById("ramsfile")?.files || []);
+      const files = [...selectedFiles];
 
       let uploadedFiles = [];
 
@@ -1097,6 +1229,13 @@
       document.querySelectorAll('#risks input[type="checkbox"]').forEach(cb => {
         cb.addEventListener("change", handleRiskCheckboxChange);
       });
+
+      const addFileBtn = document.getElementById("addFileBtn");
+      if (addFileBtn) {
+        addFileBtn.addEventListener("click", addSelectedFile);
+      }
+
+      renderSelectedFiles();
     }
 
     initPage();
