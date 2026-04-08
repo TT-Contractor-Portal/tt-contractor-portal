@@ -517,20 +517,24 @@
         .replace(/'/g, "&#039;");
     }
 
-    function getSelectedAreas() {
-      const checkboxes = document.querySelectorAll("#areas input[type='checkbox']:checked");
+      function getSelectedAreas() {
+      const checkboxes = Array.from(
+        document.querySelectorAll("#areas input[type='checkbox']:checked")
+      );
 
-      return Array.from(checkboxes).map(cb => {
-        const areaId = cb.getAttribute("data-area-id");
-        const areaName = cb.value;
-        const area = siteAreas.find(a => a.id === areaId);
+      return checkboxes
+        .filter(cb => cb.getAttribute("data-area-id") !== "ALL_AREAS")
+        .map(cb => {
+          const areaId = cb.getAttribute("data-area-id");
+          const areaName = cb.value;
+          const area = siteAreas.find(a => String(a.id) === String(areaId));
 
-        return {
-          id: areaId,
-          name: areaName,
-          description: area?.description || ""
-        };
-      });
+          return {
+            id: areaId,
+            name: areaName,
+            description: area?.description || ""
+          };
+        });
     }
 
     function getSelectedValues(containerId) {
