@@ -169,12 +169,27 @@
       .filter-row {
         grid-template-columns: 1fr;
       }
+
+     .sidebar-logo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.sidebar-logo img {
+  max-width: 140px;
+  height: auto;
+} 
     }
   </style>
 </head>
 <body>
   <div class="sidebar">
-    <h1>TT Contractor<br>Portal</h1>
+
+  <div class="sidebar-logo">
+    <img src="/images/tt-logo.png" alt="Logo">
+  </div>
+
+  <h1>TT Contractor Portal</h1>
 
     <a href="/index.html">Dashboard</a>
     <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
