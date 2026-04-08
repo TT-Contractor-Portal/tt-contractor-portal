@@ -474,6 +474,40 @@
         cb.addEventListener("change", handleAreaCheckboxChange);
       });
     }
+
+    function handleAreaCheckboxChange(event) {
+      const changed = event.target;
+      const allAreasCheckbox = document.querySelector('#areas input[data-area-id="ALL_AREAS"]');
+      const normalAreaCheckboxes = Array.from(
+        document.querySelectorAll('#areas input[type="checkbox"]')
+      ).filter(cb => cb.getAttribute("data-area-id") !== "ALL_AREAS");
+
+      if (changed.getAttribute("data-area-id") === "ALL_AREAS") {
+        if (changed.checked) {
+          normalAreaCheckboxes.forEach(cb => {
+            cb.checked = true;
+          });
+        } else {
+          normalAreaCheckboxes.forEach(cb => {
+            cb.checked = false;
+          });
+        }
+      } else {
+        const allNormalChecked = normalAreaCheckboxes.length > 0 && normalAreaCheckboxes.every(cb => cb.checked);
+        const anyNormalUnchecked = normalAreaCheckboxes.some(cb => !cb.checked);
+
+        if (allAreasCheckbox) {
+          if (allNormalChecked) {
+            allAreasCheckbox.checked = true;
+          } else if (anyNormalUnchecked) {
+            allAreasCheckbox.checked = false;
+          }
+        }
+      }
+
+      renderAreaSummary();
+    }
+    
     function escapeHtml(value) {
       return String(value || "")
         .replace(/&/g, "&amp;")
