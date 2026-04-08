@@ -130,6 +130,16 @@
       font-size: 14px;
     }
 
+    .revision-banner {
+      background: #eef6ff;
+      border-left: 6px solid #2563eb;
+      color: #123b7a;
+      padding: 14px 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      display: none;
+    }
+
     .checkbox-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(220px, 1fr));
@@ -305,11 +315,13 @@
 
   <div class="main">
     <div class="topbar">
-      <strong>New RAMS Check</strong> — Upload a RAMS and prepare it for review
+      <strong id="pageTitle">New RAMS Check</strong> — <span id="pageSubtitle">Upload a RAMS and prepare it for review</span>
     </div>
 
+    <div id="revisionBanner" class="revision-banner"></div>
+
     <div class="panel">
-      <h2>Submit RAMS for Review</h2>
+      <h2 id="formHeading">Submit RAMS for Review</h2>
 
       <div class="field">
         <label for="ramsfile">Add RAMS document</label>
@@ -418,7 +430,7 @@
   <script>
     const client = supabase.createClient(
       "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
+      "YOUR_CURRENT_SUPABASE_ANON_KEY_HERE"
     );
 
     let currentUser = null;
@@ -430,6 +442,9 @@
     let areaRules = [];
     let areaPpe = [];
     let selectedFiles = [];
+
+    let revisionSourceReview = null;
+    let revisionMode = false;
 
     async function protectPage() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
@@ -468,6 +483,10 @@
       }
 
       return true;
+    }
+
+    function getQueryParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
     }
 
     function formatFileSize(bytes) {
@@ -820,6 +839,76 @@
       return addDays(startDate, durationInDays - 1);
     }
 
+    async function loadRevisionSourceIfNeeded() {
+      const reviseId = getQueryParam("revise");
+      if (!reviseId) return;
+
+      const { data, error } = await client
+        .from("rams_reviews")
+        .select("*")
+        .eq("id", reviseId)
+        .single();
+
+      if (error || !data) {
+        alert("Could not load the RAMS being revised.");
+        return;
+      }
+
+      revisionSourceReview = data;
+      revisionMode = true;
+
+      document.getElementById("pageTitle").textContent = "Revised RAMS Check";
+      document.getElementById("pageSubtitle").textContent = "Upload a revised RAMS linked to the previous submission";
+      document.getElementById("formHeading").textContent = "Submit Revised RAMS for Review";
+
+      const banner = document.getElementById("revisionBanner");
+      banner.style.display = "block";
+      banner.innerHTML = `
+        <strong>Revision Mode</strong><br>
+        You are uploading a revised RAMS for <strong>${escapeHtml(data.contractor_name || "-")}</strong> — <strong>${escapeHtml(data.job_title || "-")}</strong>.<br>
+        Previous revision: <strong>V${Number(data.revision_number || 1)}</strong>
+      `;
+
+      prefillRevisionForm(data);
+    }
+
+    function prefillRevisionForm(review) {
+      document.getElementById("contractorName").value = review.contractor_name || "";
+      document.getElementById("taskDescription").value = review.job_title || "";
+      document.getElementById("startDate").value = review.start_date || "";
+      document.getElementById("duration").value = review.duration || 1;
+      document.getElementById("durationUnit").value = review.duration_unit || "days";
+
+      const selectedAreaNames = Array.isArray(review.areas) ? review.areas : [];
+      const selectedRisks = Array.isArray(review.risks) ? review.risks : [];
+
+      document.querySelectorAll('#risks input[type="checkbox"]').forEach(cb => {
+        cb.checked = selectedRisks.includes(cb.value);
+      });
+
+      document.querySelectorAll('#areas input[type="checkbox"]').forEach(cb => {
+        const areaId = cb.getAttribute("data-area-id");
+        const areaName = cb.value;
+
+        if (areaId === "ALL_AREAS") {
+          cb.checked = false;
+        } else {
+          cb.checked = selectedAreaNames.includes(areaName);
+        }
+      });
+
+      const allAreasCheckbox = document.querySelector('#areas input[data-area-id="ALL_AREAS"]');
+      const normalAreaCheckboxes = Array.from(
+        document.querySelectorAll('#areas input[type="checkbox"]')
+      ).filter(cb => cb.getAttribute("data-area-id") !== "ALL_AREAS");
+
+      if (allAreasCheckbox && normalAreaCheckboxes.length && normalAreaCheckboxes.every(cb => cb.checked)) {
+        allAreasCheckbox.checked = true;
+      }
+
+      renderAreaSummary();
+    }
+
     function buildDraftReview() {
       const contractorName = document.getElementById("contractorName").value.trim();
       const jobTitle = document.getElementById("taskDescription").value.trim();
@@ -889,7 +978,15 @@
         reviewDate: "",
         areaHazardSnapshot: combinedAreaData.hazards,
         areaRuleSnapshot: combinedAreaData.rules,
-        areaPpeSnapshot: combinedAreaData.ppe
+        areaPpeSnapshot: combinedAreaData.ppe,
+        rootReviewId: revisionMode
+          ? (revisionSourceReview.root_review_id || revisionSourceReview.id)
+          : null,
+        previousReviewId: revisionMode ? revisionSourceReview.id : null,
+        revisionNumber: revisionMode
+          ? Number(revisionSourceReview.revision_number || 1) + 1
+          : 1,
+        isCurrentRevision: true
       };
     }
 
@@ -897,7 +994,8 @@
       const { data, error } = await client
         .from("rams_reviews")
         .select("*")
-        .eq("status", "Approved");
+        .eq("status", "Approved")
+        .eq("is_current_revision", true);
 
       if (error) {
         console.warn("Could not load existing approved RAMS for clash check.");
@@ -920,6 +1018,10 @@
       const existingWorks = await getExistingApprovedWorksFromSupabase();
 
       return existingWorks.some(job => {
+        if (revisionMode && revisionSourceReview && job.id === revisionSourceReview.id) {
+          return false;
+        }
+
         const jobStart = new Date(job.startDate);
         const jobEnd = job.endDate ? new Date(job.endDate) : jobStart;
 
@@ -938,13 +1040,18 @@
       const { data, error } = await client
         .from("rams_reviews")
         .select("*")
-        .eq("status", "Approved");
+        .eq("status", "Approved")
+        .eq("is_current_revision", true);
 
       if (error || !data) {
         return [];
       }
 
       return data.filter(r => {
+        if (revisionMode && revisionSourceReview && r.id === revisionSourceReview.id) {
+          return false;
+        }
+
         const jobStart = new Date(r.start_date);
         const jobEnd = new Date(r.end_date || r.start_date);
 
@@ -1041,11 +1148,16 @@
         review_date: draftReview.reviewDate || null,
         reviewer_notes: draftReview.reviewerNotes || "",
         status: draftReview.status || "Under Review",
+        review_outcome: draftReview.status === "Rejected" ? "rejected" : "under_review",
         clash: !!draftReview.clash,
         primary_area_id: draftReview.primaryAreaId || null,
         area_hazard_snapshot: draftReview.areaHazardSnapshot || [],
         area_rule_snapshot: draftReview.areaRuleSnapshot || [],
-        area_ppe_snapshot: draftReview.areaPpeSnapshot || []
+        area_ppe_snapshot: draftReview.areaPpeSnapshot || [],
+        previous_review_id: draftReview.previousReviewId || null,
+        root_review_id: draftReview.rootReviewId || null,
+        revision_number: draftReview.revisionNumber || 1,
+        is_current_revision: true
       };
 
       const { data, error } = await client
@@ -1057,6 +1169,30 @@
       if (error) {
         alert("Failed to save RAMS to Supabase: " + error.message);
         return null;
+      }
+
+      if (!payload.root_review_id) {
+        await client
+          .from("rams_reviews")
+          .update({ root_review_id: data.id })
+          .eq("id", data.id);
+
+        data.root_review_id = data.id;
+      }
+
+      if (draftReview.previousReviewId) {
+        const { error: previousError } = await client
+          .from("rams_reviews")
+          .update({
+            is_current_revision: false,
+            superseded_at: new Date().toISOString(),
+            superseded_by_review_id: data.id
+          })
+          .eq("id", draftReview.previousReviewId);
+
+        if (previousError) {
+          console.warn("Previous revision update failed:", previousError.message);
+        }
       }
 
       if (draftReview.areaIds && draftReview.areaIds.length) {
@@ -1236,6 +1372,7 @@
       }
 
       renderSelectedFiles();
+      await loadRevisionSourceIfNeeded();
     }
 
     initPage();
