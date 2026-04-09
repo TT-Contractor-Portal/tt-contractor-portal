@@ -533,18 +533,28 @@
       el.textContent = isComplete ? "Complete" : "Missing";
     }
 
-    function setStatusPill(status) {
+      function setStatusPill(status) {
       const pill = document.getElementById("statusPill");
       if (!pill) return;
 
       let className = "inprogress";
+      let displayStatus = status || "In Progress";
 
-      if (status === "Ready for Review") className = "ready";
-      if (status === "Approved") className = "approved";
-      if (status === "Expired") className = "expired";
+      if (status === "Ready for Review") {
+        className = "ready";
+        displayStatus = "Awaiting Approval";
+      }
+
+      if (status === "Approved") {
+        className = "approved";
+      }
+
+      if (status === "Expired") {
+        className = "expired";
+      }
 
       pill.className = `status-pill ${className}`;
-      pill.textContent = status || "In Progress";
+      pill.textContent = displayStatus;
     }
 
     function calculateProgress(contractor) {
