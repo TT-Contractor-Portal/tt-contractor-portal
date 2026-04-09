@@ -736,7 +736,52 @@
       window.location.href = "/login.html";
     });
 
-    loadPage();
+   function getContractorId() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
+}
+
+function loadContractorData(id) {
+  // TEMP placeholder data (we will replace this with Supabase later)
+
+  const contractors = {
+    "1": {
+      company: "ABC Scaffolding Ltd",
+      contact: "John Smith",
+      email: "john@abc.co.uk",
+      phone: "07700 900123",
+      status: "Ready for Review"
+    },
+    "2": {
+      company: "Yorkshire Engineering Services",
+      contact: "Sarah Walker",
+      email: "sarah@yes.co.uk",
+      phone: "07800 123456",
+      status: "Approved"
+    }
+  };
+
+  const contractor = contractors[id];
+
+  if (!contractor) return;
+
+  // Update page title + fields
+  document.querySelector("h2").textContent = contractor.company;
+
+  document.querySelectorAll(".detail-value")[0].textContent = contractor.company;
+  document.querySelectorAll(".detail-value")[1].textContent = contractor.contact;
+  document.querySelectorAll(".detail-value")[2].textContent = contractor.email;
+  document.querySelectorAll(".detail-value")[3].textContent = contractor.phone;
+}
+
+async function initPage() {
+  await loadPage();
+
+  const contractorId = getContractorId();
+  loadContractorData(contractorId);
+}
+
+initPage();
   </script>
 </body>
 </html>
