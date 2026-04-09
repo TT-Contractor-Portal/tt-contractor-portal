@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contractors - TT Contractor Portal</title>
+  <title>Contractor Portal - TT Contractor Portal</title>
   <style>
     body {
       margin: 0;
@@ -101,6 +101,7 @@
       margin: 0;
       color: #666;
       font-size: 15px;
+      line-height: 1.5;
     }
 
     .card-grid {
@@ -129,49 +130,7 @@
       font-weight: bold;
     }
 
-    .panel {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    }
-
-    .panel h2 {
-      margin-top: 0;
-      margin-bottom: 16px;
-      color: #035740;
-    }
-
-    .register-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .register-table th,
-    .register-table td {
-      text-align: left;
-      padding: 14px 10px;
-      border-bottom: 1px solid #e5e7eb;
-      font-size: 14px;
-      vertical-align: middle;
-    }
-
-    .register-table th {
-      background: #f8fafc;
-      font-weight: 700;
-    }
-
-    .contractor-link {
-      color: #035740;
-      font-weight: 700;
-      text-decoration: none;
-    }
-
-    .contractor-link:hover {
-      text-decoration: underline;
-    }
-
-    .status {
+    .status-pill {
       display: inline-block;
       padding: 6px 10px;
       border-radius: 999px;
@@ -179,47 +138,211 @@
       font-weight: 700;
     }
 
-    .status.ready {
+    .status-pill.inprogress {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .status-pill.ready {
       background: #fef3c7;
       color: #92400e;
     }
 
-    .status.approved {
+    .status-pill.approved {
       background: #dcfce7;
       color: #166534;
     }
 
-    .status.expired {
+    .status-pill.expired {
       background: #fee2e2;
       color: #991b1b;
     }
 
-    .action-btn {
-      display: inline-block;
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .module-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 260px;
+    }
+
+    .module-card h3 {
+      margin: 0;
+      color: #035740;
+      font-size: 24px;
+    }
+
+    .module-card p {
+      margin: 0;
+      color: #555;
+      font-size: 15px;
+      line-height: 1.6;
+    }
+
+    .module-progress {
+      margin-top: auto;
+    }
+
+    .module-progress-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar-wrap {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      background: #e5e7eb;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .progress-bar {
+      height: 100%;
       background: #035740;
-      color: white;
+      width: 0%;
+    }
+
+    .progress-text {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .module-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      display: inline-block;
       text-decoration: none;
       border: none;
       border-radius: 8px;
-      padding: 8px 12px;
-      font-size: 13px;
+      padding: 10px 14px;
+      font-size: 14px;
       font-weight: 700;
       cursor: pointer;
     }
 
-    .action-btn:hover {
+    .primary-btn {
+      background: #035740;
+      color: white;
+    }
+
+    .primary-btn:hover {
       background: #024534;
     }
 
-    .empty-text {
+    .secondary-btn {
+      background: #e5e7eb;
+      color: #222;
+    }
+
+    .secondary-btn:hover {
+      background: #d1d5db;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #035740;
+      font-size: 22px;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .check-item-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .check-item-subtext {
+      font-size: 13px;
       color: #666;
+    }
+
+    .tick {
+      display: inline-block;
+      min-width: 88px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tick.complete {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .tick.incomplete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .message-box {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
       font-size: 14px;
-      margin: 0;
+      display: none;
+    }
+
+    .message-box.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .message-box.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     @media (max-width: 1000px) {
       .card-grid {
         grid-template-columns: 1fr 1fr;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: 1fr;
       }
     }
 
@@ -242,6 +365,11 @@
         flex-direction: column;
         align-items: flex-start;
       }
+
+      .check-item {
+        flex-direction: column;
+        align-items: flex-start;
+      }
     }
   </style>
 </head>
@@ -253,14 +381,10 @@
 
     <h1>TT Contractor Portal</h1>
 
-    <a href="/index.html">Dashboard</a>
-    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
-    <a href="/rams/register.html">RAMS</a>
-    <a href="/rams/new.html">New RAMS</a>
-    <a href="/profile/index.html">My Profile</a>
-    <a href="/contractors/index.html">Contractors</a>
-    <a href="/permits/index.html">Permits</a>
-    <a href="/sop/index.html">SOP / SSW</a>
+    <a href="/contractor/index.html">Dashboard</a>
+    <a href="/contractor/profile.html">My Profile</a>
+    <a href="/contractor/compliance.html">Contractor Compliance</a>
+    <a href="/contractor/passport.html">Contractor Passport</a>
   </div>
 
   <div class="main">
@@ -272,48 +396,110 @@
     </div>
 
     <div class="page-header">
-      <h2>Contractor Register</h2>
-      <p>Contractors who are ready for review, approved or expired.</p>
+      <h2 id="companyHeading">Contractor Dashboard</h2>
+      <p>
+        Complete all mandatory requirements below to submit your contractor record for review.
+        Once all required items are complete, your profile will move to <strong>Ready for Review</strong>.
+      </p>
     </div>
 
     <div class="card-grid">
       <div class="card">
-        <h3>Ready for Review</h3>
-        <p id="readyCount">0</p>
+        <h3>Overall Progress</h3>
+        <p id="overallProgress">0%</p>
       </div>
       <div class="card">
-        <h3>Approved</h3>
-        <p id="approvedCount">0</p>
+        <h3>Status</h3>
+        <p><span id="statusPill" class="status-pill inprogress">In Progress</span></p>
       </div>
       <div class="card">
-        <h3>Expired</h3>
-        <p id="expiredCount">0</p>
+        <h3>Mandatory Items Complete</h3>
+        <p id="mandatoryCount">0 / 4</p>
       </div>
       <div class="card">
-        <h3>Total Shown</h3>
-        <p id="totalCount">0</p>
+        <h3>Expiry Date</h3>
+        <p id="expiryDate">-</p>
+      </div>
+    </div>
+
+    <div class="dashboard-grid">
+      <div class="module-card">
+        <h3>Contractor Compliance</h3>
+        <p>
+          Upload and complete your company compliance requirements, including public liability insurance and the Supplier Assurance Questionnaire.
+        </p>
+
+        <div class="module-progress">
+          <div class="module-progress-label">Progress</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="complianceProgressBar"></div>
+          </div>
+          <div class="progress-text" id="complianceProgressText">0% complete</div>
+        </div>
+
+        <div class="module-actions">
+          <a class="primary-btn" href="/contractor/compliance.html">Open Contractor Compliance</a>
+        </div>
+      </div>
+
+      <div class="module-card">
+        <h3>Contractor Passport</h3>
+        <p>
+          Complete your contractor passport requirements, including uploading your photo and passing the induction at 100%.
+        </p>
+
+        <div class="module-progress">
+          <div class="module-progress-label">Progress</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="passportProgressBar"></div>
+          </div>
+          <div class="progress-text" id="passportProgressText">0% complete</div>
+        </div>
+
+        <div class="module-actions">
+          <a class="primary-btn" href="/contractor/passport.html">Open Contractor Passport</a>
+        </div>
       </div>
     </div>
 
     <div class="panel">
-      <h2>Contractors</h2>
+      <h3>Mandatory Requirements Checklist</h3>
 
-      <table class="register-table">
-        <thead>
-          <tr>
-            <th>Company Name</th>
-            <th>Contact Name</th>
-            <th>Status</th>
-            <th>Expiry Date</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="contractorTableBody">
-          <tr>
-            <td colspan="5">Loading contractors...</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="check-list">
+        <div class="check-item">
+          <div>
+            <div class="check-item-title">Public Liability Insurance</div>
+            <div class="check-item-subtext">Mandatory company requirement</div>
+          </div>
+          <span id="insuranceTick" class="tick incomplete">Missing</span>
+        </div>
+
+        <div class="check-item">
+          <div>
+            <div class="check-item-title">Supplier Assurance Questionnaire (SAQ)</div>
+            <div class="check-item-subtext">Mandatory company requirement</div>
+          </div>
+          <span id="saqTick" class="tick incomplete">Missing</span>
+        </div>
+
+        <div class="check-item">
+          <div>
+            <div class="check-item-title">Photo Upload</div>
+            <div class="check-item-subtext">Mandatory passport requirement</div>
+          </div>
+          <span id="photoTick" class="tick incomplete">Missing</span>
+        </div>
+
+        <div class="check-item">
+          <div>
+            <div class="check-item-title">Induction Complete</div>
+            <div class="check-item-subtext">Video completed and test passed at 100%</div>
+          </div>
+          <span id="inductionTick" class="tick incomplete">Missing</span>
+        </div>
+      </div>
+
+      <div id="dashboardMessage" class="message-box"></div>
     </div>
   </div>
 
@@ -325,18 +511,10 @@
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const logoutBtn = document.getElementById("logoutBtn");
-    const adminNavLink = document.getElementById("adminNavLink");
     const welcomeText = document.getElementById("welcomeText");
-
-    const contractorTableBody = document.getElementById("contractorTableBody");
-    const readyCount = document.getElementById("readyCount");
-    const approvedCount = document.getElementById("approvedCount");
-    const expiredCount = document.getElementById("expiredCount");
-    const totalCount = document.getElementById("totalCount");
 
     function formatDate(dateStr) {
       if (!dateStr) return "-";
-
       const d = new Date(dateStr);
       if (Number.isNaN(d.getTime())) return "-";
 
@@ -347,138 +525,142 @@
       });
     }
 
-    function getStatusClass(status) {
-      if (status === "Ready for Review") return "ready";
-      if (status === "Approved") return "approved";
-      if (status === "Expired") return "expired";
-      return "ready";
+    function setTick(elementId, isComplete) {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+
+      el.className = `tick ${isComplete ? "complete" : "incomplete"}`;
+      el.textContent = isComplete ? "Complete" : "Missing";
     }
 
-    async function loadPage() {
+    function setStatusPill(status) {
+      const pill = document.getElementById("statusPill");
+      if (!pill) return;
+
+      let className = "inprogress";
+
+      if (status === "Ready for Review") className = "ready";
+      if (status === "Approved") className = "approved";
+      if (status === "Expired") className = "expired";
+
+      pill.className = `status-pill ${className}`;
+      pill.textContent = status || "In Progress";
+    }
+
+    function calculateProgress(contractor) {
+      const mandatoryFlags = [
+        contractor.public_liability_uploaded,
+        contractor.saq_completed,
+        contractor.photo_uploaded,
+        contractor.induction_completed
+      ];
+
+      const completeCount = mandatoryFlags.filter(Boolean).length;
+      const overallPercent = completeCount * 25;
+
+      const complianceCount = [
+        contractor.public_liability_uploaded,
+        contractor.saq_completed
+      ].filter(Boolean).length;
+
+      const passportCount = [
+        contractor.photo_uploaded,
+        contractor.induction_completed
+      ].filter(Boolean).length;
+
+      return {
+        completeCount,
+        overallPercent,
+        compliancePercent: complianceCount * 50,
+        passportPercent: passportCount * 50
+      };
+    }
+
+    async function loadDashboard() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
 
       if (sessionError || !sessionData.session) {
         window.location.href = "/login.html";
-        return null;
+        return;
       }
 
       const currentUser = sessionData.session.user;
 
-      const { data: profile, error: profileError } = await client
+      const { data: authProfile, error: authProfileError } = await client
         .from("user_profiles")
         .select("*")
         .eq("id", currentUser.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError || !profile) {
-        alert("Profile not found.");
-        window.location.href = "/login.html";
-        return null;
-      }
-
-      if (profile.is_active === false) {
-        alert("Your account has been deactivated. Please contact an administrator.");
-        await client.auth.signOut();
-        window.location.href = "/login.html";
-        return null;
-      }
-
-      let roleLabel = "View Only";
-      if (profile.role === "admin") {
-        roleLabel = "Admin";
-      } else if (profile.role === "reviewer") {
-        roleLabel = "Reviewer";
-      }
-
-      const firstName = profile.full_name
-        ? profile.full_name.split(" ")[0]
-        : "User";
-
-      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
-
-      if (profile.role === "admin") {
-        adminNavLink.style.display = "block";
-      }
-
-      return profile;
-    }
-
-    function renderCounts(contractors) {
-      readyCount.textContent = contractors.filter(c => c.status === "Ready for Review").length;
-      approvedCount.textContent = contractors.filter(c => c.status === "Approved").length;
-      expiredCount.textContent = contractors.filter(c => c.status === "Expired").length;
-      totalCount.textContent = contractors.length;
-    }
-
-    function renderContractors(contractors) {
-      contractorTableBody.innerHTML = "";
-
-      if (!contractors.length) {
-        contractorTableBody.innerHTML = `
-          <tr>
-            <td colspan="5">No contractors to show yet.</td>
-          </tr>
-        `;
+      if (authProfileError) {
+        document.getElementById("dashboardMessage").className = "message-box error";
+        document.getElementById("dashboardMessage").textContent = "Failed to load your user profile.";
         return;
       }
 
-      contractors.forEach(contractor => {
-        const row = document.createElement("tr");
+      let welcomeName = "User";
 
-        row.innerHTML = `
-          <td>
-            <a class="contractor-link" href="/contractors/profile.html?id=${contractor.id}">
-              ${contractor.company_name || "-"}
-            </a>
-          </td>
-          <td>${contractor.contact_name || "-"}</td>
-          <td>
-            <span class="status ${getStatusClass(contractor.status)}">
-              ${contractor.status || "-"}
-            </span>
-          </td>
-          <td>${formatDate(contractor.expires_at)}</td>
-          <td>
-            <a class="action-btn" href="/contractors/profile.html?id=${contractor.id}">
-              View
-            </a>
-          </td>
-        `;
-
-        contractorTableBody.appendChild(row);
-      });
-    }
-
-    async function loadContractors(profile) {
-      if (!profile) return;
-
-      if (profile.role !== "admin" && profile.role !== "reviewer") {
-        contractorTableBody.innerHTML = `
-          <tr>
-            <td colspan="5">You do not have permission to view the contractor register.</td>
-          </tr>
-        `;
-        return;
+      if (authProfile && authProfile.full_name) {
+        welcomeName = authProfile.full_name.split(" ")[0];
       }
 
-      const { data, error } = await client
+      const { data: contractor, error: contractorError } = await client
         .from("contractors")
         .select("*")
-        .in("status", ["Ready for Review", "Approved", "Expired"])
-        .order("company_name", { ascending: true });
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
 
-      if (error) {
-        contractorTableBody.innerHTML = `
-          <tr>
-            <td colspan="5">Failed to load contractors: ${error.message}</td>
-          </tr>
-        `;
+      if (contractorError) {
+        document.getElementById("dashboardMessage").className = "message-box error";
+        document.getElementById("dashboardMessage").textContent = "Failed to load your contractor record: " + contractorError.message;
         return;
       }
 
-      const contractors = data || [];
-      renderCounts(contractors);
-      renderContractors(contractors);
+      if (!contractor) {
+        document.getElementById("dashboardMessage").className = "message-box error";
+        document.getElementById("dashboardMessage").textContent = "No contractor record found for this login yet.";
+        return;
+      }
+
+      welcomeText.textContent = `Welcome, ${welcomeName} — Contractor`;
+      document.getElementById("companyHeading").textContent = contractor.company_name || "Contractor Dashboard";
+
+      const progress = calculateProgress(contractor);
+
+      document.getElementById("overallProgress").textContent = `${progress.overallPercent}%`;
+      document.getElementById("mandatoryCount").textContent = `${progress.completeCount} / 4`;
+      document.getElementById("expiryDate").textContent = formatDate(contractor.expires_at);
+
+      setStatusPill(contractor.status);
+
+      setTick("insuranceTick", contractor.public_liability_uploaded);
+      setTick("saqTick", contractor.saq_completed);
+      setTick("photoTick", contractor.photo_uploaded);
+      setTick("inductionTick", contractor.induction_completed);
+
+      document.getElementById("complianceProgressBar").style.width = `${progress.compliancePercent}%`;
+      document.getElementById("complianceProgressText").textContent = `${progress.compliancePercent}% complete`;
+
+      document.getElementById("passportProgressBar").style.width = `${progress.passportPercent}%`;
+      document.getElementById("passportProgressText").textContent = `${progress.passportPercent}% complete`;
+
+      if (contractor.status === "Ready for Review") {
+        document.getElementById("dashboardMessage").className = "message-box success";
+        document.getElementById("dashboardMessage").textContent =
+          "All mandatory items are complete. Your contractor record is now ready for review.";
+      }
+
+      if (contractor.status === "Approved") {
+        document.getElementById("dashboardMessage").className = "message-box success";
+        document.getElementById("dashboardMessage").textContent =
+          "Your contractor record has been approved.";
+      }
+
+      if (contractor.status === "Expired") {
+        document.getElementById("dashboardMessage").className = "message-box error";
+        document.getElementById("dashboardMessage").textContent =
+          "Your approval has expired and renewal is required.";
+      }
     }
 
     logoutBtn.addEventListener("click", async () => {
@@ -486,12 +668,7 @@
       window.location.href = "/login.html";
     });
 
-    async function initPage() {
-      const profile = await loadPage();
-      await loadContractors(profile);
-    }
-
-    initPage();
+    loadDashboard();
   </script>
 </body>
 </html>
