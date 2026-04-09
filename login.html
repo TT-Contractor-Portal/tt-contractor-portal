@@ -190,183 +190,191 @@
 
 </body>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script>
-    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+ <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const form = document.getElementById("loginForm");
-    const message = document.getElementById("message");
-    const formSubtitle = document.getElementById("formSubtitle");
-    const loginBtn = document.getElementById("loginBtn");
-    const showSignupBtn = document.getElementById("showSignupBtn");
-    const signupBtn = document.getElementById("signupBtn");
-    const signupFields = document.getElementById("signupFields");
-    const backToLoginWrap = document.getElementById("backToLoginWrap");
-    const backToLogin = document.getElementById("backToLogin");
-    const forgotPasswordWrap = document.getElementById("forgotPasswordWrap");
+  const form = document.getElementById("loginForm");
+  const message = document.getElementById("message");
+  const formSubtitle = document.getElementById("formSubtitle");
+  const loginBtn = document.getElementById("loginBtn");
+  const showSignupBtn = document.getElementById("showSignupBtn");
+  const signupBtn = document.getElementById("signupBtn");
+  const signupFields = document.getElementById("signupFields");
+  const backToLoginWrap = document.getElementById("backToLoginWrap");
+  const backToLogin = document.getElementById("backToLogin");
+  const forgotPasswordWrap = document.getElementById("forgotPasswordWrap");
 
-   form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  message.style.color = "#035740";
-  message.textContent = "Signing in...";
-
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const password = document.getElementById("password").value;
-
-  const { data, error } = await client.auth.signInWithPassword({
-    email,
-    password
-  });
-
-  if (error) {
-    message.style.color = "#b42318";
-    message.textContent = error.message;
-    return;
-  }
-
-  const user = data.user;
-
-  if (!user) {
-    message.style.color = "#b42318";
-    message.textContent = "Login failed. No user returned.";
-    return;
-  }
-
-  const isTTUser = email.endsWith("@timtaylors.co.uk");
-
-  if (isTTUser) {
-    const { data: profile, error: profileError } = await client
-      .from("user_profiles")
-      .select("role, is_active")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if (profileError || !profile) {
-      message.style.color = "#b42318";
-      message.textContent = "Unable to load your TT profile.";
-      await client.auth.signOut();
-      return;
-    }
-
-    if (profile.is_active === false) {
-      message.style.color = "#b42318";
-      message.textContent = "Your account has been deactivated. Please contact an administrator.";
-      await client.auth.signOut();
-      return;
-    }
-
-    await client
-      .from("user_profiles")
-      .update({ last_sign_in_at: new Date().toISOString() })
-      .eq("id", user.id);
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
     message.style.color = "#035740";
-    message.textContent = "Login successful...";
-    window.location.href = "/index.html";
-    return;
-  }
+    message.textContent = "Signing in...";
 
-  const { data: contractor, error: contractorError } = await client
-    .from("contractors")
-    .select("id, user_id")
-    .eq("user_id", user.id)
-    .maybeSingle();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
 
-  if (contractorError || !contractor) {
-    message.style.color = "#b42318";
-    message.textContent = "Unable to load your contractor account.";
-    await client.auth.signOut();
-    return;
-  }
+    const { data, error } = await client.auth.signInWithPassword({
+      email,
+      password
+    });
 
-  message.style.color = "#035740";
-  message.textContent = "Login successful...";
-  window.location.href = "/contractors/index.html";
-});
+    if (error) {
+      message.style.color = "#b42318";
+      message.textContent = error.message;
+      return;
+    }
 
-      if (error) {
-        message.style.color = "#b42318";
-        message.textContent = error.message;
-        return;
-      }
+    const user = data.user;
 
-      const user = data.user;
+    if (!user) {
+      message.style.color = "#b42318";
+      message.textContent = "Login failed. No user returned.";
+      return;
+    }
 
-      if (!user) {
-        message.style.color = "#b42318";
-        message.textContent = "Login failed. No user returned.";
-        return;
-      }
+    const isTTUser = email.endsWith("@timtaylors.co.uk");
 
-           const { data: profile, error: profileError } = await client
+    if (isTTUser) {
+      const { data: profile, error: profileError } = await client
         .from("user_profiles")
-        .select("role, is_active, full_name")
+        .select("role, is_active")
         .eq("id", user.id)
         .maybeSingle();
 
-      if (profile && profile.is_active === false) {
+      if (profileError || !profile) {
+        message.style.color = "#b42318";
+        message.textContent = "Unable to load your TT profile.";
+        await client.auth.signOut();
+        return;
+      }
+
+      if (profile.is_active === false) {
         message.style.color = "#b42318";
         message.textContent = "Your account has been deactivated. Please contact an administrator.";
         await client.auth.signOut();
         return;
       }
 
-      if (profile) {
-        await client
-          .from("user_profiles")
-          .update({ last_sign_in_at: new Date().toISOString() })
-          .eq("id", user.id);
+      await client
+        .from("user_profiles")
+        .update({ last_sign_in_at: new Date().toISOString() })
+        .eq("id", user.id);
 
-        message.style.color = "#035740";
-        message.textContent = "Login successful...";
-        window.location.href = "/index.html";
-        return;
-      }
+      message.style.color = "#035740";
+      message.textContent = "Login successful...";
+      window.location.href = "/index.html";
+      return;
+    }
 
-      const { data: contractor, error: contractorError } = await client
-        .from("contractors")
-        .select("id, user_id")
-        .eq("user_id", user.id)
-        .maybeSingle();
+    const { data: contractor, error: contractorError } = await client
+      .from("contractors")
+      .select("id, user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
 
-      if (contractorError) {
-        message.style.color = "#b42318";
-        message.textContent = "Unable to load your contractor account.";
-        await client.auth.signOut();
-        return;
-      }
-
-      if (contractor) {
-        message.style.color = "#035740";
-        message.textContent = "Login successful...";
-        window.location.href = "/contractors/index.html";
-        return;
-      }
-
+    if (contractorError || !contractor) {
       message.style.color = "#b42318";
-      message.textContent = "No TT staff or contractor profile was found for this account.";
+      message.textContent = "Unable to load your contractor account.";
       await client.auth.signOut();
+      return;
+    }
+
+    message.style.color = "#035740";
+    message.textContent = "Login successful...";
+    window.location.href = "/contractors/index.html";
+  });
+
+  showSignupBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    formSubtitle.textContent = "Create your account";
+    signupFields.style.display = "block";
+    loginBtn.style.display = "none";
+    showSignupBtn.style.display = "none";
+    signupBtn.style.display = "block";
+    backToLoginWrap.style.display = "block";
+    forgotPasswordWrap.style.display = "none";
+    message.textContent = "";
+  });
+
+  backToLogin.addEventListener("click", (e) => {
+    e.preventDefault();
+
+    formSubtitle.textContent = "Sign in to continue";
+    signupFields.style.display = "none";
+    loginBtn.style.display = "block";
+    showSignupBtn.style.display = "block";
+    signupBtn.style.display = "none";
+    backToLoginWrap.style.display = "none";
+    forgotPasswordWrap.style.display = "block";
+    message.textContent = "";
+
+    document.getElementById("fullName").value = "";
+    document.getElementById("inductionComplete").value = "";
+    document.getElementById("ptwComplete").value = "";
+  });
+
+  signupBtn.addEventListener("click", async () => {
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+    const fullName = document.getElementById("fullName").value.trim();
+    const inductionComplete = document.getElementById("inductionComplete").value;
+    const ptwComplete = document.getElementById("ptwComplete").value;
+
+    if (!email.endsWith("@timtaylors.co.uk")) {
+      message.style.color = "#b42318";
+      message.textContent = "You must use a @timtaylors.co.uk email";
+      return;
+    }
+
+    if (!fullName) {
+      message.style.color = "#b42318";
+      message.textContent = "Please enter your full name";
+      return;
+    }
+
+    if (inductionComplete === "" || ptwComplete === "") {
+      message.style.color = "#b42318";
+      message.textContent = "Please answer both training questions";
+      return;
+    }
+
+    message.style.color = "#035740";
+    message.textContent = "Creating account...";
+
+    const { error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          induction_complete: inductionComplete === "true",
+          ptw_complete: ptwComplete === "true",
+          reviewer_requested:
+            inductionComplete === "true" && ptwComplete === "true"
+        }
+      }
     });
 
-    showSignupBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      formSubtitle.textContent = "Create your account";
-      signupFields.style.display = "block";
-      loginBtn.style.display = "none";
-      showSignupBtn.style.display = "none";
-      signupBtn.style.display = "block";
-      backToLoginWrap.style.display = "block";
-      forgotPasswordWrap.style.display = "none";
-      message.textContent = "";
-    });
+    if (error) {
+      message.style.color = "#b42318";
+      message.textContent = error.message;
+      return;
+    }
 
-    backToLogin.addEventListener("click", (e) => {
-      e.preventDefault();
+    message.style.color = "#035740";
+    message.textContent = "Account created. Please check your email and click the link to verify your account.";
 
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    document.getElementById("fullName").value = "";
+    document.getElementById("inductionComplete").value = "";
+    document.getElementById("ptwComplete").value = "";
+
+    setTimeout(() => {
       formSubtitle.textContent = "Sign in to continue";
       signupFields.style.display = "none";
       loginBtn.style.display = "block";
@@ -375,80 +383,8 @@
       backToLoginWrap.style.display = "none";
       forgotPasswordWrap.style.display = "block";
       message.textContent = "";
-
-      document.getElementById("fullName").value = "";
-      document.getElementById("inductionComplete").value = "";
-      document.getElementById("ptwComplete").value = "";
-    });
-
-    signupBtn.addEventListener("click", async () => {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const fullName = document.getElementById("fullName").value.trim();
-      const inductionComplete = document.getElementById("inductionComplete").value;
-      const ptwComplete = document.getElementById("ptwComplete").value;
-
-      if (!email.endsWith("@timtaylors.co.uk")) {
-        message.style.color = "#b42318";
-        message.textContent = "You must use a @timtaylors.co.uk email";
-        return;
-      }
-
-      if (!fullName) {
-        message.style.color = "#b42318";
-        message.textContent = "Please enter your full name";
-        return;
-      }
-
-      if (inductionComplete === "" || ptwComplete === "") {
-        message.style.color = "#b42318";
-        message.textContent = "Please answer both training questions";
-        return;
-      }
-
-      message.style.color = "#035740";
-      message.textContent = "Creating account...";
-
-      const { data, error } = await client.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: fullName,
-            induction_complete: inductionComplete === "true",
-            ptw_complete: ptwComplete === "true",
-            reviewer_requested:
-              inductionComplete === "true" && ptwComplete === "true"
-          }
-        }
-      });
-
-      if (error) {
-        message.style.color = "#b42318";
-        message.textContent = error.message;
-        return;
-      }
-
-      message.style.color = "#035740";
-      message.textContent = "Account created. Please check your email and click the link to verify your account.";
-
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
-      document.getElementById("fullName").value = "";
-      document.getElementById("inductionComplete").value = "";
-      document.getElementById("ptwComplete").value = "";
-
-      setTimeout(() => {
-        formSubtitle.textContent = "Sign in to continue";
-        signupFields.style.display = "none";
-        loginBtn.style.display = "block";
-        showSignupBtn.style.display = "block";
-        signupBtn.style.display = "none";
-        backToLoginWrap.style.display = "none";
-        forgotPasswordWrap.style.display = "block";
-        message.textContent = "";
-      }, 2000);
-    });
-  </script>
+    }, 2000);
+  });
+</script>
 
 </html>
