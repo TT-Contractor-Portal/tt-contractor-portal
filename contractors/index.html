@@ -1,9 +1,441 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Coming Soon</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contractors - TT Contractor Portal</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+      line-height: 1.3;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo img {
+      max-width: 140px;
+      height: auto;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #024534;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: #035740;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .card h3 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      color: #666;
+    }
+
+    .card p {
+      margin: 0;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #035740;
+    }
+
+    .register-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .register-table th,
+    .register-table td {
+      text-align: left;
+      padding: 14px 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+      vertical-align: middle;
+    }
+
+    .register-table th {
+      background: #f8fafc;
+      font-weight: 700;
+    }
+
+    .contractor-link {
+      color: #035740;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .contractor-link:hover {
+      text-decoration: underline;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status.ready {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.expired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status.rejected {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .action-btn {
+      display: inline-block;
+      background: #035740;
+      color: white;
+      text-decoration: none;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .action-btn:hover {
+      background: #024534;
+    }
+
+    .empty-text {
+      color: #666;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    @media (max-width: 1000px) {
+      .card-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .register-table {
+        font-size: 13px;
+      }
+    }
+  </style>
 </head>
 <body>
-  <h1>Coming Soon</h1>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="Logo">
+    </div>
+
+    <h1>TT Contractor Portal</h1>
+
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <strong id="welcomeText">Welcome</strong>
+        <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <h2>Contractor Register</h2>
+      <p>Approved and review-ready contractors for Timothy Taylor’s contractor management process.</p>
+    </div>
+
+    <div class="card-grid">
+      <div class="card">
+        <h3>Ready for Review</h3>
+        <p id="readyCount">2</p>
+      </div>
+      <div class="card">
+        <h3>Approved</h3>
+        <p id="approvedCount">3</p>
+      </div>
+      <div class="card">
+        <h3>Expired</h3>
+        <p id="expiredCount">1</p>
+      </div>
+      <div class="card">
+        <h3>Rejected</h3>
+        <p id="rejectedCount">1</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Contractors</h2>
+
+      <table class="register-table">
+        <thead>
+          <tr>
+            <th>Company Name</th>
+            <th>Contact Name</th>
+            <th>Status</th>
+            <th>Expiry Date</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="contractorTableBody">
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=1">ABC Scaffolding Ltd</a></td>
+            <td>John Smith</td>
+            <td><span class="status ready">Ready for Review</span></td>
+            <td>-</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=1">View</a></td>
+          </tr>
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=2">Yorkshire Engineering Services</a></td>
+            <td>Sarah Walker</td>
+            <td><span class="status approved">Approved</span></td>
+            <td>09 Apr 2027</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=2">View</a></td>
+          </tr>
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=3">North Brew Maintenance</a></td>
+            <td>David Green</td>
+            <td><span class="status expired">Expired</span></td>
+            <td>01 Mar 2026</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=3">View</a></td>
+          </tr>
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=4">Pennine Industrial Cleaning</a></td>
+            <td>Rachel Moore</td>
+            <td><span class="status ready">Ready for Review</span></td>
+            <td>-</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=4">View</a></td>
+          </tr>
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=5">Haworth Fabrication Ltd</a></td>
+            <td>Mark Taylor</td>
+            <td><span class="status approved">Approved</span></td>
+            <td>18 Feb 2027</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=5">View</a></td>
+          </tr>
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=6">Wharfedale Utilities</a></td>
+            <td>Emma White</td>
+            <td><span class="status rejected">Rejected</span></td>
+            <td>-</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=6">View</a></td>
+          </tr>
+          <tr>
+            <td><a class="contractor-link" href="/contractors/profile.html?id=7">Valley Mechanical Ltd</a></td>
+            <td>Chris Bennett</td>
+            <td><span class="status approved">Approved</span></td>
+            <td>27 Jan 2027</td>
+            <td><a class="action-btn" href="/contractors/profile.html?id=7">View</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNavLink = document.getElementById("adminNavLink");
+    const welcomeText = document.getElementById("welcomeText");
+
+    async function loadPage() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return;
+      }
+
+      let roleLabel = "View Only";
+      if (profile.role === "admin") {
+        roleLabel = "Admin";
+      } else if (profile.role === "reviewer") {
+        roleLabel = "Reviewer";
+      }
+
+      const firstName = profile.full_name
+        ? profile.full_name.split(" ")[0]
+        : "User";
+
+      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+
+      if (profile.role === "admin") {
+        adminNavLink.style.display = "block";
+      }
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await client.auth.signOut();
+      window.location.href = "/login.html";
+    });
+
+    loadPage();
+  </script>
 </body>
 </html>
