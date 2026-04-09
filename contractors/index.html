@@ -621,8 +621,16 @@
         document.getElementById("dashboardMessage").textContent = "No contractor record found for this login yet.";
         return;
       }
+const { data: contractor } = await client
+  .from("contractors")
+  .select("contact_name")
+  .eq("user_id", currentUser.id)
+  .single();
+      const firstName = contractor?.contact_name
+  ? contractor.contact_name.split(" ")[0]
+  : "User";
 
-      welcomeText.textContent = `Welcome, ${welcomeName} — Contractor`;
+welcomeText.textContent = `Welcome, ${firstName} — Contractor`;
       document.getElementById("companyHeading").textContent = contractor.company_name || "Contractor Dashboard";
 
       const progress = calculateProgress(contractor);
