@@ -640,12 +640,11 @@
       document.getElementById("passportProgressBar").style.width = `${progress.passportPercent}%`;
       document.getElementById("passportProgressText").textContent = `${progress.passportPercent}% complete`;
 
-      if (contractor.status === "Ready for Review") {
+            if (contractor.status === "Ready for Review") {
         document.getElementById("dashboardMessage").className = "message-box success";
         document.getElementById("dashboardMessage").textContent =
-          "All mandatory items are complete. Your contractor record is now ready for review.";
+          "All mandatory items are complete. Your contractor record is now awaiting approval.";
       }
-
       if (contractor.status === "Approved") {
         document.getElementById("dashboardMessage").className = "message-box success";
         document.getElementById("dashboardMessage").textContent =
