@@ -586,25 +586,7 @@
 
       const currentUser = sessionData.session.user;
 
-      const { data: authProfile, error: authProfileError } = await client
-        .from("user_profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
-
-      if (authProfileError) {
-        document.getElementById("dashboardMessage").className = "message-box error";
-        document.getElementById("dashboardMessage").textContent = "Failed to load your user profile.";
-        return;
-      }
-
-      let welcomeName = "User";
-
-      if (authProfile && authProfile.full_name) {
-        welcomeName = authProfile.full_name.split(" ")[0];
-      }
-
-      const { data: contractor, error: contractorError } = await client
+           const { data: contractor, error: contractorError } = await client
         .from("contractors")
         .select("*")
         .eq("user_id", currentUser.id)
@@ -621,16 +603,12 @@
         document.getElementById("dashboardMessage").textContent = "No contractor record found for this login yet.";
         return;
       }
-const { data: contractor } = await client
-  .from("contractors")
-  .select("contact_name")
-  .eq("user_id", currentUser.id)
-  .single();
-      const firstName = contractor?.contact_name
-  ? contractor.contact_name.split(" ")[0]
-  : "User";
 
-welcomeText.textContent = `Welcome, ${firstName} — Contractor`;
+      const firstName = contractor.contact_name
+        ? contractor.contact_name.split(" ")[0]
+        : "User";
+
+      welcomeText.textContent = `Welcome, ${firstName} — Contractor`;
       document.getElementById("companyHeading").textContent = contractor.company_name || "Contractor Dashboard";
 
       const progress = calculateProgress(contractor);
