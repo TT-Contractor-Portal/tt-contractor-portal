@@ -194,11 +194,6 @@
       color: #991b1b;
     }
 
-    .status.rejected {
-      background: #e5e7eb;
-      color: #374151;
-    }
-
     .action-btn {
       display: inline-block;
       background: #035740;
@@ -247,10 +242,6 @@
         flex-direction: column;
         align-items: flex-start;
       }
-
-      .register-table {
-        font-size: 13px;
-      }
     }
   </style>
 </head>
@@ -282,25 +273,25 @@
 
     <div class="page-header">
       <h2>Contractor Register</h2>
-      <p>Approved and review-ready contractors for Timothy Taylor’s contractor management process.</p>
+      <p>Contractors who are ready for review, approved or expired.</p>
     </div>
 
     <div class="card-grid">
       <div class="card">
         <h3>Ready for Review</h3>
-        <p id="readyCount">2</p>
+        <p id="readyCount">0</p>
       </div>
       <div class="card">
         <h3>Approved</h3>
-        <p id="approvedCount">3</p>
+        <p id="approvedCount">0</p>
       </div>
       <div class="card">
         <h3>Expired</h3>
-        <p id="expiredCount">1</p>
+        <p id="expiredCount">0</p>
       </div>
       <div class="card">
-        <h3>Rejected</h3>
-        <p id="rejectedCount">1</p>
+        <h3>Total Shown</h3>
+        <p id="totalCount">0</p>
       </div>
     </div>
 
@@ -319,53 +310,7 @@
         </thead>
         <tbody id="contractorTableBody">
           <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=1">ABC Scaffolding Ltd</a></td>
-            <td>John Smith</td>
-            <td><span class="status ready">Ready for Review</span></td>
-            <td>-</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=1">View</a></td>
-          </tr>
-          <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=2">Yorkshire Engineering Services</a></td>
-            <td>Sarah Walker</td>
-            <td><span class="status approved">Approved</span></td>
-            <td>09 Apr 2027</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=2">View</a></td>
-          </tr>
-          <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=3">North Brew Maintenance</a></td>
-            <td>David Green</td>
-            <td><span class="status expired">Expired</span></td>
-            <td>01 Mar 2026</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=3">View</a></td>
-          </tr>
-          <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=4">Pennine Industrial Cleaning</a></td>
-            <td>Rachel Moore</td>
-            <td><span class="status ready">Ready for Review</span></td>
-            <td>-</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=4">View</a></td>
-          </tr>
-          <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=5">Haworth Fabrication Ltd</a></td>
-            <td>Mark Taylor</td>
-            <td><span class="status approved">Approved</span></td>
-            <td>18 Feb 2027</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=5">View</a></td>
-          </tr>
-          <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=6">Wharfedale Utilities</a></td>
-            <td>Emma White</td>
-            <td><span class="status rejected">Rejected</span></td>
-            <td>-</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=6">View</a></td>
-          </tr>
-          <tr>
-            <td><a class="contractor-link" href="/contractors/profile.html?id=7">Valley Mechanical Ltd</a></td>
-            <td>Chris Bennett</td>
-            <td><span class="status approved">Approved</span></td>
-            <td>27 Jan 2027</td>
-            <td><a class="action-btn" href="/contractors/profile.html?id=7">View</a></td>
+            <td colspan="5">Loading contractors...</td>
           </tr>
         </tbody>
       </table>
@@ -383,12 +328,38 @@
     const adminNavLink = document.getElementById("adminNavLink");
     const welcomeText = document.getElementById("welcomeText");
 
+    const contractorTableBody = document.getElementById("contractorTableBody");
+    const readyCount = document.getElementById("readyCount");
+    const approvedCount = document.getElementById("approvedCount");
+    const expiredCount = document.getElementById("expiredCount");
+    const totalCount = document.getElementById("totalCount");
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "-";
+
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return "-";
+
+      return d.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function getStatusClass(status) {
+      if (status === "Ready for Review") return "ready";
+      if (status === "Approved") return "approved";
+      if (status === "Expired") return "expired";
+      return "ready";
+    }
+
     async function loadPage() {
       const { data: sessionData, error: sessionError } = await client.auth.getSession();
 
       if (sessionError || !sessionData.session) {
         window.location.href = "/login.html";
-        return;
+        return null;
       }
 
       const currentUser = sessionData.session.user;
@@ -402,14 +373,14 @@
       if (profileError || !profile) {
         alert("Profile not found.");
         window.location.href = "/login.html";
-        return;
+        return null;
       }
 
       if (profile.is_active === false) {
         alert("Your account has been deactivated. Please contact an administrator.");
         await client.auth.signOut();
         window.location.href = "/login.html";
-        return;
+        return null;
       }
 
       let roleLabel = "View Only";
@@ -428,6 +399,86 @@
       if (profile.role === "admin") {
         adminNavLink.style.display = "block";
       }
+
+      return profile;
+    }
+
+    function renderCounts(contractors) {
+      readyCount.textContent = contractors.filter(c => c.status === "Ready for Review").length;
+      approvedCount.textContent = contractors.filter(c => c.status === "Approved").length;
+      expiredCount.textContent = contractors.filter(c => c.status === "Expired").length;
+      totalCount.textContent = contractors.length;
+    }
+
+    function renderContractors(contractors) {
+      contractorTableBody.innerHTML = "";
+
+      if (!contractors.length) {
+        contractorTableBody.innerHTML = `
+          <tr>
+            <td colspan="5">No contractors to show yet.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      contractors.forEach(contractor => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>
+            <a class="contractor-link" href="/contractors/profile.html?id=${contractor.id}">
+              ${contractor.company_name || "-"}
+            </a>
+          </td>
+          <td>${contractor.contact_name || "-"}</td>
+          <td>
+            <span class="status ${getStatusClass(contractor.status)}">
+              ${contractor.status || "-"}
+            </span>
+          </td>
+          <td>${formatDate(contractor.expires_at)}</td>
+          <td>
+            <a class="action-btn" href="/contractors/profile.html?id=${contractor.id}">
+              View
+            </a>
+          </td>
+        `;
+
+        contractorTableBody.appendChild(row);
+      });
+    }
+
+    async function loadContractors(profile) {
+      if (!profile) return;
+
+      if (profile.role !== "admin" && profile.role !== "reviewer") {
+        contractorTableBody.innerHTML = `
+          <tr>
+            <td colspan="5">You do not have permission to view the contractor register.</td>
+          </tr>
+        `;
+        return;
+      }
+
+      const { data, error } = await client
+        .from("contractors")
+        .select("*")
+        .in("status", ["Ready for Review", "Approved", "Expired"])
+        .order("company_name", { ascending: true });
+
+      if (error) {
+        contractorTableBody.innerHTML = `
+          <tr>
+            <td colspan="5">Failed to load contractors: ${error.message}</td>
+          </tr>
+        `;
+        return;
+      }
+
+      const contractors = data || [];
+      renderCounts(contractors);
+      renderContractors(contractors);
     }
 
     logoutBtn.addEventListener("click", async () => {
@@ -435,7 +486,12 @@
       window.location.href = "/login.html";
     });
 
-    loadPage();
+    async function initPage() {
+      const profile = await loadPage();
+      await loadContractors(profile);
+    }
+
+    initPage();
   </script>
 </body>
 </html>
