@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contractor Passport - TT Contractor Portal</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+      line-height: 1.3;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo img {
+      max-width: 140px;
+      height: auto;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #024534;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: #035740;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 16px;
+      color: #035740;
+      font-size: 22px;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .summary-card {
+      background: #fafafa;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .summary-card h4 {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+      color: #666;
+    }
+
+    .summary-card p {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .passport-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 24px;
+    }
+
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .requirement-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 18px;
+      background: #fafafa;
+      margin-bottom: 16px;
+    }
+
+    .requirement-card:last-child {
+      margin-bottom: 0;
+    }
+
+    .requirement-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .requirement-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 6px;
+    }
+
+    .requirement-subtext {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .mandatory-badge,
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .mandatory-badge {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status-badge.complete {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-badge.incomplete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .primary-btn,
+    .secondary-btn {
+      display: inline-block;
+      text-decoration: none;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .primary-btn {
+      background: #035740;
+      color: white;
+    }
+
+    .primary-btn:hover {
+      background: #024534;
+    }
+
+    .secondary-btn {
+      background: #e5e7eb;
+      color: #222;
+    }
+
+    .secondary-btn:hover {
+      background: #d1d5db;
+    }
+
+    .photo-box {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .photo-box img {
+      width: 200px;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      background: white;
+    }
+
+    .photo-note {
+      font-size: 13px;
+      color: #666;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .message-box {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message-box.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .message-box.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .note-box {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.6;
+      margin-top: 8px;
+    }
+
+    @media (max-width: 1000px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .passport-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar-inner,
+      .requirement-top {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .photo-box img {
+        width: 150px;
+        height: 150px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="Logo">
+    </div>
+
+    <h1>TT Contractor Portal</h1>
+
+    <a href="/contractor/index.html">Dashboard</a>
+    <a href="/contractor/profile.html">My Profile</a>
+    <a href="/contractor/compliance.html">Contractor Compliance</a>
+    <a href="/contractor/passport.html">Contractor Passport</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <strong id="welcomeText">Welcome</strong>
+        <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <h2>Contractor Passport</h2>
+      <p>
+        Complete your contractor passport requirements below. You must upload a photo and complete the induction before your contractor record can be submitted for review.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h3>Passport Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Passport Progress</h4>
+          <p id="passportPercent">0%</p>
+        </div>
+        <div class="summary-card">
+          <h4>Mandatory Items Complete</h4>
+          <p id="mandatoryComplete">0 / 2</p>
+        </div>
+        <div class="summary-card">
+          <h4>Status</h4>
+          <p id="contractorStatus">In Progress</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="passport-layout">
+      <div class="left-column">
+        <div class="panel">
+          <h3>Passport Requirements</h3>
+
+          <div class="requirement-card">
+            <div class="requirement-top">
+              <div>
+                <div class="requirement-title">Photo Upload</div>
+                <div class="requirement-subtext">
+                  Upload a clear photo for your contractor passport. This will be shown to Timothy Taylor’s personnel.
+                </div>
+              </div>
+              <div>
+                <span class="mandatory-badge">Mandatory</span>
+                <span id="photoStatus" class="status-badge incomplete">Missing</span>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button id="photoCompleteBtn" class="primary-btn" type="button">Mark as Uploaded</button>
+              <button id="photoResetBtn" class="secondary-btn" type="button">Reset</button>
+            </div>
+          </div>
+
+          <div class="requirement-card">
+            <div class="requirement-top">
+              <div>
+                <div class="requirement-title">Induction Complete</div>
+                <div class="requirement-subtext">
+                  Complete the induction video and achieve 100% on the test. For now, this page is using a simple working flag until we build the real video and quiz flow.
+                </div>
+              </div>
+              <div>
+                <span class="mandatory-badge">Mandatory</span>
+                <span id="inductionStatus" class="status-badge incomplete">Missing</span>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <button id="inductionCompleteBtn" class="primary-btn" type="button">Mark as Complete</button>
+              <button id="inductionResetBtn" class="secondary-btn" type="button">Reset</button>
+            </div>
+
+            <div class="note-box">
+              Later, this button will be replaced with:
+              <br>
+              - induction video
+              <br>
+              - automatic test launch
+              <br>
+              - pass requirement of 100%
+              <br>
+              - certificate generation
+            </div>
+          </div>
+
+          <div id="passportMessage" class="message-box"></div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="panel">
+          <h3>Passport Photo</h3>
+          <div class="photo-box">
+            <img id="passportPhoto" src="/images/tt-logo.png" alt="Passport Photo">
+            <p class="photo-note">
+              This is the photo that will appear on the contractor passport record.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const welcomeText = document.getElementById("welcomeText");
+
+    let currentContractor = null;
+
+    function showMessage(type, text) {
+      const box = document.getElementById("passportMessage");
+      box.className = `message-box ${type}`;
+      box.textContent = text;
+    }
+
+    function setStatusBadge(elementId, isComplete, completeText = "Complete", incompleteText = "Missing") {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+
+      el.className = `status-badge ${isComplete ? "complete" : "incomplete"}`;
+      el.textContent = isComplete ? completeText : incompleteText;
+    }
+
+    function renderPassport(contractor) {
+      currentContractor = contractor;
+
+      const mandatoryDone = [
+        contractor.photo_uploaded,
+        contractor.induction_completed
+      ].filter(Boolean).length;
+
+      const percent = mandatoryDone * 50;
+
+      document.getElementById("passportPercent").textContent = `${percent}%`;
+      document.getElementById("mandatoryComplete").textContent = `${mandatoryDone} / 2`;
+      document.getElementById("contractorStatus").textContent = contractor.status || "In Progress";
+
+      setStatusBadge("photoStatus", contractor.photo_uploaded, "Uploaded", "Missing");
+      setStatusBadge("inductionStatus", contractor.induction_completed, "Complete", "Missing");
+
+      const passportPhoto = document.getElementById("passportPhoto");
+      if (contractor.profile_photo_url && contractor.profile_photo_url.trim()) {
+        passportPhoto.src = contractor.profile_photo_url;
+      } else {
+        passportPhoto.src = "/images/tt-logo.png";
+      }
+    }
+
+    async function updateContractorField(fieldName, value) {
+      if (!currentContractor) return;
+
+      const { data, error } = await client
+        .from("contractors")
+        .update({ [fieldName]: value })
+        .eq("id", currentContractor.id)
+        .select()
+        .single();
+
+      if (error) {
+        showMessage("error", "Failed to save change: " + error.message);
+        return;
+      }
+
+      renderPassport(data);
+      showMessage("success", "Saved successfully.");
+    }
+
+    async function loadPassportPage() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const currentUser = sessionData.session.user;
+
+      const { data: authProfile } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .maybeSingle();
+
+      let welcomeName = "User";
+      if (authProfile && authProfile.full_name) {
+        welcomeName = authProfile.full_name.split(" ")[0];
+      }
+
+      welcomeText.textContent = `Welcome, ${welcomeName} — Contractor`;
+
+      const { data: contractor, error: contractorError } = await client
+        .from("contractors")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      if (contractorError) {
+        showMessage("error", "Failed to load contractor record: " + contractorError.message);
+        return;
+      }
+
+      if (!contractor) {
+        showMessage("error", "No contractor record found for this login yet.");
+        return;
+      }
+
+      renderPassport(contractor);
+    }
+
+    document.getElementById("photoCompleteBtn").addEventListener("click", () => {
+      updateContractorField("photo_uploaded", true);
+    });
+
+    document.getElementById("photoResetBtn").addEventListener("click", () => {
+      updateContractorField("photo_uploaded", false);
+    });
+
+    document.getElementById("inductionCompleteBtn").addEventListener("click", () => {
+      updateContractorField("induction_completed", true);
+    });
+
+    document.getElementById("inductionResetBtn").addEventListener("click", () => {
+      updateContractorField("induction_completed", false);
+    });
+
+    logoutBtn.addEventListener("click", async () => {
+      await client.auth.signOut();
+      window.location.href = "/login.html";
+    });
+
+    loadPassportPage();
+  </script>
+</body>
+</html>
