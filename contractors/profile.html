@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contractor Profile - TT Contractor Portal</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+      line-height: 1.3;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo img {
+      max-width: 140px;
+      height: auto;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #024534;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .page-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: #035740;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .back-link {
+      display: inline-block;
+      text-decoration: none;
+      color: #035740;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status.ready {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.expired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status.rejected {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      color: #035740;
+      font-size: 22px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+
+    .detail-item {
+      min-width: 0;
+    }
+
+    .detail-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #666;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      color: #222;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .photo-box {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .photo-box img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      background: white;
+    }
+
+    .photo-note {
+      font-size: 13px;
+      color: #666;
+      margin: 0;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .check-item-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .check-item-subtext {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .tick {
+      display: inline-block;
+      min-width: 88px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tick.complete {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .tick.incomplete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .documents-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .document-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .document-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .document-meta {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .doc-btn {
+      display: inline-block;
+      background: #035740;
+      color: white;
+      text-decoration: none;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .doc-btn:hover {
+      background: #024534;
+    }
+
+    .review-summary {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .review-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .approve-btn,
+    .reject-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .approve-btn {
+      background: #035740;
+      color: white;
+    }
+
+    .approve-btn:hover {
+      background: #024534;
+    }
+
+    .reject-btn {
+      background: #b42318;
+      color: white;
+    }
+
+    .reject-btn:hover {
+      background: #8f1c13;
+    }
+
+    .notes-box {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+      resize: vertical;
+      box-sizing: border-box;
+      margin-top: 12px;
+    }
+
+    .small-note {
+      color: #666;
+      font-size: 13px;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 1100px) {
+      .profile-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .check-item,
+      .document-item,
+      .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .photo-box img {
+        width: 140px;
+        height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="Logo">
+    </div>
+
+    <h1>TT Contractor Portal</h1>
+
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <strong id="welcomeText">Welcome</strong>
+        <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <a class="back-link" href="/contractors/index.html">← Back to Contractor Register</a>
+
+      <div class="page-header-top">
+        <div>
+          <h2>ABC Scaffolding Ltd</h2>
+          <p>Contractor profile and compliance record.</p>
+        </div>
+        <span class="status ready">Ready for Review</span>
+      </div>
+    </div>
+
+    <div class="profile-layout">
+      <div class="left-column">
+        <div class="panel">
+          <h3>Company Details</h3>
+          <div class="details-grid">
+            <div class="detail-item">
+              <span class="detail-label">Company Name</span>
+              <div class="detail-value">ABC Scaffolding Ltd</div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Main Contact</span>
+              <div class="detail-value">John Smith</div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Email</span>
+              <div class="detail-value">john.smith@abcscaffolding.co.uk</div>
+            </div>
+
+            <div class="detail-item">
+              <span class="detail-label">Phone</span>
+              <div class="detail-value">07700 900123</div>
+            </div>
+
+            <div class="detail-item" style="grid-column: 1 / -1;">
+              <span class="detail-label">Address</span>
+              <div class="detail-value">
+                Unit 4, Industrial Estate Road,<br>
+                Keighley,<br>
+                West Yorkshire,<br>
+                BD21 4XX
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Contractor Compliance</h3>
+          <div class="check-list">
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Public Liability Insurance</div>
+                <div class="check-item-subtext">Mandatory document uploaded</div>
+              </div>
+              <span class="tick complete">Complete</span>
+            </div>
+
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Supplier Assurance Questionnaire (SAQ)</div>
+                <div class="check-item-subtext">Mandatory questionnaire completed</div>
+              </div>
+              <span class="tick complete">Complete</span>
+            </div>
+
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Health &amp; Safety Policy</div>
+                <div class="check-item-subtext">Optional supporting document</div>
+              </div>
+              <span class="tick incomplete">Not Uploaded</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Contractor Passport</h3>
+          <div class="check-list">
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Photo Upload</div>
+                <div class="check-item-subtext">Mandatory for contractor passport</div>
+              </div>
+              <span class="tick complete">Complete</span>
+            </div>
+
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Induction Video</div>
+                <div class="check-item-subtext">Mandatory site induction video completed</div>
+              </div>
+              <span class="tick complete">Complete</span>
+            </div>
+
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Induction Test</div>
+                <div class="check-item-subtext">Passed at 100%</div>
+              </div>
+              <span class="tick complete">100%</span>
+            </div>
+
+            <div class="check-item">
+              <div>
+                <div class="check-item-title">Passport Certificate</div>
+                <div class="check-item-subtext">Certificate available to print for first site visit</div>
+              </div>
+              <a class="doc-btn" href="#">View Certificate</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Documents</h3>
+          <div class="documents-list">
+            <div class="document-item">
+              <div>
+                <div class="document-name">Public Liability Insurance Certificate.pdf</div>
+                <div class="document-meta">Uploaded 08 Apr 2026</div>
+              </div>
+              <a class="doc-btn" href="#">View</a>
+            </div>
+
+            <div class="document-item">
+              <div>
+                <div class="document-name">Supplier Assurance Questionnaire.pdf</div>
+                <div class="document-meta">Completed 08 Apr 2026</div>
+              </div>
+              <a class="doc-btn" href="#">View</a>
+            </div>
+
+            <div class="document-item">
+              <div>
+                <div class="document-name">IPAF Certificate - John Smith.pdf</div>
+                <div class="document-meta">Uploaded 08 Apr 2026</div>
+              </div>
+              <a class="doc-btn" href="#">View</a>
+            </div>
+
+            <div class="document-item">
+              <div>
+                <div class="document-name">PASMA Certificate - John Smith.pdf</div>
+                <div class="document-meta">Uploaded 08 Apr 2026</div>
+              </div>
+              <a class="doc-btn" href="#">View</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-column">
+        <div class="panel">
+          <h3>Photo</h3>
+          <div class="photo-box">
+            <img src="/images/tt-logo.png" alt="Contractor Photo">
+            <p class="photo-note">Passport photo uploaded during contractor induction process.</p>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Approval Summary</h3>
+
+          <div class="review-summary">
+            <div class="summary-row">
+              <strong>Status</strong>
+              <span>Ready for Review</span>
+            </div>
+
+            <div class="summary-row">
+              <strong>Mandatory Items Complete</strong>
+              <span>4 / 4</span>
+            </div>
+
+            <div class="summary-row">
+              <strong>Date Submitted</strong>
+              <span>08 Apr 2026</span>
+            </div>
+
+            <div class="summary-row">
+              <strong>Approved On</strong>
+              <span>-</span>
+            </div>
+
+            <div class="summary-row">
+              <strong>Expiry Date</strong>
+              <span>-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Reviewer Approval</h3>
+          <p style="margin-top: 0; color: #666; font-size: 14px;">
+            Review the contractor’s compliance record and approve or reject their application.
+          </p>
+
+          <label for="reviewerNotes" class="detail-label" style="margin-top: 16px;">Reviewer Notes</label>
+          <textarea id="reviewerNotes" class="notes-box" placeholder="Add review notes here..."></textarea>
+
+          <div class="review-actions">
+            <button class="approve-btn" type="button">Approve Contractor</button>
+            <button class="reject-btn" type="button">Reject Contractor</button>
+          </div>
+
+          <p class="small-note">
+            Approval will activate the contractor for 12 months before renewal is required.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY_HERE";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNavLink = document.getElementById("adminNavLink");
+    const welcomeText = document.getElementById("welcomeText");
+
+    async function loadPage() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return;
+      }
+
+      let roleLabel = "View Only";
+      if (profile.role === "admin") {
+        roleLabel = "Admin";
+      } else if (profile.role === "reviewer") {
+        roleLabel = "Reviewer";
+      }
+
+      const firstName = profile.full_name
+        ? profile.full_name.split(" ")[0]
+        : "User";
+
+      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+
+      if (profile.role === "admin") {
+        adminNavLink.style.display = "block";
+      }
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await client.auth.signOut();
+      window.location.href = "/login.html";
+    });
+
+    loadPage();
+  </script>
+</body>
+</html>
