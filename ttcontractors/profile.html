@@ -1,1 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contractor Profile - TT Contractor Portal</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
 
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+      line-height: 1.3;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo img {
+      max-width: 140px;
+      height: auto;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #024534;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .page-header-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: #035740;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .back-link {
+      display: inline-block;
+      text-decoration: none;
+      color: #035740;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status.ready {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status.approved {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status.expired {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .status.rejected {
+      background: #e5e7eb;
+      color: #374151;
+    }
+
+    .status.inprogress {
+      background: #e0f2fe;
+      color: #075985;
+    }
+
+    .profile-layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .left-column,
+    .right-column {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .panel {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .panel h3 {
+      margin-top: 0;
+      margin-bottom: 18px;
+      color: #035740;
+      font-size: 22px;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px 24px;
+    }
+
+    .detail-item {
+      min-width: 0;
+    }
+
+    .detail-label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #666;
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .detail-value {
+      font-size: 15px;
+      color: #222;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+
+    .photo-box {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .photo-box img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 12px;
+      border: 1px solid #ddd;
+      margin-bottom: 12px;
+      background: white;
+    }
+
+    .photo-note {
+      font-size: 13px;
+      color: #666;
+      margin: 0;
+    }
+
+    .check-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .check-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .check-item-title {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .check-item-subtext {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .tick {
+      display: inline-block;
+      min-width: 88px;
+      text-align: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .tick.complete {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .tick.incomplete {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .documents-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .document-item {
+      padding: 14px 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      background: #fafafa;
+    }
+
+    .document-name {
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .document-meta {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .review-summary {
+      display: grid;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 14px;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .review-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .approve-btn,
+    .reject-btn {
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .approve-btn {
+      background: #035740;
+      color: white;
+    }
+
+    .approve-btn:hover {
+      background: #024534;
+    }
+
+    .reject-btn {
+      background: #b42318;
+      color: white;
+    }
+
+    .reject-btn:hover {
+      background: #8f1c13;
+    }
+
+    .approve-btn:disabled,
+    .reject-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .notes-box {
+      width: 100%;
+      min-height: 100px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      padding: 12px;
+      font-size: 14px;
+      font-family: Arial, sans-serif;
+      resize: vertical;
+      box-sizing: border-box;
+      margin-top: 12px;
+    }
+
+    .small-note {
+      color: #666;
+      font-size: 13px;
+      margin-top: 10px;
+      margin-bottom: 0;
+    }
+
+    .message-box {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message-box.success {
+      display: block;
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .message-box.error {
+      display: block;
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .loading-box {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 1100px) {
+      .profile-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 800px) {
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 700px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .check-item,
+      .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .photo-box img {
+        width: 140px;
+        height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="Logo">
+    </div>
+
+    <h1>TT Contractor Portal</h1>
+
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/contractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <strong id="welcomeText">Welcome</strong>
+        <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div id="pageContent">
+      <div class="loading-box">Loading contractor profile...</div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNavLink = document.getElementById("adminNavLink");
+    const welcomeText = document.getElementById("welcomeText");
+    const pageContent = document.getElementById("pageContent");
+
+    let currentProfile = null;
+    let currentContractor = null;
+
+    function getContractorId() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get("id");
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return "-";
+      const d = new Date(dateStr);
+      if (Number.isNaN(d.getTime())) return "-";
+
+      return d.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric"
+      });
+    }
+
+    function getStatusClass(status) {
+      if (status === "Ready for Review") return "ready";
+      if (status === "Approved") return "approved";
+      if (status === "Expired") return "expired";
+      if (status === "Rejected") return "rejected";
+      return "inprogress";
+    }
+
+    function yesNoTick(isComplete, completeText = "Complete", incompleteText = "Incomplete") {
+      return `
+        <span class="tick ${isComplete ? "complete" : "incomplete"}">
+          ${isComplete ? completeText : incompleteText}
+        </span>
+      `;
+    }
+
+    function escapeHtml(value) {
+      if (value === null || value === undefined) return "";
+      return String(value)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderProfile(contractor) {
+      const mandatoryCount = [
+        contractor.public_liability_uploaded,
+        contractor.saq_completed,
+        contractor.photo_uploaded,
+        contractor.induction_completed
+      ].filter(Boolean).length;
+
+      const photoUrl = contractor.profile_photo_url && contractor.profile_photo_url.trim()
+        ? contractor.profile_photo_url
+        : "/images/tt-logo.png";
+
+      pageContent.innerHTML = `
+        <div class="page-header">
+          <a class="back-link" href="/contractors/index.html">← Back to Contractor Register</a>
+
+          <div class="page-header-top">
+            <div>
+              <h2>${escapeHtml(contractor.company_name || "Contractor")}</h2>
+              <p>Contractor profile and compliance record.</p>
+            </div>
+            <span class="status ${getStatusClass(contractor.status)}">${escapeHtml(contractor.status || "-")}</span>
+          </div>
+        </div>
+
+        <div class="profile-layout">
+          <div class="left-column">
+            <div class="panel">
+              <h3>Company Details</h3>
+              <div class="details-grid">
+                <div class="detail-item">
+                  <span class="detail-label">Company Name</span>
+                  <div class="detail-value">${escapeHtml(contractor.company_name || "-")}</div>
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Main Contact</span>
+                  <div class="detail-value">${escapeHtml(contractor.contact_name || "-")}</div>
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Email</span>
+                  <div class="detail-value">${escapeHtml(contractor.email || "-")}</div>
+                </div>
+
+                <div class="detail-item">
+                  <span class="detail-label">Phone</span>
+                  <div class="detail-value">${escapeHtml(contractor.phone || "-")}</div>
+                </div>
+
+                <div class="detail-item" style="grid-column: 1 / -1;">
+                  <span class="detail-label">Address</span>
+                  <div class="detail-value">${escapeHtml(contractor.address || "-").replace(/\n/g, "<br>")}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Contractor Compliance</h3>
+              <div class="check-list">
+                <div class="check-item">
+                  <div>
+                    <div class="check-item-title">Public Liability Insurance</div>
+                    <div class="check-item-subtext">Mandatory document uploaded</div>
+                  </div>
+                  ${yesNoTick(contractor.public_liability_uploaded, "Complete", "Missing")}
+                </div>
+
+                <div class="check-item">
+                  <div>
+                    <div class="check-item-title">Supplier Assurance Questionnaire (SAQ)</div>
+                    <div class="check-item-subtext">Mandatory questionnaire completed</div>
+                  </div>
+                  ${yesNoTick(contractor.saq_completed, "Complete", "Missing")}
+                </div>
+
+                <div class="check-item">
+                  <div>
+                    <div class="check-item-title">Health &amp; Safety Policy</div>
+                    <div class="check-item-subtext">Optional supporting document</div>
+                  </div>
+                  ${yesNoTick(contractor.hs_policy_uploaded, "Uploaded", "Not Uploaded")}
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Contractor Passport</h3>
+              <div class="check-list">
+                <div class="check-item">
+                  <div>
+                    <div class="check-item-title">Photo Upload</div>
+                    <div class="check-item-subtext">Mandatory for contractor passport</div>
+                  </div>
+                  ${yesNoTick(contractor.photo_uploaded, "Complete", "Missing")}
+                </div>
+
+                <div class="check-item">
+                  <div>
+                    <div class="check-item-title">Induction</div>
+                    <div class="check-item-subtext">Video completed and test passed at 100%</div>
+                  </div>
+                  ${yesNoTick(contractor.induction_completed, "Complete", "Missing")}
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Documents</h3>
+              <div class="documents-list">
+                <div class="document-item">
+                  <div class="document-name">Public Liability Insurance</div>
+                  <div class="document-meta">
+                    ${contractor.public_liability_uploaded ? "Uploaded" : "Not uploaded yet"}
+                  </div>
+                </div>
+
+                <div class="document-item">
+                  <div class="document-name">Supplier Assurance Questionnaire (SAQ)</div>
+                  <div class="document-meta">
+                    ${contractor.saq_completed ? "Completed" : "Not completed yet"}
+                  </div>
+                </div>
+
+                <div class="document-item">
+                  <div class="document-name">Health &amp; Safety Policy</div>
+                  <div class="document-meta">
+                    ${contractor.hs_policy_uploaded ? "Uploaded" : "Not uploaded"}
+                  </div>
+                </div>
+
+                <div class="document-item">
+                  <div class="document-name">Profile Photo</div>
+                  <div class="document-meta">
+                    ${contractor.photo_uploaded ? "Uploaded" : "Not uploaded"}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="right-column">
+            <div class="panel">
+              <h3>Photo</h3>
+              <div class="photo-box">
+                <img src="${escapeHtml(photoUrl)}" alt="Contractor Photo">
+                <p class="photo-note">Passport photo uploaded during contractor induction process.</p>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Approval Summary</h3>
+
+              <div class="review-summary">
+                <div class="summary-row">
+                  <strong>Status</strong>
+                  <span>${escapeHtml(contractor.status || "-")}</span>
+                </div>
+
+                <div class="summary-row">
+                  <strong>Mandatory Items Complete</strong>
+                  <span>${mandatoryCount} / 4</span>
+                </div>
+
+                <div class="summary-row">
+                  <strong>Submitted for Review</strong>
+                  <span>${formatDate(contractor.submitted_for_review_at)}</span>
+                </div>
+
+                <div class="summary-row">
+                  <strong>Approved On</strong>
+                  <span>${formatDate(contractor.approved_at)}</span>
+                </div>
+
+                <div class="summary-row">
+                  <strong>Expiry Date</strong>
+                  <span>${formatDate(contractor.expires_at)}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <h3>Reviewer Approval</h3>
+              <p style="margin-top: 0; color: #666; font-size: 14px;">
+                Review the contractor’s compliance record and approve or reject their application.
+              </p>
+
+              <label for="reviewerNotes" class="detail-label" style="margin-top: 16px;">Reviewer Notes</label>
+              <textarea id="reviewerNotes" class="notes-box" placeholder="Add review notes here...">${escapeHtml(contractor.reviewer_notes || "")}</textarea>
+
+              <div class="review-actions">
+                <button class="approve-btn" id="approveBtn" type="button">Approve Contractor</button>
+                <button class="reject-btn" id="rejectBtn" type="button">Reject Contractor</button>
+              </div>
+
+              <div id="reviewMessage" class="message-box"></div>
+
+              <p class="small-note">
+                Approval will activate the contractor for 12 months before renewal is required.
+              </p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const approveBtn = document.getElementById("approveBtn");
+      const rejectBtn = document.getElementById("rejectBtn");
+
+      const canReview = currentProfile && (currentProfile.role === "admin" || currentProfile.role === "reviewer");
+
+      if (!canReview) {
+        approveBtn.disabled = true;
+        rejectBtn.disabled = true;
+      } else {
+        approveBtn.addEventListener("click", approveContractor);
+        rejectBtn.addEventListener("click", rejectContractor);
+      }
+    }
+
+    function showReviewMessage(type, text) {
+      const box = document.getElementById("reviewMessage");
+      if (!box) return;
+      box.className = `message-box ${type}`;
+      box.textContent = text;
+    }
+
+    async function loadPage() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return false;
+      }
+
+      const currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return false;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return false;
+      }
+
+      currentProfile = profile;
+
+      let roleLabel = "View Only";
+      if (profile.role === "admin") {
+        roleLabel = "Admin";
+      } else if (profile.role === "reviewer") {
+        roleLabel = "Reviewer";
+      }
+
+      const firstName = profile.full_name
+        ? profile.full_name.split(" ")[0]
+        : "User";
+
+      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+
+      if (profile.role === "admin") {
+        adminNavLink.style.display = "block";
+      }
+
+      return true;
+    }
+
+    async function loadContractor() {
+      const contractorId = getContractorId();
+
+      if (!contractorId) {
+        pageContent.innerHTML = `<div class="loading-box">No contractor ID was provided in the URL.</div>`;
+        return;
+      }
+
+      const { data, error } = await client
+        .from("contractors")
+        .select("*")
+        .eq("id", contractorId)
+        .single();
+
+      if (error || !data) {
+        pageContent.innerHTML = `<div class="loading-box">Failed to load contractor profile.</div>`;
+        return;
+      }
+
+      currentContractor = data;
+      renderProfile(data);
+    }
+
+    async function approveContractor() {
+      if (!currentContractor) return;
+
+      const notes = document.getElementById("reviewerNotes").value.trim();
+      const now = new Date();
+      const expiry = new Date(now);
+      expiry.setFullYear(expiry.getFullYear() + 1);
+
+      const { error } = await client
+        .from("contractors")
+        .update({
+          status: "Approved",
+          reviewer_notes: notes || null,
+          approved_at: now.toISOString(),
+          expires_at: expiry.toISOString()
+        })
+        .eq("id", currentContractor.id);
+
+      if (error) {
+        showReviewMessage("error", "Failed to approve contractor: " + error.message);
+        return;
+      }
+
+      showReviewMessage("success", "Contractor approved successfully.");
+      await loadContractor();
+    }
+
+    async function rejectContractor() {
+      if (!currentContractor) return;
+
+      const notes = document.getElementById("reviewerNotes").value.trim();
+
+      const { error } = await client
+        .from("contractors")
+        .update({
+          status: "Rejected",
+          reviewer_notes: notes || null
+        })
+        .eq("id", currentContractor.id);
+
+      if (error) {
+        showReviewMessage("error", "Failed to reject contractor: " + error.message);
+        return;
+      }
+
+      showReviewMessage("success", "Contractor rejected successfully.");
+      await loadContractor();
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await client.auth.signOut();
+      window.location.href = "/login.html";
+    });
+
+    async function initPage() {
+      const ok = await loadPage();
+      if (!ok) return;
+      await loadContractor();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
