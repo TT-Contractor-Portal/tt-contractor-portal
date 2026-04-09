@@ -236,34 +236,54 @@
         return;
       }
 
-      const { data: profile, error: profileError } = await client
+           const { data: profile, error: profileError } = await client
         .from("user_profiles")
-        .select("role, is_active")
+        .select("role, is_active, full_name")
         .eq("id", user.id)
-        .single();
+        .maybeSingle();
 
-      if (profileError || !profile) {
-        message.style.color = "#b42318";
-        message.textContent = "Unable to load your profile.";
-        await client.auth.signOut();
-        return;
-      }
-
-      if (profile.is_active === false) {
+      if (profile && profile.is_active === false) {
         message.style.color = "#b42318";
         message.textContent = "Your account has been deactivated. Please contact an administrator.";
         await client.auth.signOut();
         return;
       }
 
-      await client
-        .from("user_profiles")
-        .update({ last_sign_in_at: new Date().toISOString() })
-        .eq("id", user.id);
+      if (profile) {
+        await client
+          .from("user_profiles")
+          .update({ last_sign_in_at: new Date().toISOString() })
+          .eq("id", user.id);
 
-      message.style.color = "#035740";
-      message.textContent = "Login successful...";
-      window.location.href = "/index.html";
+        message.style.color = "#035740";
+        message.textContent = "Login successful...";
+        window.location.href = "/index.html";
+        return;
+      }
+
+      const { data: contractor, error: contractorError } = await client
+        .from("contractors")
+        .select("id, user_id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (contractorError) {
+        message.style.color = "#b42318";
+        message.textContent = "Unable to load your contractor account.";
+        await client.auth.signOut();
+        return;
+      }
+
+      if (contractor) {
+        message.style.color = "#035740";
+        message.textContent = "Login successful...";
+        window.location.href = "/contractors/index.html";
+        return;
+      }
+
+      message.style.color = "#b42318";
+      message.textContent = "No TT staff or contractor profile was found for this account.";
+      await client.auth.signOut();
     });
 
     showSignupBtn.addEventListener("click", (e) => {
