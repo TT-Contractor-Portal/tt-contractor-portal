@@ -208,19 +208,85 @@
     const backToLogin = document.getElementById("backToLogin");
     const forgotPasswordWrap = document.getElementById("forgotPasswordWrap");
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+   form.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-      message.style.color = "#035740";
-      message.textContent = "Signing in...";
+  message.style.color = "#035740";
+  message.textContent = "Signing in...";
 
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const password = document.getElementById("password").value;
 
-      const { data, error } = await client.auth.signInWithPassword({
-        email,
-        password
-      });
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  if (error) {
+    message.style.color = "#b42318";
+    message.textContent = error.message;
+    return;
+  }
+
+  const user = data.user;
+
+  if (!user) {
+    message.style.color = "#b42318";
+    message.textContent = "Login failed. No user returned.";
+    return;
+  }
+
+  const isTTUser = email.endsWith("@timtaylors.co.uk");
+
+  if (isTTUser) {
+    const { data: profile, error: profileError } = await client
+      .from("user_profiles")
+      .select("role, is_active")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (profileError || !profile) {
+      message.style.color = "#b42318";
+      message.textContent = "Unable to load your TT profile.";
+      await client.auth.signOut();
+      return;
+    }
+
+    if (profile.is_active === false) {
+      message.style.color = "#b42318";
+      message.textContent = "Your account has been deactivated. Please contact an administrator.";
+      await client.auth.signOut();
+      return;
+    }
+
+    await client
+      .from("user_profiles")
+      .update({ last_sign_in_at: new Date().toISOString() })
+      .eq("id", user.id);
+
+    message.style.color = "#035740";
+    message.textContent = "Login successful...";
+    window.location.href = "/index.html";
+    return;
+  }
+
+  const { data: contractor, error: contractorError } = await client
+    .from("contractors")
+    .select("id, user_id")
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (contractorError || !contractor) {
+    message.style.color = "#b42318";
+    message.textContent = "Unable to load your contractor account.";
+    await client.auth.signOut();
+    return;
+  }
+
+  message.style.color = "#035740";
+  message.textContent = "Login successful...";
+  window.location.href = "/contractors/index.html";
+});
 
       if (error) {
         message.style.color = "#b42318";
