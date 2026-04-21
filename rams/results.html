@@ -1053,45 +1053,7 @@
       }, 800);
     }
 
-    async function markRelatedClashes(review) {
-      const { data, error } = await client
-        .from("rams_reviews")
-        .select("*")
-        .eq("status", "Approved")
-        .eq("is_current_revision", true);
-
-      if (error || !data) return;
-
-      const thisStart = new Date(review.start_date);
-      const thisEnd = new Date(review.end_date || review.start_date);
-      const thisAreas = Array.isArray(review.areas) ? review.areas : [];
-
-      const overlappingIds = data
-        .filter(row => {
-          if (row.id === review.id) return false;
-
-          const otherStart = new Date(row.start_date);
-          const otherEnd = new Date(row.end_date || row.start_date);
-          const overlap = thisStart <= otherEnd && otherStart <= thisEnd;
-          if (!overlap) return false;
-
-          const otherAreas = Array.isArray(row.areas) ? row.areas : [];
-          return thisAreas.some(area => otherAreas.includes(area));
-        })
-        .map(row => row.id);
-
-      if (!overlappingIds.length) return;
-
-      await client
-        .from("rams_reviews")
-        .update({ clash: true })
-        .in("id", overlappingIds);
-
-      await client
-        .from("rams_reviews")
-        .update({ clash: true })
-        .eq("id", review.id);
-    }
+    
 
     function openClashApprovalModal() {
       document.getElementById("clashApprovalModal").style.display = "flex";
