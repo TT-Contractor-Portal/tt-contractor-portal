@@ -967,11 +967,49 @@
       `).join("");
     }
 
-    async function saveStatus(newStatus, clashAcknowledged = false) {
-      if (!currentReview || !currentUser) {
-        alert("No RAMS review loaded.");
-        return;
-      }
+ async function saveStatus(newStatus, clashAcknowledged = false) {
+  if (!currentReview || !currentUser) {
+    alert("No RAMS review loaded.");
+    return;
+  }
+
+  const reviewerNotes = document.getElementById("reviewerNotes").value.trim();
+
+  const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+  if (sessionError || !sessionData.session?.access_token) {
+    alert("Your session has expired. Please log in again.");
+    window.location.href = "/login.html";
+    return;
+  }
+
+  const response = await fetch("/.netlify/functions/update-rams-status", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${sessionData.session.access_token}`
+    },
+    body: JSON.stringify({
+      reviewId: currentReview.id,
+      status: newStatus,
+      reviewerNotes,
+      clashAcknowledged
+    })
+  });
+
+  const result = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    alert(result.error || "Failed to update RAMS.");
+    return;
+  }
+
+  showStatusMessage(result.message || `RAMS updated to ${newStatus}`);
+
+  setTimeout(() => {
+    window.location.href = "/rams/register.html";
+  }, 800);
+}
 
       const reviewerNotes = document.getElementById("reviewerNotes").value.trim();
       const reviewerName = currentUserProfile?.full_name || currentUser.email || "Reviewer";
