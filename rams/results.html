@@ -662,13 +662,37 @@
       return permits;
     }
 
-    async function protectPage() {
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+ async function protectPage() {
+  const auth = await window.ttAuth.requireTTUser({
+    adminNavLinkId: "adminNavLink"
+  });
 
-      if (sessionError || !sessionData.session) {
-        window.location.href = "/login.html";
-        return false;
-      }
+  if (!auth) {
+    return false;
+  }
+
+  currentUser = auth.user;
+  currentUserProfile = auth.profile;
+
+  const canApprove = auth.profile.role === "reviewer" || auth.profile.role === "admin";
+
+  const approveBtn = document.getElementById("approveBtn");
+  const underReviewBtn = document.getElementById("underReviewBtn");
+  const rejectBtn = document.getElementById("rejectBtn");
+  const reviewerNotes = document.getElementById("reviewerNotes");
+
+  if (!canApprove) {
+    if (approveBtn) {
+      approveBtn.disabled = true;
+      approveBtn.textContent = "Approval requires Reviewer/Admin access";
+    }
+    if (underReviewBtn) underReviewBtn.disabled = true;
+    if (rejectBtn) rejectBtn.disabled = true;
+    if (reviewerNotes) reviewerNotes.disabled = true;
+  }
+
+  return true;
+}
 
       currentUser = sessionData.session.user;
 
