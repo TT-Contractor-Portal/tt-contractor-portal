@@ -16,7 +16,8 @@ function buildJson(statusCode, body) {
 }
 
 function hasReviewerAccess(profile) {
-  return profile && (profile.role === "reviewer" || profile.role === "admin");
+  if (!profile) return false;
+  return ["reviewer", "admin"].includes(profile.role);
 }
 
 function normaliseAreas(value) {
