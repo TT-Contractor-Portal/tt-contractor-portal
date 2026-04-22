@@ -20,6 +20,10 @@ function hasReviewerAccess(profile) {
   return ["reviewer", "admin"].includes(profile.role);
 }
 
+function hasAdminAccess(profile) {
+  return profile && profile.role === "admin";
+}
+
 function normaliseAreas(value) {
   return Array.isArray(value) ? value.filter(Boolean) : [];
 }
