@@ -662,7 +662,7 @@
       return permits;
     }
 
- async function protectPage() {
+async function protectPage() {
   const auth = await window.ttAuth.requireTTUser({
     adminNavLinkId: "adminNavLink"
   });
@@ -693,37 +693,6 @@
 
   return true;
 }
-
-      currentUser = sessionData.session.user;
-
-      const { data: profile, error: profileError } = await client
-        .from("user_profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single();
-
-      if (profileError || !profile) {
-        alert("Profile not found.");
-        window.location.href = "/login.html";
-        return false;
-      }
-
-      if (profile.is_active === false) {
-        alert("Your account has been deactivated. Please contact an administrator.");
-        await client.auth.signOut();
-        window.location.href = "/login.html";
-        return false;
-      }
-
-      currentUserProfile = profile;
-
-      const adminNavLink = document.getElementById("adminNavLink");
-      if (profile.role === "admin" && adminNavLink) {
-        adminNavLink.style.display = "block";
-      }
-
-      return true;
-    }
 
     async function loadReview() {
       const id = getQueryParam("id");
