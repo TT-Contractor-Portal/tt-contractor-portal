@@ -666,78 +666,36 @@ function renderPlanner(items, weekStart, weekEnd) {
       renderExpiringSoon(items, todayStart);
     }
 
-    async function loadDashboard() {
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+   async function loadDashboard() {
+  const auth = await window.ttAuth.requireTTUser({
+    welcomeTextId: "welcomeText",
+    adminNavLinkId: "adminNavLink"
+  });
 
-      if (sessionError || !sessionData.session) {
-        window.location.href = "/login.html";
-        return;
-      }
+  if (!auth) {
+    return;
+  }
 
-      currentUser = sessionData.session.user;
+  currentUser = auth.user;
+  currentProfile = auth.profile;
 
-      const { data: profile, error: profileError } = await client
-        .from("user_profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .single();
+  const { data, error } = await client
+    .from("rams_reviews")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-      if (profileError || !profile) {
-        alert("Profile not found.");
-        window.location.href = "/login.html";
-        return;
-      }
+  if (error) {
+    alert("Failed to load dashboard RAMS: " + error.message);
+    return;
+  }
 
-      if (profile.is_active === false) {
-        alert("Your account has been deactivated. Please contact an administrator.");
-        await client.auth.signOut();
-        window.location.href = "/login.html";
-        return;
-      }
+  allRams = (data || []).map(mapRamsRow);
+  renderDashboard(allRams);
+}
 
-      currentProfile = profile;
-
-      let roleLabel = "View Only";
-      if (profile.role === "admin") {
-        roleLabel = "Admin";
-      } else if (profile.role === "reviewer") {
-        roleLabel = "Reviewer";
-      }
-
-      const firstName = profile.full_name
-        ? profile.full_name.split(" ")[0]
-        : "User";
-
-      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
-
-      if (profile.role === "admin") {
-        adminNavLink.style.display = "block";
-      }
-
-      let query = client
-        .from("rams_reviews")
-        .select("*")
-        .order("created_at", { ascending: false });
-
-      if (profile.role !== "admin" && profile.role !== "reviewer") {
-        query = query.eq("user_id", currentUser.id);
-      }
-
-      const { data, error } = await query;
-
-      if (error) {
-        alert("Failed to load dashboard RAMS: " + error.message);
-        return;
-      }
-
-      allRams = (data || []).map(mapRamsRow);
-      renderDashboard(allRams);
-    }
-
-    logoutBtn.addEventListener("click", async () => {
-      await client.auth.signOut();
-      window.location.href = "/login.html";
-    });
+  logoutBtn.addEventListener("click", async () => {
+  await window.ttAuth.signOutAndRedirect();
+});
 
     loadDashboard();
   </script>
