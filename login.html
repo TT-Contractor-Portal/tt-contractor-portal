@@ -212,7 +212,8 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
- const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const form = document.getElementById("loginForm");
@@ -246,6 +247,18 @@
     document.getElementById("inductionComplete").value = "";
     document.getElementById("ptwComplete").value = "";
     companySelect.value = "";
+  }
+
+  function switchToLoginMode() {
+    formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
+    signupFields.style.display = "none";
+    contractorSignupFields.style.display = "none";
+    ttSignupFields.style.display = "none";
+    loginBtn.style.display = "block";
+    showSignupBtn.style.display = "block";
+    signupBtn.style.display = "none";
+    backToLoginWrap.style.display = "none";
+    forgotPasswordWrap.style.display = "block";
   }
 
   function updateSignupMode() {
@@ -414,18 +427,8 @@
 
   backToLogin.addEventListener("click", (e) => {
     e.preventDefault();
-
-    formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
-    signupFields.style.display = "none";
-    contractorSignupFields.style.display = "none";
-    ttSignupFields.style.display = "none";
-    loginBtn.style.display = "block";
-    showSignupBtn.style.display = "block";
-    signupBtn.style.display = "none";
-    backToLoginWrap.style.display = "none";
-    forgotPasswordWrap.style.display = "block";
+    switchToLoginMode();
     message.textContent = "";
-
     resetSignupFields();
   });
 
@@ -435,38 +438,74 @@
     }
   });
 
-signupBtn.addEventListener("click", async () => {
-  try {
-    console.log("Create Account clicked");
+  signupBtn.addEventListener("click", async () => {
+    try {
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const password = document.getElementById("password").value;
+      const fullName = document.getElementById("fullName").value.trim();
+      const inductionComplete = document.getElementById("inductionComplete").value;
+      const ptwComplete = document.getElementById("ptwComplete").value;
+      const selectedCompanyId = companySelect.value;
 
-    const email = document.getElementById("email").value.trim().toLowerCase();
-    const password = document.getElementById("password").value;
-    const fullName = document.getElementById("fullName").value.trim();
-    const inductionComplete = document.getElementById("inductionComplete").value;
-    const ptwComplete = document.getElementById("ptwComplete").value;
-    const selectedCompanyId = companySelect.value;
+      if (!fullName) {
+        setMessage("Please enter your full name", "#b42318");
+        return;
+      }
 
-    console.log("Signup values:", {
-      email,
-      fullName,
-      selectedCompanyId
-    });
+      if (!password || password.length < 6) {
+        setMessage("Please enter a password with at least 6 characters", "#b42318");
+        return;
+      }
 
-    if (!fullName) {
-      setMessage("Please enter your full name", "#b42318");
-      return;
-    }
+      const ttUser = isTTEmail(email);
 
-    if (!password || password.length < 6) {
-      setMessage("Please enter a password with at least 6 characters", "#b42318");
-      return;
-    }
+      if (ttUser) {
+        if (inductionComplete === "" || ptwComplete === "") {
+          setMessage("Please answer both training questions", "#b42318");
+          return;
+        }
 
-    const ttUser = isTTEmail(email);
+        setMessage("Creating account...");
 
-    if (ttUser) {
-      if (inductionComplete === "" || ptwComplete === "") {
-        setMessage("Please answer both training questions", "#b42318");
+        const { error } = await client.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName,
+              induction_complete: inductionComplete === "true",
+              ptw_complete: ptwComplete === "true",
+              reviewer_requested: inductionComplete === "true" && ptwComplete === "true"
+            }
+          }
+        });
+
+        if (error) {
+          setMessage(error.message, "#b42318");
+          return;
+        }
+
+        setMessage("Account created successfully. You can now sign in using your email and password.");
+        document.getElementById("email").value = "";
+        document.getElementById("password").value = "";
+        resetSignupFields();
+
+        setTimeout(() => {
+          switchToLoginMode();
+        }, 4000);
+
+        return;
+      }
+
+      if (!selectedCompanyId) {
+        setMessage("Please select your company", "#b42318");
+        return;
+      }
+
+      const selectedCompany = availableCompanies.find(c => c.id === selectedCompanyId);
+
+      if (!selectedCompany) {
+        setMessage("Selected company not found. Please try again.", "#b42318");
         return;
       }
 
@@ -478,9 +517,9 @@ signupBtn.addEventListener("click", async () => {
         options: {
           data: {
             full_name: fullName,
-            induction_complete: inductionComplete === "true",
-            ptw_complete: ptwComplete === "true",
-            reviewer_requested: inductionComplete === "true" && ptwComplete === "true"
+            company_id: selectedCompany.id,
+            company_name: selectedCompany.company_name,
+            account_type: "contractor"
           }
         }
       });
@@ -490,97 +529,19 @@ signupBtn.addEventListener("click", async () => {
         return;
       }
 
+      setMessage("Account created successfully. You can now sign in using your email and password.");
+      document.getElementById("email").value = "";
+      document.getElementById("password").value = "";
+      resetSignupFields();
 
-    if (!selectedCompanyId) {
-      setMessage("Please select your company", "#b42318");
-      return;
+      setTimeout(() => {
+        switchToLoginMode();
+      }, 4000);
+    } catch (err) {
+      console.error("Signup crash:", err);
+      setMessage("Something went wrong during signup. Check browser console.", "#b42318");
     }
-
-    const selectedCompany = availableCompanies.find(c => c.id === selectedCompanyId);
-
-    console.log("Selected company:", selectedCompany);
-
-    if (!selectedCompany) {
-      setMessage("Selected company not found. Please try again.", "#b42318");
-      return;
-    }
-
-    setMessage("Creating account...");
-
-    const { data, error } = await client.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          company_id: selectedCompany.id,
-          company_name: selectedCompany.company_name,
-          account_type: "contractor"
-        }
-      }
-    });
-
-    console.log("Sign up response:", { data, error });
-
-    if (error) {
-      setMessage(error.message, "#b42318");
-      return;
-    }
-
-setMessage("Account created successfully. You can now sign in using your email and password.");
-
-document.getElementById("email").value = "";
-document.getElementById("password").value = "";
-resetSignupFields();
-
-setTimeout(() => {
-  formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
-  signupFields.style.display = "none";
-  contractorSignupFields.style.display = "none";
-  ttSignupFields.style.display = "none";
-  loginBtn.style.display = "block";
-  showSignupBtn.style.display = "block";
-  signupBtn.style.display = "none";
-  backToLoginWrap.style.display = "none";
-  forgotPasswordWrap.style.display = "block";
-}, 4000);
-
-      return;
-    }
-
-    if (!selectedCompanyId) {
-      setMessage("Please select your company", "#b42318");
-      return;
-    }
-
-    const selectedCompany = availableCompanies.find(c => c.id === selectedCompanyId);
-
-    if (!selectedCompany) {
-      setMessage("Selected company not found. Please try again.", "#b42318");
-      return;
-    }
-
-    setMessage("Creating account...");
-
-    const { error } = await client.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: fullName,
-          company_id: selectedCompany.id,
-          company_name: selectedCompany.company_name,
-          account_type: "contractor"
-        }
-      }
-    });
-
-    if (error) {
-      setMessage(error.message, "#b42318");
-      return;
-    }
-
-   });
+  });
 </script>
 
 </body>
