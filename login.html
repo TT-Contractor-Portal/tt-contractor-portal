@@ -458,7 +458,7 @@ function setMessage(text, type = "success") {
     signupBtn.style.display = "block";
     backToLoginWrap.style.display = "block";
     forgotPasswordWrap.style.display = "none";
-    message.textContent = "";
+   document.getElementById("messageBox").style.display = "none";
 
     updateSignupMode();
   });
@@ -466,7 +466,7 @@ function setMessage(text, type = "success") {
   backToLogin.addEventListener("click", (e) => {
     e.preventDefault();
     switchToLoginMode();
-    message.textContent = "";
+   document.getElementById("messageBox").style.display = "none";
     resetSignupFields();
   });
 
