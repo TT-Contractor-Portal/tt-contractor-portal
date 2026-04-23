@@ -125,6 +125,43 @@
     .login-container {
       margin: 20px;
     }
+
+.message-box {
+  display: none;
+  margin-top: 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+  line-height: 1.5;
+  border: 2px solid transparent;
+}
+
+/* SUCCESS (Green) */
+.message-box.success {
+  display: block;
+  background: #ecfdf5;
+  border-color: #16a34a;
+  color: #166534;
+}
+
+/* ERROR (Red) */
+.message-box.error {
+  display: block;
+  background: #fef2f2;
+  border-color: #dc2626;
+  color: #991b1b;
+}
+
+/* INFO (Amber) */
+.message-box.info {
+  display: block;
+  background: #fffbeb;
+  border-color: #f59e0b;
+  color: #92400e;
+}
+    
   }
 </style>
 </head>
@@ -201,7 +238,7 @@
       Already have an account? <a href="#" id="backToLogin">Log in</a>
     </p>
 
-    <div id="message"></div>
+<div id="messageBox" class="message-box"></div>
 
     <p style="font-size: 11px; color: #888; text-align: center; margin-top: 15px;">
       Authorised access only. All activity is logged and monitored.
