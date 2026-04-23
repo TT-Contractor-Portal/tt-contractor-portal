@@ -490,27 +490,6 @@ signupBtn.addEventListener("click", async () => {
         return;
       }
 
-      setMessage("Account created. Please check your email and click the link to verify your account.");
-
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
-      resetSignupFields();
-
-      setTimeout(() => {
-        formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
-        signupFields.style.display = "none";
-        contractorSignupFields.style.display = "none";
-        ttSignupFields.style.display = "none";
-        loginBtn.style.display = "block";
-        showSignupBtn.style.display = "block";
-        signupBtn.style.display = "none";
-        backToLoginWrap.style.display = "none";
-        forgotPasswordWrap.style.display = "block";
-        message.textContent = "";
-      }, 2000);
-
-      return;
-    }
 
     if (!selectedCompanyId) {
       setMessage("Please select your company", "#b42318");
@@ -548,53 +527,23 @@ signupBtn.addEventListener("click", async () => {
       return;
     }
 
-  setMessage("Account created successfully. You can now sign in using your email and password.");
+setMessage("Account created successfully. You can now sign in using your email and password.");
 
-    document.getElementById("email").value = "";
-    document.getElementById("password").value = "";
-    resetSignupFields();
+document.getElementById("email").value = "";
+document.getElementById("password").value = "";
+resetSignupFields();
 
-    setTimeout(() => {
-      formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
-      signupFields.style.display = "none";
-      contractorSignupFields.style.display = "none";
-      ttSignupFields.style.display = "none";
-      loginBtn.style.display = "block";
-      showSignupBtn.style.display = "block";
-      signupBtn.style.display = "none";
-      backToLoginWrap.style.display = "none";
-      forgotPasswordWrap.style.display = "block";
-      message.textContent = "";
-    }, 2500);
-  } catch (err) {
-    console.error("Signup crash:", err);
-    setMessage("Something went wrong during signup. Check browser console.", "#b42318");
-  }
-});
-
-      if (error) {
-        setMessage(error.message, "#b42318");
-        return;
-      }
-
-      setMessage("Account created. Please check your email and click the link to verify your account.");
-
-      document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
-      resetSignupFields();
-
-      setTimeout(() => {
-        formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
-        signupFields.style.display = "none";
-        contractorSignupFields.style.display = "none";
-        ttSignupFields.style.display = "none";
-        loginBtn.style.display = "block";
-        showSignupBtn.style.display = "block";
-        signupBtn.style.display = "none";
-        backToLoginWrap.style.display = "none";
-        forgotPasswordWrap.style.display = "block";
-        message.textContent = "";
-      }, 2000);
+setTimeout(() => {
+  formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
+  signupFields.style.display = "none";
+  contractorSignupFields.style.display = "none";
+  ttSignupFields.style.display = "none";
+  loginBtn.style.display = "block";
+  showSignupBtn.style.display = "block";
+  signupBtn.style.display = "none";
+  backToLoginWrap.style.display = "none";
+  forgotPasswordWrap.style.display = "block";
+}, 4000);
 
       return;
     }
@@ -631,25 +580,7 @@ signupBtn.addEventListener("click", async () => {
       return;
     }
 
-    setMessage("Account created. Please check your email and click the link to verify your account, then sign in.");
-
-    document.getElementById("email").value = "";
-    document.getElementById("password").value = "";
-    resetSignupFields();
-
-    setTimeout(() => {
-      formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
-      signupFields.style.display = "none";
-      contractorSignupFields.style.display = "none";
-      ttSignupFields.style.display = "none";
-      loginBtn.style.display = "block";
-      showSignupBtn.style.display = "block";
-      signupBtn.style.display = "none";
-      backToLoginWrap.style.display = "none";
-      forgotPasswordWrap.style.display = "block";
-      message.textContent = "";
-    }, 2500);
-  });
+   });
 </script>
 
 </body>
