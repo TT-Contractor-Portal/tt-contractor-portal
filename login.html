@@ -435,15 +435,22 @@
     }
   });
 
-  signupBtn.addEventListener("click", async () => {
-console.log("Create Account clicked");
-    
+signupBtn.addEventListener("click", async () => {
+  try {
+    console.log("Create Account clicked");
+
     const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value;
     const fullName = document.getElementById("fullName").value.trim();
     const inductionComplete = document.getElementById("inductionComplete").value;
     const ptwComplete = document.getElementById("ptwComplete").value;
     const selectedCompanyId = companySelect.value;
+
+    console.log("Signup values:", {
+      email,
+      fullName,
+      selectedCompanyId
+    });
 
     if (!fullName) {
       setMessage("Please enter your full name", "#b42318");
@@ -477,6 +484,93 @@ console.log("Create Account clicked");
           }
         }
       });
+
+      if (error) {
+        setMessage(error.message, "#b42318");
+        return;
+      }
+
+      setMessage("Account created. Please check your email and click the link to verify your account.");
+
+      document.getElementById("email").value = "";
+      document.getElementById("password").value = "";
+      resetSignupFields();
+
+      setTimeout(() => {
+        formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
+        signupFields.style.display = "none";
+        contractorSignupFields.style.display = "none";
+        ttSignupFields.style.display = "none";
+        loginBtn.style.display = "block";
+        showSignupBtn.style.display = "block";
+        signupBtn.style.display = "none";
+        backToLoginWrap.style.display = "none";
+        forgotPasswordWrap.style.display = "block";
+        message.textContent = "";
+      }, 2000);
+
+      return;
+    }
+
+    if (!selectedCompanyId) {
+      setMessage("Please select your company", "#b42318");
+      return;
+    }
+
+    const selectedCompany = availableCompanies.find(c => c.id === selectedCompanyId);
+
+    console.log("Selected company:", selectedCompany);
+
+    if (!selectedCompany) {
+      setMessage("Selected company not found. Please try again.", "#b42318");
+      return;
+    }
+
+    setMessage("Creating account...");
+
+    const { data, error } = await client.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+          company_id: selectedCompany.id,
+          company_name: selectedCompany.company_name,
+          account_type: "contractor"
+        }
+      }
+    });
+
+    console.log("Sign up response:", { data, error });
+
+    if (error) {
+      setMessage(error.message, "#b42318");
+      return;
+    }
+
+    setMessage("Account created. Please check your email and click the link to verify your account, then sign in.");
+
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+    resetSignupFields();
+
+    setTimeout(() => {
+      formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
+      signupFields.style.display = "none";
+      contractorSignupFields.style.display = "none";
+      ttSignupFields.style.display = "none";
+      loginBtn.style.display = "block";
+      showSignupBtn.style.display = "block";
+      signupBtn.style.display = "none";
+      backToLoginWrap.style.display = "none";
+      forgotPasswordWrap.style.display = "block";
+      message.textContent = "";
+    }, 2500);
+  } catch (err) {
+    console.error("Signup crash:", err);
+    setMessage("Something went wrong during signup. Check browser console.", "#b42318");
+  }
+});
 
       if (error) {
         setMessage(error.message, "#b42318");
