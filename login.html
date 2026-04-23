@@ -524,7 +524,10 @@ function setMessage(text, type = "success") {
           return;
         }
 
-        setMessage("Account created successfully. You can now sign in using your email and password.");
+     setMessage(`
+  <strong>✅ Account created successfully!</strong><br>
+  You can now sign in using your email and password.
+`, "success");
         document.getElementById("email").value = "";
         document.getElementById("password").value = "";
         resetSignupFields();
@@ -537,18 +540,18 @@ function setMessage(text, type = "success") {
       }
 
       if (!selectedCompanyId) {
-        setMessage("Please select your company", "#b42318");
+       setMessage("❌ Please select your company", "error");
         return;
       }
 
       const selectedCompany = availableCompanies.find(c => c.id === selectedCompanyId);
 
       if (!selectedCompany) {
-        setMessage("Selected company not found. Please try again.", "#b42318");
+      setMessage("❌ Selected company not found. Please try again.", "error");
         return;
       }
 
-      setMessage("Creating account...");
+     setMessage("ℹ️ Creating account...", "info");
 
       const { error } = await client.auth.signUp({
         email,
@@ -564,11 +567,14 @@ function setMessage(text, type = "success") {
       });
 
       if (error) {
-        setMessage(error.message, "#b42318");
+        setMessage(`❌ ${error.message}`, "error");
         return;
       }
 
-      setMessage("Account created successfully. You can now sign in using your email and password.");
+  setMessage(`
+  <strong>✅ Account created successfully!</strong><br>
+  You can now sign in using your email and password.
+`, "success");
       document.getElementById("email").value = "";
       document.getElementById("password").value = "";
       resetSignupFields();
@@ -578,7 +584,7 @@ function setMessage(text, type = "success") {
       }, 4000);
     } catch (err) {
       console.error("Signup crash:", err);
-      setMessage("Something went wrong during signup. Check browser console.", "#b42318");
+     setMessage("❌ Something went wrong during signup. Check browser console.", "error");
     }
   });
 </script>
