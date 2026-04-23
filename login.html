@@ -266,8 +266,8 @@
 
 function setMessage(text, type = "success") {
   const box = document.getElementById("messageBox");
-
   box.className = "message-box " + type;
+  box.style.display = "block";
   box.innerHTML = text;
 }
 
