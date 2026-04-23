@@ -271,6 +271,13 @@ function setMessage(text, type = "success") {
   box.innerHTML = text;
 }
 
+function hideMessage() {
+  const box = document.getElementById("messageBox");
+  box.className = "message-box";
+  box.style.display = "none";
+  box.innerHTML = "";
+}
+  
   function isTTEmail(email) {
     return email.endsWith("@timtaylors.co.uk");
   }
