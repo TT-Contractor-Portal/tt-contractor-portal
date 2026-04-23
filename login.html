@@ -109,7 +109,14 @@
     margin-top: 10px;
   }
 
-  /* Mobile */
+  .field-note {
+    font-size: 12px;
+    color: #666;
+    margin-top: -10px;
+    margin-bottom: 16px;
+    text-align: left;
+  }
+
   @media (max-width: 768px) {
     body {
       justify-content: center;
@@ -126,74 +133,86 @@
 <div class="login-container">
   <div class="login-card">
 
-    <img src="/images/tt-logo.png" class="logo" />
+    <img src="/images/tt-logo.png" class="logo" alt="TT Logo" />
 
     <h1>TT Contractor Portal</h1>
     <p style="font-size: 13px; color: #666; margin-bottom: 20px;">
-  This system is used by authorised Timothy Taylor’s staff and contractors to manage RAMS submissions and approvals.
-</p>
+      This system is used by authorised Timothy Taylor’s staff and contractors to manage RAMS submissions and approvals.
+    </p>
+
     <p id="formSubtitle">
-  Secure login for the TT Contractor Portal – Timothy Taylor’s internal RAMS management system.
-</p>
+      Secure login for the TT Contractor Portal.
+    </p>
 
-   <form id="loginForm">
-  <label for="email">Email address</label>
-  <input type="email" id="email" required />
+    <form id="loginForm">
+      <label for="email">Email address</label>
+      <input type="email" id="email" required />
 
-  <label for="password">Password</label>
-  <input type="password" id="password" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" required />
 
-  <div id="signupFields" style="display:none; margin-top: 10px;">
-    <label for="fullName">Full name</label>
-    <input type="text" id="fullName" />
+      <div id="signupFields" style="display:none; margin-top: 10px;">
+        <label for="fullName">Full name</label>
+        <input type="text" id="fullName" />
 
-    <label for="inductionComplete">Contractor induction training completed?</label>
-    <select id="inductionComplete">
-      <option value="">Select</option>
-      <option value="true">Yes</option>
-      <option value="false">No</option>
-    </select>
+        <div id="contractorSignupFields" style="display:none;">
+          <label for="companySelect">Company</label>
+          <select id="companySelect">
+            <option value="">Select company</option>
+          </select>
+          <div class="field-note">
+            Your company must already exist on the approved contractor list before you can create an external contractor account.
+          </div>
+        </div>
 
-    <label for="ptwComplete">Permit to work training completed?</label>
-    <select id="ptwComplete">
-      <option value="">Select</option>
-      <option value="true">Yes</option>
-      <option value="false">No</option>
-    </select>
-  </div>
+        <div id="ttSignupFields" style="display:none;">
+          <label for="inductionComplete">Contractor induction training completed?</label>
+          <select id="inductionComplete">
+            <option value="">Select</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
 
-  <div class="form-links" id="forgotPasswordWrap">
-    <a href="/forgot-password.html">Forgot password?</a>
-  </div>
+          <label for="ptwComplete">Permit to work training completed?</label>
+          <select id="ptwComplete">
+            <option value="">Select</option>
+            <option value="true">Yes</option>
+            <option value="false">No</option>
+          </select>
+        </div>
+      </div>
 
-  <button type="submit" id="loginBtn">Sign in</button>
+      <div class="form-links" id="forgotPasswordWrap">
+        <a href="/forgot-password.html">Forgot password?</a>
+      </div>
 
-  <button type="button" id="showSignupBtn" style="margin-top:10px; background:#ccc; color:#000;">
-    Sign Up
-  </button>
+      <button type="submit" id="loginBtn">Sign in</button>
 
-  <button type="button" id="signupBtn" style="display:none; margin-top:10px;">
-    Create Account
-  </button>
-</form>
+      <button type="button" id="showSignupBtn" style="margin-top:10px; background:#ccc; color:#000;">
+        Sign Up
+      </button>
 
-<p id="backToLoginWrap" style="display:none; margin-top:10px; text-align:center;">
-  Already have an account? <a href="#" id="backToLogin">Log in</a>
-</p>
+      <button type="button" id="signupBtn" style="display:none; margin-top:10px;">
+        Create Account
+      </button>
+    </form>
+
+    <p id="backToLoginWrap" style="display:none; margin-top:10px; text-align:center;">
+      Already have an account? <a href="#" id="backToLogin">Log in</a>
+    </p>
 
     <div id="message"></div>
-<p style="font-size: 11px; color: #888; text-align: center; margin-top: 15px;">
-  Authorised access only. All activity is logged and monitored.
-</p>
+
+    <p style="font-size: 11px; color: #888; text-align: center; margin-top: 15px;">
+      Authorised access only. All activity is logged and monitored.
+    </p>
   </div>
 </div>
 
-</body>
-
- <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
   const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -204,15 +223,118 @@
   const showSignupBtn = document.getElementById("showSignupBtn");
   const signupBtn = document.getElementById("signupBtn");
   const signupFields = document.getElementById("signupFields");
+  const contractorSignupFields = document.getElementById("contractorSignupFields");
+  const ttSignupFields = document.getElementById("ttSignupFields");
   const backToLoginWrap = document.getElementById("backToLoginWrap");
   const backToLogin = document.getElementById("backToLogin");
   const forgotPasswordWrap = document.getElementById("forgotPasswordWrap");
+  const emailInput = document.getElementById("email");
+  const companySelect = document.getElementById("companySelect");
+
+  let availableCompanies = [];
+
+  function setMessage(text, color = "#035740") {
+    message.style.color = color;
+    message.textContent = text;
+  }
+
+  function isTTEmail(email) {
+    return email.endsWith("@timtaylors.co.uk");
+  }
+
+  function resetSignupFields() {
+    document.getElementById("fullName").value = "";
+    document.getElementById("inductionComplete").value = "";
+    document.getElementById("ptwComplete").value = "";
+    companySelect.value = "";
+  }
+
+  function updateSignupMode() {
+    const email = emailInput.value.trim().toLowerCase();
+    const ttUser = isTTEmail(email);
+
+    if (ttUser) {
+      contractorSignupFields.style.display = "none";
+      ttSignupFields.style.display = "block";
+      formSubtitle.textContent = "Create a Timothy Taylor’s staff account";
+    } else {
+      contractorSignupFields.style.display = "block";
+      ttSignupFields.style.display = "none";
+      formSubtitle.textContent = "Create an external contractor account";
+    }
+  }
+
+  async function loadCompaniesForSignup() {
+    const { data, error } = await client
+      .from("contractor_companies")
+      .select("id, company_name")
+      .eq("is_active", true)
+      .order("company_name", { ascending: true });
+
+    if (error) {
+      availableCompanies = [];
+      companySelect.innerHTML = '<option value="">Unable to load companies</option>';
+      return;
+    }
+
+    availableCompanies = data || [];
+    companySelect.innerHTML = '<option value="">Select company</option>';
+
+    availableCompanies.forEach(company => {
+      const option = document.createElement("option");
+      option.value = company.id;
+      option.textContent = company.company_name;
+      companySelect.appendChild(option);
+    });
+  }
+
+  async function ensureContractorRecord(user) {
+    const { data: existingContractor, error: existingError } = await client
+      .from("contractors")
+      .select("id, user_id")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (existingError) {
+      return { ok: false, message: "Unable to load your contractor account." };
+    }
+
+    if (existingContractor) {
+      return { ok: true };
+    }
+
+    const userMeta = user.user_metadata || {};
+    const companyId = userMeta.company_id || null;
+    const companyName = userMeta.company_name || null;
+    const fullName = userMeta.full_name || "";
+    const email = (user.email || "").trim().toLowerCase();
+
+    if (!companyId) {
+      return { ok: false, message: "Your contractor account is missing a company link. Please contact Timothy Taylor’s." };
+    }
+
+    const { error: insertError } = await client
+      .from("contractors")
+      .insert({
+        user_id: user.id,
+        company_id: companyId,
+        company_name: companyName,
+        contact_name: fullName || null,
+        email: email || null,
+        person_status: "Profile Incomplete"
+      });
+
+    if (insertError) {
+      return { ok: false, message: "Unable to create your contractor profile: " + insertError.message };
+    }
+
+    return { ok: true };
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
 
-    message.style.color = "#035740";
-    message.textContent = "Signing in...";
+    setMessage("Signing in...");
 
     const email = document.getElementById("email").value.trim().toLowerCase();
     const password = document.getElementById("password").value;
@@ -223,22 +345,18 @@
     });
 
     if (error) {
-      message.style.color = "#b42318";
-      message.textContent = error.message;
+      setMessage(error.message, "#b42318");
       return;
     }
 
     const user = data.user;
 
     if (!user) {
-      message.style.color = "#b42318";
-      message.textContent = "Login failed. No user returned.";
+      setMessage("Login failed. No user returned.", "#b42318");
       return;
     }
 
-    const isTTUser = email.endsWith("@timtaylors.co.uk");
-
-    if (isTTUser) {
+    if (isTTEmail(email)) {
       const { data: profile, error: profileError } = await client
         .from("user_profiles")
         .select("role, is_active")
@@ -246,15 +364,13 @@
         .maybeSingle();
 
       if (profileError || !profile) {
-        message.style.color = "#b42318";
-        message.textContent = "Unable to load your TT profile.";
+        setMessage("Unable to load your TT profile.", "#b42318");
         await client.auth.signOut();
         return;
       }
 
       if (profile.is_active === false) {
-        message.style.color = "#b42318";
-        message.textContent = "Your account has been deactivated. Please contact an administrator.";
+        setMessage("Your account has been deactivated. Please contact an administrator.", "#b42318");
         await client.auth.signOut();
         return;
       }
@@ -264,33 +380,28 @@
         .update({ last_sign_in_at: new Date().toISOString() })
         .eq("id", user.id);
 
-      message.style.color = "#035740";
-      message.textContent = "Login successful...";
+      setMessage("Login successful...");
       window.location.href = "/index.html";
       return;
     }
 
-    const { data: contractor, error: contractorError } = await client
-      .from("contractors")
-      .select("id, user_id")
-      .eq("user_id", user.id)
-      .maybeSingle();
+    const contractorResult = await ensureContractorRecord(user);
 
-    if (contractorError || !contractor) {
-      message.style.color = "#b42318";
-      message.textContent = "Unable to load your contractor account.";
+    if (!contractorResult.ok) {
+      setMessage(contractorResult.message, "#b42318");
       await client.auth.signOut();
       return;
     }
 
-    message.style.color = "#035740";
-    message.textContent = "Login successful...";
+    setMessage("Login successful...");
     window.location.href = "/contractors/index.html";
   });
 
-  showSignupBtn.addEventListener("click", (e) => {
+  showSignupBtn.addEventListener("click", async (e) => {
     e.preventDefault();
-    formSubtitle.textContent = "Create your account";
+
+    await loadCompaniesForSignup();
+
     signupFields.style.display = "block";
     loginBtn.style.display = "none";
     showSignupBtn.style.display = "none";
@@ -298,13 +409,17 @@
     backToLoginWrap.style.display = "block";
     forgotPasswordWrap.style.display = "none";
     message.textContent = "";
+
+    updateSignupMode();
   });
 
   backToLogin.addEventListener("click", (e) => {
     e.preventDefault();
 
-    formSubtitle.textContent = "Sign in to continue";
+    formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
     signupFields.style.display = "none";
+    contractorSignupFields.style.display = "none";
+    ttSignupFields.style.display = "none";
     loginBtn.style.display = "block";
     showSignupBtn.style.display = "block";
     signupBtn.style.display = "none";
@@ -312,9 +427,13 @@
     forgotPasswordWrap.style.display = "block";
     message.textContent = "";
 
-    document.getElementById("fullName").value = "";
-    document.getElementById("inductionComplete").value = "";
-    document.getElementById("ptwComplete").value = "";
+    resetSignupFields();
+  });
+
+  emailInput.addEventListener("input", () => {
+    if (signupFields.style.display === "block") {
+      updateSignupMode();
+    }
   });
 
   signupBtn.addEventListener("click", async () => {
@@ -323,27 +442,81 @@
     const fullName = document.getElementById("fullName").value.trim();
     const inductionComplete = document.getElementById("inductionComplete").value;
     const ptwComplete = document.getElementById("ptwComplete").value;
-
-    if (!email.endsWith("@timtaylors.co.uk")) {
-      message.style.color = "#b42318";
-      message.textContent = "You must use a @timtaylors.co.uk email";
-      return;
-    }
+    const selectedCompanyId = companySelect.value;
 
     if (!fullName) {
-      message.style.color = "#b42318";
-      message.textContent = "Please enter your full name";
+      setMessage("Please enter your full name", "#b42318");
       return;
     }
 
-    if (inductionComplete === "" || ptwComplete === "") {
-      message.style.color = "#b42318";
-      message.textContent = "Please answer both training questions";
+    if (!password || password.length < 6) {
+      setMessage("Please enter a password with at least 6 characters", "#b42318");
       return;
     }
 
-    message.style.color = "#035740";
-    message.textContent = "Creating account...";
+    const ttUser = isTTEmail(email);
+
+    if (ttUser) {
+      if (inductionComplete === "" || ptwComplete === "") {
+        setMessage("Please answer both training questions", "#b42318");
+        return;
+      }
+
+      setMessage("Creating account...");
+
+      const { error } = await client.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+            induction_complete: inductionComplete === "true",
+            ptw_complete: ptwComplete === "true",
+            reviewer_requested: inductionComplete === "true" && ptwComplete === "true"
+          }
+        }
+      });
+
+      if (error) {
+        setMessage(error.message, "#b42318");
+        return;
+      }
+
+      setMessage("Account created. Please check your email and click the link to verify your account.");
+
+      document.getElementById("email").value = "";
+      document.getElementById("password").value = "";
+      resetSignupFields();
+
+      setTimeout(() => {
+        formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
+        signupFields.style.display = "none";
+        contractorSignupFields.style.display = "none";
+        ttSignupFields.style.display = "none";
+        loginBtn.style.display = "block";
+        showSignupBtn.style.display = "block";
+        signupBtn.style.display = "none";
+        backToLoginWrap.style.display = "none";
+        forgotPasswordWrap.style.display = "block";
+        message.textContent = "";
+      }, 2000);
+
+      return;
+    }
+
+    if (!selectedCompanyId) {
+      setMessage("Please select your company", "#b42318");
+      return;
+    }
+
+    const selectedCompany = availableCompanies.find(c => c.id === selectedCompanyId);
+
+    if (!selectedCompany) {
+      setMessage("Selected company not found. Please try again.", "#b42318");
+      return;
+    }
+
+    setMessage("Creating account...");
 
     const { error } = await client.auth.signUp({
       email,
@@ -351,40 +524,38 @@
       options: {
         data: {
           full_name: fullName,
-          induction_complete: inductionComplete === "true",
-          ptw_complete: ptwComplete === "true",
-          reviewer_requested:
-            inductionComplete === "true" && ptwComplete === "true"
+          company_id: selectedCompany.id,
+          company_name: selectedCompany.company_name,
+          account_type: "contractor"
         }
       }
     });
 
     if (error) {
-      message.style.color = "#b42318";
-      message.textContent = error.message;
+      setMessage(error.message, "#b42318");
       return;
     }
 
-    message.style.color = "#035740";
-    message.textContent = "Account created. Please check your email and click the link to verify your account.";
+    setMessage("Account created. Please check your email and click the link to verify your account, then sign in.");
 
     document.getElementById("email").value = "";
     document.getElementById("password").value = "";
-    document.getElementById("fullName").value = "";
-    document.getElementById("inductionComplete").value = "";
-    document.getElementById("ptwComplete").value = "";
+    resetSignupFields();
 
     setTimeout(() => {
-      formSubtitle.textContent = "Sign in to continue";
+      formSubtitle.textContent = "Secure login for the TT Contractor Portal.";
       signupFields.style.display = "none";
+      contractorSignupFields.style.display = "none";
+      ttSignupFields.style.display = "none";
       loginBtn.style.display = "block";
       showSignupBtn.style.display = "block";
       signupBtn.style.display = "none";
       backToLoginWrap.style.display = "none";
       forgotPasswordWrap.style.display = "block";
       message.textContent = "";
-    }, 2000);
+    }, 2500);
   });
 </script>
 
+</body>
 </html>
