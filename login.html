@@ -270,10 +270,12 @@
 
   let availableCompanies = [];
 
-  function setMessage(text, color = "#035740") {
-    message.style.color = color;
-    message.textContent = text;
-  }
+function setMessage(text, type = "success") {
+  const box = document.getElementById("messageBox");
+
+  box.className = "message-box " + type;
+  box.innerHTML = text;
+}
 
   function isTTEmail(email) {
     return email.endsWith("@timtaylors.co.uk");
