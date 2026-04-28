@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Contractor Passport - TT Contractor Portal</title>
+  <title>Contractor Induction - TT Contractor Portal</title>
   <style>
     body {
       margin: 0;
@@ -83,27 +83,7 @@
       background: #024534;
     }
 
-    .page-header {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      margin-bottom: 24px;
-    }
-
-    .page-header h2 {
-      margin: 0 0 8px 0;
-      font-size: 28px;
-      color: #035740;
-    }
-
-    .page-header p {
-      margin: 0;
-      color: #666;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
+    .page-header,
     .panel {
       background: white;
       border-radius: 12px;
@@ -112,11 +92,17 @@
       margin-bottom: 24px;
     }
 
+    .page-header h2,
     .panel h3 {
       margin-top: 0;
-      margin-bottom: 16px;
       color: #035740;
-      font-size: 22px;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+      line-height: 1.5;
     }
 
     .summary-grid {
@@ -146,79 +132,65 @@
 
     .passport-layout {
       display: grid;
-      grid-template-columns: 1.2fr 1fr;
+      grid-template-columns: 1.4fr 0.8fr;
       gap: 24px;
     }
 
-    .left-column,
-    .right-column {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .requirement-card {
-      border: 1px solid #e5e7eb;
+    .video-wrap {
+      position: relative;
+      width: 100%;
+      padding-bottom: 56.25%;
+      height: 0;
       border-radius: 12px;
-      padding: 18px;
+      overflow: hidden;
+      background: #111;
+      margin-bottom: 18px;
+    }
+
+    .video-wrap iframe {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .confirm-box {
+      padding: 14px;
+      border: 1px solid #e5e7eb;
       background: #fafafa;
+      border-radius: 10px;
       margin-bottom: 16px;
-    }
-
-    .requirement-card:last-child {
-      margin-bottom: 0;
-    }
-
-    .requirement-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 16px;
-      margin-bottom: 14px;
-    }
-
-    .requirement-title {
-      font-size: 18px;
-      font-weight: 700;
-      color: #222;
-      margin-bottom: 6px;
-    }
-
-    .requirement-subtext {
-      font-size: 14px;
-      color: #666;
       line-height: 1.5;
     }
 
-    .mandatory-badge,
-    .status-badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
+    .confirm-box input {
+      width: auto;
+      margin-right: 8px;
     }
 
-    .mandatory-badge {
-      background: #fee2e2;
-      color: #991b1b;
+    .question-card {
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+      margin-bottom: 14px;
     }
 
-    .status-badge.complete {
-      background: #dcfce7;
-      color: #166534;
+    .question-card h4 {
+      margin: 0 0 12px 0;
+      color: #222;
     }
 
-    .status-badge.incomplete {
-      background: #fee2e2;
-      color: #991b1b;
+    .answer-option {
+      display: block;
+      margin: 8px 0;
+      line-height: 1.5;
     }
 
-    .action-row {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
+    .answer-option input {
+      width: auto;
+      margin-right: 8px;
     }
 
     .primary-btn,
@@ -231,6 +203,8 @@
       font-size: 14px;
       font-weight: 700;
       cursor: pointer;
+      margin-right: 8px;
+      margin-top: 8px;
     }
 
     .primary-btn {
@@ -242,13 +216,33 @@
       background: #024534;
     }
 
+    .primary-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     .secondary-btn {
       background: #e5e7eb;
       color: #222;
     }
 
-    .secondary-btn:hover {
-      background: #d1d5db;
+    .status-badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status-badge.complete {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .status-badge.incomplete {
+      background: #fee2e2;
+      color: #991b1b;
     }
 
     .photo-box {
@@ -269,19 +263,14 @@
       background: white;
     }
 
-    .photo-note {
-      font-size: 13px;
-      color: #666;
-      margin: 0;
-      line-height: 1.5;
-    }
-
     .message-box {
       margin-top: 16px;
-      padding: 12px 14px;
+      padding: 14px 16px;
       border-radius: 10px;
       font-size: 14px;
       display: none;
+      line-height: 1.5;
+      font-weight: 600;
     }
 
     .message-box.success {
@@ -296,18 +285,14 @@
       color: #991b1b;
     }
 
-    .note-box {
-      font-size: 14px;
-      color: #666;
-      line-height: 1.6;
-      margin-top: 8px;
+    .message-box.info {
+      display: block;
+      background: #fffbeb;
+      color: #92400e;
     }
 
     @media (max-width: 1000px) {
-      .summary-grid {
-        grid-template-columns: 1fr;
-      }
-
+      .summary-grid,
       .passport-layout {
         grid-template-columns: 1fr;
       }
@@ -324,15 +309,9 @@
         margin-left: 0;
       }
 
-      .topbar-inner,
-      .requirement-top {
+      .topbar-inner {
         flex-direction: column;
         align-items: flex-start;
-      }
-
-      .photo-box img {
-        width: 150px;
-        height: 150px;
       }
     }
   </style>
@@ -348,7 +327,7 @@
     <a href="/contractors/index.html">Dashboard</a>
     <a href="/contractors/profile.html">My Profile</a>
     <a href="/contractors/compliance.html">Contractor Compliance</a>
-    <a href="/contractors/passport.html">Contractor Passport</a>
+    <a href="/contractors/passport.html">Contractor Induction</a>
   </div>
 
   <div class="main">
@@ -360,100 +339,98 @@
     </div>
 
     <div class="page-header">
-      <h2>Contractor Passport</h2>
+      <h2>Contractor Induction</h2>
       <p>
-        Complete your contractor passport requirements below. You must upload a photo and complete the induction before your contractor record can be submitted for review.
+        Watch the induction video, confirm you have watched it, then complete the test.
+        You must achieve 100% to complete your induction.
       </p>
     </div>
 
     <div class="panel">
-      <h3>Passport Summary</h3>
+      <h3>Induction Summary</h3>
       <div class="summary-grid">
         <div class="summary-card">
-          <h4>Passport Progress</h4>
-          <p id="passportPercent">0%</p>
+          <h4>Induction Status</h4>
+          <p id="inductionSummary">Not Complete</p>
         </div>
         <div class="summary-card">
-          <h4>Mandatory Items Complete</h4>
-          <p id="mandatoryComplete">0 / 2</p>
+          <h4>Test Score</h4>
+          <p id="scoreSummary">-</p>
         </div>
         <div class="summary-card">
-          <h4>Status</h4>
-          <p id="contractorStatus">In Progress</p>
+          <h4>Profile Status</h4>
+          <p id="contractorStatus">Profile Incomplete</p>
         </div>
       </div>
     </div>
 
     <div class="passport-layout">
-      <div class="left-column">
+      <div>
         <div class="panel">
-          <h3>Passport Requirements</h3>
+          <h3>Step 1 — Watch the Induction Video</h3>
 
-          <div class="requirement-card">
-            <div class="requirement-top">
-              <div>
-                <div class="requirement-title">Photo Upload</div>
-                <div class="requirement-subtext">
-                  Upload a clear photo for your contractor passport. This will be shown to Timothy Taylor’s personnel.
-                </div>
-              </div>
-              <div>
-                <span class="mandatory-badge">Mandatory</span>
-                <span id="photoStatus" class="status-badge incomplete">Missing</span>
-              </div>
-            </div>
-
-            <div class="action-row">
-              <button id="photoCompleteBtn" class="primary-btn" type="button">Mark as Uploaded</button>
-              <button id="photoResetBtn" class="secondary-btn" type="button">Reset</button>
-            </div>
+          <div class="video-wrap">
+            <iframe
+              src="https://www.youtube.com/embed/B8eRNLuMLQc"
+              title="Contractor Induction Video"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen>
+            </iframe>
           </div>
 
-          <div class="requirement-card">
-            <div class="requirement-top">
-              <div>
-                <div class="requirement-title">Induction Complete</div>
-                <div class="requirement-subtext">
-                  Complete the induction video and achieve 100% on the test. For now, this page is using a simple working flag until we build the real video and quiz flow.
-                </div>
-              </div>
-              <div>
-                <span class="mandatory-badge">Mandatory</span>
-                <span id="inductionStatus" class="status-badge incomplete">Missing</span>
-              </div>
-            </div>
-
-            <div class="action-row">
-              <button id="inductionCompleteBtn" class="primary-btn" type="button">Mark as Complete</button>
-              <button id="inductionResetBtn" class="secondary-btn" type="button">Reset</button>
-            </div>
-
-            <div class="note-box">
-              Later, this button will be replaced with:
-              <br>
-              - induction video
-              <br>
-              - automatic test launch
-              <br>
-              - pass requirement of 100%
-              <br>
-              - certificate generation
-            </div>
+          <div class="confirm-box">
+            <label>
+              <input type="checkbox" id="watchedConfirm">
+              I confirm I have watched the full contractor induction video.
+            </label>
           </div>
+
+          <button id="startTestBtn" class="primary-btn" type="button" disabled>
+            Start Induction Test
+          </button>
+
+          <div id="videoMessage" class="message-box info">
+            Tick the confirmation box after watching the video to unlock the test.
+          </div>
+        </div>
+
+        <div class="panel" id="testPanel" style="display:none;">
+          <h3>Step 2 — Induction Test</h3>
+          <p style="color:#666; line-height:1.5;">
+            You must answer every question correctly. If you do not score 100%, review the induction video and try again.
+          </p>
+
+          <form id="inductionTestForm">
+            <div id="questionsWrap"></div>
+
+            <button class="primary-btn" type="submit">Submit Test</button>
+            <button class="secondary-btn" type="button" id="resetTestBtn">Reset Answers</button>
+          </form>
 
           <div id="passportMessage" class="message-box"></div>
         </div>
       </div>
 
-      <div class="right-column">
+      <div>
         <div class="panel">
           <h3>Passport Photo</h3>
           <div class="photo-box">
             <img id="passportPhoto" src="/images/tt-logo.png" alt="Passport Photo">
-            <p class="photo-note">
-              This is the photo that will appear on the contractor passport record.
+            <p style="font-size:13px; color:#666; line-height:1.5;">
+              Your profile photo will appear here. We will connect the real upload function next.
             </p>
+            <span id="photoStatus" class="status-badge incomplete">Photo Missing</span>
           </div>
+        </div>
+
+        <div class="panel">
+          <h3>Induction Result</h3>
+          <p>
+            <span id="inductionStatus" class="status-badge incomplete">Not Complete</span>
+          </p>
+          <p style="font-size:14px; color:#666; line-height:1.5;">
+            Once completed, Timothy Taylor’s will be able to see your induction status against your company record.
+          </p>
         </div>
       </div>
     </div>
@@ -468,16 +445,124 @@
 
     const logoutBtn = document.getElementById("logoutBtn");
     const welcomeText = document.getElementById("welcomeText");
+    const watchedConfirm = document.getElementById("watchedConfirm");
+    const startTestBtn = document.getElementById("startTestBtn");
+    const testPanel = document.getElementById("testPanel");
+    const questionsWrap = document.getElementById("questionsWrap");
+    const inductionTestForm = document.getElementById("inductionTestForm");
+    const resetTestBtn = document.getElementById("resetTestBtn");
 
     let currentContractor = null;
+
+    const questions = [
+      {
+        q: "Can contractors use Mechanical Handling Aids on Site?",
+        options: [
+          "No, only internally trained employees can use Mechanical Handling Aids on site.",
+          "Yes, contractors can use Mechanical Handling Aids on site"
+        ],
+        correct: 0
+      },
+      {
+        q: "Where can you smoke on site?",
+        options: [
+          "Only in the designated smoking areas, which will be directed by your host",
+          "Anywhere you like"
+        ],
+        correct: 0
+      },
+      {
+        q: "Can you use your mobile phone on site?",
+        options: [
+          "Yes, but ONLY if express permission has been given by your host",
+          "No, the use of mobile phones is strictly prohibited"
+        ],
+        correct: 0
+      },
+      {
+        q: "What should be obtained before carrying out any work on site?",
+        options: [
+          "A medical questionnaire",
+          "A green card",
+          "Permit to work"
+        ],
+        correct: 2
+      },
+      {
+        q: "If your RAMS have not been submitted or are not suitable for the job you are carrying out, what may happen?",
+        options: [
+          "We will let you in anyway, just do better next time",
+          "This will delay starting work or may result in you being turned away from site",
+          "You will be banned from site and asked to retake the induction"
+        ],
+        correct: 1
+      },
+      {
+        q: "What must you do to your boots before entering the site?",
+        options: [
+          "Wash your boots in the boot wash",
+          "Change your boots to your normal shoes"
+        ],
+        correct: 0
+      },
+      {
+        q: "Where can you eat on site?",
+        options: [
+          "Anywhere that is not a food contact area",
+          "Only in the canteen areas provided"
+        ],
+        correct: 1
+      },
+      {
+        q: "If you see a fire, what should you do?",
+        options: [
+          "Run as quick as you can",
+          "Grab all of your belongings",
+          "Raise the alarm by hitting the smash glass alarm point"
+        ],
+        correct: 2
+      },
+      {
+        q: "If you need urgent first aid treatment, what should happen?",
+        options: [
+          "Deal with it yourself",
+          "Notify a member of staff who will help you receive the necessary assistance from one of our trained first aiders."
+        ],
+        correct: 1
+      },
+      {
+        q: "Can you use cameras on site without prior permission?",
+        options: [
+          "No this is strictly prohibited",
+          "Yes, it’s fine"
+        ],
+        correct: 0
+      },
+      {
+        q: "If you need to carry essential medication with you whilst on site, what should you do?",
+        options: [
+          "Keep them out of sight from anybody",
+          "Let your host know"
+        ],
+        correct: 1
+      },
+      {
+        q: "Can you put any waste into any skip or bin on the premises?",
+        options: [
+          "Yes, it’s fine",
+          "No, only if authorised to do so by your host."
+        ],
+        correct: 1
+      }
+    ];
 
     function showMessage(type, text) {
       const box = document.getElementById("passportMessage");
       box.className = `message-box ${type}`;
-      box.textContent = text;
+      box.innerHTML = text;
     }
 
-    function setStatusBadge(elementId, isComplete, completeText = "Complete", incompleteText = "Missing") {
+    function setStatusBadge(elementId, isComplete, completeText, incompleteText) {
       const el = document.getElementById(elementId);
       if (!el) return;
 
@@ -485,22 +570,41 @@
       el.textContent = isComplete ? completeText : incompleteText;
     }
 
+    function renderQuestions() {
+      questionsWrap.innerHTML = "";
+
+      questions.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "question-card";
+
+        const optionsHtml = item.options.map((option, optionIndex) => `
+          <label class="answer-option">
+            <input type="radio" name="question_${index}" value="${optionIndex}">
+            ${option}
+          </label>
+        `).join("");
+
+        card.innerHTML = `
+          <h4>${index + 1}. ${item.q}</h4>
+          ${optionsHtml}
+        `;
+
+        questionsWrap.appendChild(card);
+      });
+    }
+
     function renderPassport(contractor) {
       currentContractor = contractor;
 
-      const mandatoryDone = [
-        contractor.photo_uploaded,
-        contractor.induction_completed
-      ].filter(Boolean).length;
+      const inductionComplete = contractor.induction_completed === true;
+      const score = contractor.induction_score;
 
-      const percent = mandatoryDone * 50;
+      document.getElementById("inductionSummary").textContent = inductionComplete ? "Complete" : "Not Complete";
+      document.getElementById("scoreSummary").textContent = score === null || score === undefined ? "-" : `${score}%`;
+      document.getElementById("contractorStatus").textContent = contractor.person_status || contractor.status || "Profile Incomplete";
 
-      document.getElementById("passportPercent").textContent = `${percent}%`;
-      document.getElementById("mandatoryComplete").textContent = `${mandatoryDone} / 2`;
-      document.getElementById("contractorStatus").textContent = contractor.status || "In Progress";
-
-      setStatusBadge("photoStatus", contractor.photo_uploaded, "Uploaded", "Missing");
-      setStatusBadge("inductionStatus", contractor.induction_completed, "Complete", "Missing");
+      setStatusBadge("photoStatus", contractor.photo_uploaded, "Photo Uploaded", "Photo Missing");
+      setStatusBadge("inductionStatus", inductionComplete, "Induction Complete", "Not Complete");
 
       const passportPhoto = document.getElementById("passportPhoto");
       if (contractor.profile_photo_url && contractor.profile_photo_url.trim()) {
@@ -508,25 +612,77 @@
       } else {
         passportPhoto.src = "/images/tt-logo.png";
       }
+
+      if (inductionComplete) {
+        watchedConfirm.checked = true;
+        startTestBtn.disabled = false;
+        document.getElementById("videoMessage").className = "message-box success";
+        document.getElementById("videoMessage").textContent = "Your induction is complete. You can retake the test if needed.";
+      }
     }
 
-    async function updateContractorField(fieldName, value) {
+    function calculateScore() {
+      let correctCount = 0;
+
+      for (let i = 0; i < questions.length; i++) {
+        const selected = document.querySelector(`input[name="question_${i}"]:checked`);
+
+        if (!selected) {
+          return {
+            complete: false,
+            score: 0,
+            correctCount
+          };
+        }
+
+        if (Number(selected.value) === questions[i].correct) {
+          correctCount++;
+        }
+      }
+
+      return {
+        complete: true,
+        score: Math.round((correctCount / questions.length) * 100),
+        correctCount
+      };
+    }
+
+    async function savePassedInduction() {
       if (!currentContractor) return;
 
       const { data, error } = await client
         .from("contractors")
-        .update({ [fieldName]: value })
+        .update({
+          induction_completed: true,
+          induction_completed_at: new Date().toISOString(),
+          induction_score: 100,
+          person_status: "Induction Complete"
+        })
         .eq("id", currentContractor.id)
         .select()
         .single();
 
       if (error) {
-        showMessage("error", "Failed to save change: " + error.message);
+        showMessage("error", "Failed to save induction result: " + error.message);
         return;
       }
 
       renderPassport(data);
-      showMessage("success", "Saved successfully.");
+      showMessage("success", "<strong>Induction complete.</strong><br>You scored 100% and your result has been saved.");
+    }
+
+    async function saveFailedAttempt(score) {
+      if (!currentContractor) return;
+
+      await client
+        .from("contractors")
+        .update({
+          induction_score: score,
+          person_status: "Induction Incomplete"
+        })
+        .eq("id", currentContractor.id);
+
+      showMessage("error", `<strong>Test not passed.</strong><br>You scored ${score}%. You must score 100%. Please review the video and try again.`);
     }
 
     async function loadPassportPage() {
@@ -538,19 +694,6 @@
       }
 
       const currentUser = sessionData.session.user;
-
-      const { data: authProfile } = await client
-        .from("user_profiles")
-        .select("*")
-        .eq("id", currentUser.id)
-        .maybeSingle();
-
-      let welcomeName = "User";
-      if (authProfile && authProfile.full_name) {
-        welcomeName = authProfile.full_name.split(" ")[0];
-      }
-
-      welcomeText.textContent = `Welcome, ${welcomeName} — Contractor`;
 
       const { data: contractor, error: contractorError } = await client
         .from("contractors")
@@ -568,23 +711,53 @@
         return;
       }
 
+      const firstName = contractor.contact_name
+        ? contractor.contact_name.split(" ")[0]
+        : "User";
+
+      welcomeText.textContent = `Welcome, ${firstName} — Contractor`;
+
       renderPassport(contractor);
     }
 
-    document.getElementById("photoCompleteBtn").addEventListener("click", () => {
-      updateContractorField("photo_uploaded", true);
+    watchedConfirm.addEventListener("change", () => {
+      startTestBtn.disabled = !watchedConfirm.checked;
+
+      const msg = document.getElementById("videoMessage");
+      if (watchedConfirm.checked) {
+        msg.className = "message-box success";
+        msg.textContent = "Video confirmation complete. You can now start the induction test.";
+      } else {
+        msg.className = "message-box info";
+        msg.textContent = "Tick the confirmation box after watching the video to unlock the test.";
+      }
     });
 
-    document.getElementById("photoResetBtn").addEventListener("click", () => {
-      updateContractorField("photo_uploaded", false);
+    startTestBtn.addEventListener("click", () => {
+      testPanel.style.display = "block";
+      testPanel.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    document.getElementById("inductionCompleteBtn").addEventListener("click", () => {
-      updateContractorField("induction_completed", true);
+    resetTestBtn.addEventListener("click", () => {
+      inductionTestForm.reset();
+      showMessage("info", "Answers reset. You can try again.");
     });
 
-    document.getElementById("inductionResetBtn").addEventListener("click", () => {
-      updateContractorField("induction_completed", false);
+    inductionTestForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const result = calculateScore();
+
+      if (!result.complete) {
+        showMessage("error", "Please answer every question before submitting the test.");
+        return;
+      }
+
+      if (result.score === 100) {
+        await savePassedInduction();
+      } else {
+        await saveFailedAttempt(result.score);
+      }
     });
 
     logoutBtn.addEventListener("click", async () => {
@@ -592,6 +765,7 @@
       window.location.href = "/login.html";
     });
 
+    renderQuestions();
     loadPassportPage();
   </script>
 </body>
