@@ -5,325 +5,63 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Contractor Induction - TT Contractor Portal</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #222; }
+    .sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: #035740; color: white; padding: 24px 20px; box-sizing: border-box; }
+    .sidebar h1 { font-size: 22px; margin: 0 0 30px 0; line-height: 1.3; }
+    .sidebar a { display: block; color: white; text-decoration: none; margin: 14px 0; font-size: 16px; }
+    .sidebar-logo { text-align: center; margin-bottom: 20px; }
+    .sidebar-logo img { max-width: 140px; height: auto; }
+    .main { margin-left: 240px; padding: 30px; }
+    .topbar, .page-header, .panel { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .topbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .logout-btn, .primary-btn, .secondary-btn { border: none; border-radius: 8px; padding: 10px 14px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .logout-btn, .primary-btn { background: #035740; color: white; }
+    .logout-btn:hover, .primary-btn:hover { background: #024534; }
+    .secondary-btn { background: #e5e7eb; color: #222; }
+    .primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    h2, h3 { color: #035740; margin-top: 0; }
+    .page-header p { margin: 0; color: #666; line-height: 1.5; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .summary-card { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px; }
+    .summary-card h4 { margin: 0 0 8px 0; color: #666; }
+    .summary-card p { margin: 0; font-size: 24px; font-weight: 700; }
+    .step-card { border: 1px solid #e5e7eb; background: #fafafa; border-radius: 12px; padding: 18px; margin-bottom: 16px; }
+    .step-card.locked { opacity: 0.45; }
+    .video-wrap { position: relative; width: 100%; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; background: #111; margin-bottom: 16px; }
+    .video-wrap iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    input[type="file"] { margin: 10px 0 14px 0; }
+    input[type="radio"], input[type="checkbox"] { width: auto; margin-right: 8px; }
+    .question-card { border: 1px solid #e5e7eb; border-radius: 10px; background: white; padding: 14px; margin-bottom: 12px; }
+    .answer-option { display: block; margin: 8px 0; line-height: 1.5; }
+    .message-box { display: none; margin-top: 16px; padding: 14px 16px; border-radius: 10px; font-size: 14px; line-height: 1.5; font-weight: 600; }
+    .message-box.success { display: block; background: #dcfce7; color: #166534; }
+    .message-box.error { display: block; background: #fee2e2; color: #991b1b; }
+    .message-box.info { display: block; background: #fffbeb; color: #92400e; }
+    .certificate { border: 3px solid #035740; background: #fff; padding: 28px; border-radius: 14px; text-align: center; }
+    .certificate h2 { font-size: 30px; margin-bottom: 8px; }
+    .certificate-name { font-size: 24px; font-weight: 700; margin: 18px 0; }
+    .photo-preview { width: 150px; height: 150px; object-fit: cover; border-radius: 12px; border: 1px solid #ddd; background: white; margin-top: 10px; }
+    @media print {
+      body { background: white; }
+      .sidebar, .topbar, .page-header, .summary-grid, .step-card:not(#certificateStep), #passportMessage { display: none !important; }
+      .main { margin-left: 0; padding: 0; }
+      .panel { box-shadow: none; margin: 0; }
     }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 240px;
-      height: 100vh;
-      background: #035740;
-      color: white;
-      padding: 24px 20px;
-      box-sizing: border-box;
-    }
-
-    .sidebar h1 {
-      font-size: 22px;
-      margin: 0 0 30px 0;
-      line-height: 1.3;
-    }
-
-    .sidebar a {
-      display: block;
-      color: white;
-      text-decoration: none;
-      margin: 14px 0;
-      font-size: 16px;
-    }
-
-    .sidebar-logo {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-
-    .sidebar-logo img {
-      max-width: 140px;
-      height: auto;
-    }
-
-    .main {
-      margin-left: 240px;
-      padding: 30px;
-    }
-
-    .topbar {
-      background: white;
-      padding: 18px 24px;
-      border-radius: 12px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      margin-bottom: 24px;
-    }
-
-    .topbar-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-
-    .logout-btn {
-      background: #035740;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 16px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .logout-btn:hover {
-      background: #024534;
-    }
-
-    .page-header,
-    .panel {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-      margin-bottom: 24px;
-    }
-
-    .page-header h2,
-    .panel h3 {
-      margin-top: 0;
-      color: #035740;
-    }
-
-    .page-header p {
-      margin: 0;
-      color: #666;
-      font-size: 15px;
-      line-height: 1.5;
-    }
-
-    .summary-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-
-    .summary-card {
-      background: #fafafa;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 18px;
-    }
-
-    .summary-card h4 {
-      margin: 0 0 8px 0;
-      font-size: 15px;
-      color: #666;
-    }
-
-    .summary-card p {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 700;
-    }
-
-    .passport-layout {
-      display: grid;
-      grid-template-columns: 1.4fr 0.8fr;
-      gap: 24px;
-    }
-
-    .video-wrap {
-      position: relative;
-      width: 100%;
-      padding-bottom: 56.25%;
-      height: 0;
-      border-radius: 12px;
-      overflow: hidden;
-      background: #111;
-      margin-bottom: 18px;
-    }
-
-    .video-wrap iframe {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      border: 0;
-    }
-
-    .confirm-box {
-      padding: 14px;
-      border: 1px solid #e5e7eb;
-      background: #fafafa;
-      border-radius: 10px;
-      margin-bottom: 16px;
-      line-height: 1.5;
-    }
-
-    .confirm-box input {
-      width: auto;
-      margin-right: 8px;
-    }
-
-    .question-card {
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 16px;
-      background: #fafafa;
-      margin-bottom: 14px;
-    }
-
-    .question-card h4 {
-      margin: 0 0 12px 0;
-      color: #222;
-    }
-
-    .answer-option {
-      display: block;
-      margin: 8px 0;
-      line-height: 1.5;
-    }
-
-    .answer-option input {
-      width: auto;
-      margin-right: 8px;
-    }
-
-    .primary-btn,
-    .secondary-btn {
-      display: inline-block;
-      text-decoration: none;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 14px;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      margin-right: 8px;
-      margin-top: 8px;
-    }
-
-    .primary-btn {
-      background: #035740;
-      color: white;
-    }
-
-    .primary-btn:hover {
-      background: #024534;
-    }
-
-    .primary-btn:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    .secondary-btn {
-      background: #e5e7eb;
-      color: #222;
-    }
-
-    .status-badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-
-    .status-badge.complete {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .status-badge.incomplete {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .photo-box {
-      text-align: center;
-      padding: 20px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      background: #fafafa;
-    }
-
-    .photo-box img {
-      width: 200px;
-      height: 200px;
-      object-fit: cover;
-      border-radius: 12px;
-      border: 1px solid #ddd;
-      margin-bottom: 12px;
-      background: white;
-    }
-
-    .message-box {
-      margin-top: 16px;
-      padding: 14px 16px;
-      border-radius: 10px;
-      font-size: 14px;
-      display: none;
-      line-height: 1.5;
-      font-weight: 600;
-    }
-
-    .message-box.success {
-      display: block;
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .message-box.error {
-      display: block;
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .message-box.info {
-      display: block;
-      background: #fffbeb;
-      color: #92400e;
-    }
-
-    @media (max-width: 1000px) {
-      .summary-grid,
-      .passport-layout {
-        grid-template-columns: 1fr;
-      }
-    }
-
     @media (max-width: 700px) {
-      .sidebar {
-        position: static;
-        width: 100%;
-        height: auto;
-      }
-
-      .main {
-        margin-left: 0;
-      }
-
-      .topbar-inner {
-        flex-direction: column;
-        align-items: flex-start;
-      }
+      .sidebar { position: static; width: 100%; height: auto; }
+      .main { margin-left: 0; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .topbar-inner { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
+
 <body>
   <div class="sidebar">
     <div class="sidebar-logo">
       <img src="/images/tt-logo.png" alt="Logo">
     </div>
-
     <h1>TT Contractor Portal</h1>
-
     <a href="/contractors/index.html">Dashboard</a>
     <a href="/contractors/profile.html">My Profile</a>
     <a href="/contractors/compliance.html">Contractor Compliance</a>
@@ -338,37 +76,38 @@
       </div>
     </div>
 
-    <div class="page-header">
+    <div class="page-header" id="topOfPage">
       <h2>Contractor Induction</h2>
-      <p>
-        Watch the induction video, confirm you have watched it, then complete the test.
-        You must achieve 100% to complete your induction.
-      </p>
+      <p>Complete the guided steps below. You must upload a photo, watch the induction video, and score 100% on the test.</p>
     </div>
 
     <div class="panel">
-      <h3>Induction Summary</h3>
+      <h3>Progress Summary</h3>
       <div class="summary-grid">
-        <div class="summary-card">
-          <h4>Induction Status</h4>
-          <p id="inductionSummary">Not Complete</p>
-        </div>
-        <div class="summary-card">
-          <h4>Test Score</h4>
-          <p id="scoreSummary">-</p>
-        </div>
-        <div class="summary-card">
-          <h4>Profile Status</h4>
-          <p id="contractorStatus">Profile Incomplete</p>
-        </div>
+        <div class="summary-card"><h4>Photo</h4><p id="photoSummary">Missing</p></div>
+        <div class="summary-card"><h4>Induction</h4><p id="inductionSummary">Not Complete</p></div>
+        <div class="summary-card"><h4>Score</h4><p id="scoreSummary">-</p></div>
       </div>
     </div>
 
-    <div class="passport-layout">
-      <div>
-        <div class="panel">
-          <h3>Step 1 — Watch the Induction Video</h3>
+    <div class="panel">
+      <h3>Guided Induction Process</h3>
 
+      <div class="step-card" id="photoStep">
+        <h3>Step 1 — Upload Your Photo</h3>
+        <p>This photo will appear on your contractor passport record.</p>
+        <input type="file" id="photoUpload" accept="image/*">
+        <br>
+        <button id="uploadPhotoBtn" class="primary-btn" type="button">Upload Photo</button>
+        <br>
+        <img id="photoPreview" class="photo-preview" src="/images/tt-logo.png" alt="Passport Photo">
+      </div>
+
+      <div class="step-card locked" id="videoStep">
+        <h3>Step 2 — Watch the Induction Video</h3>
+        <div id="videoLockedText" class="message-box info">Upload your photo first to unlock the induction video.</div>
+
+        <div id="videoContent" style="display:none;">
           <div class="video-wrap">
             <iframe
               src="https://www.youtube.com/embed/B8eRNLuMLQc"
@@ -378,61 +117,46 @@
             </iframe>
           </div>
 
-          <div class="confirm-box">
-            <label>
-              <input type="checkbox" id="watchedConfirm">
-              I confirm I have watched the full contractor induction video.
-            </label>
-          </div>
-
-          <button id="startTestBtn" class="primary-btn" type="button" disabled>
-            Start Induction Test
-          </button>
-
-          <div id="videoMessage" class="message-box info">
-            Tick the confirmation box after watching the video to unlock the test.
-          </div>
-        </div>
-
-        <div class="panel" id="testPanel" style="display:none;">
-          <h3>Step 2 — Induction Test</h3>
-          <p style="color:#666; line-height:1.5;">
-            You must answer every question correctly. If you do not score 100%, review the induction video and try again.
-          </p>
-
-          <form id="inductionTestForm">
-            <div id="questionsWrap"></div>
-
-            <button class="primary-btn" type="submit">Submit Test</button>
-            <button class="secondary-btn" type="button" id="resetTestBtn">Reset Answers</button>
-          </form>
-
-          <div id="passportMessage" class="message-box"></div>
+          <label>
+            <input type="checkbox" id="watchedConfirm">
+            I confirm I have watched the full contractor induction video.
+          </label>
+          <br>
+          <button id="startTestBtn" class="primary-btn" type="button" disabled>Start Induction Test</button>
         </div>
       </div>
 
-      <div>
-        <div class="panel">
-          <h3>Passport Photo</h3>
-          <div class="photo-box">
-            <img id="passportPhoto" src="/images/tt-logo.png" alt="Passport Photo">
-            <p style="font-size:13px; color:#666; line-height:1.5;">
-              Your profile photo will appear here. We will connect the real upload function next.
-            </p>
-            <span id="photoStatus" class="status-badge incomplete">Photo Missing</span>
-          </div>
-        </div>
+      <div class="step-card locked" id="testStep">
+        <h3>Step 3 — Complete the Test</h3>
+        <div id="testLockedText" class="message-box info">Watch the video and confirm completion to unlock the test.</div>
 
-        <div class="panel">
-          <h3>Induction Result</h3>
-          <p>
-            <span id="inductionStatus" class="status-badge incomplete">Not Complete</span>
-          </p>
-          <p style="font-size:14px; color:#666; line-height:1.5;">
-            Once completed, Timothy Taylor’s will be able to see your induction status against your company record.
-          </p>
+        <form id="inductionTestForm" style="display:none;">
+          <div id="questionsWrap"></div>
+          <button class="primary-btn" type="submit">Submit Test</button>
+          <button class="secondary-btn" type="button" id="resetTestBtn">Reset Answers</button>
+        </form>
+      </div>
+
+      <div class="step-card locked" id="certificateStep">
+        <h3>Step 4 — Certificate</h3>
+        <div id="certificateLockedText" class="message-box info">Complete the induction test with 100% to unlock your certificate.</div>
+
+        <div id="certificateContent" style="display:none;">
+          <div class="certificate">
+            <img src="/images/tt-logo.png" alt="TT Logo" style="max-width:130px;">
+            <h2>Contractor Induction Certificate</h2>
+            <p>This confirms that:</p>
+            <div class="certificate-name" id="certificateName">Contractor Name</div>
+            <p>has successfully completed the Timothy Taylor’s contractor induction.</p>
+            <p><strong>Score:</strong> 100%</p>
+            <p><strong>Date:</strong> <span id="certificateDate">-</span></p>
+          </div>
+
+          <button onclick="window.print()" class="primary-btn" type="button">Print / Save Certificate</button>
         </div>
       </div>
+
+      <div id="passportMessage" class="message-box"></div>
     </div>
   </div>
 
@@ -440,121 +164,24 @@
   <script>
     const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
-
     const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const logoutBtn = document.getElementById("logoutBtn");
-    const welcomeText = document.getElementById("welcomeText");
-    const watchedConfirm = document.getElementById("watchedConfirm");
-    const startTestBtn = document.getElementById("startTestBtn");
-    const testPanel = document.getElementById("testPanel");
-    const questionsWrap = document.getElementById("questionsWrap");
-    const inductionTestForm = document.getElementById("inductionTestForm");
-    const resetTestBtn = document.getElementById("resetTestBtn");
+    const questions = [
+      { q: "Can contractors use Mechanical Handling Aids on Site?", options: ["No, only internally trained employees can use Mechanical Handling Aids on site.", "Yes, contractors can use Mechanical Handling Aids on site"], correct: 0 },
+      { q: "Where can you smoke on site?", options: ["Only in the designated smoking areas, which will be directed by your host", "Anywhere you like"], correct: 0 },
+      { q: "Can you use your mobile phone on site?", options: ["Yes, but ONLY if express permission has been given by your host", "No, the use of mobile phones is strictly prohibited"], correct: 0 },
+      { q: "What should be obtained before carrying out any work on site?", options: ["A medical questionnaire", "A green card", "Permit to work"], correct: 2 },
+      { q: "If your RAMS have not been submitted or are not suitable for the job you are carrying out, what may happen?", options: ["We will let you in anyway, just do better next time", "This will delay starting work or may result in you being turned away from site", "You will be banned from site and asked to retake the induction"], correct: 1 },
+      { q: "What must you do to your boots before entering the site?", options: ["Wash your boots in the boot wash", "Change your boots to your normal shoes"], correct: 0 },
+      { q: "Where can you eat on site?", options: ["Anywhere that is not a food contact area", "Only in the canteen areas provided"], correct: 1 },
+      { q: "If you see a fire, what should you do?", options: ["Run as quick as you can", "Grab all of your belongings", "Raise the alarm by hitting the smash glass alarm point"], correct: 2 },
+      { q: "If you need urgent first aid treatment, what should happen?", options: ["Deal with it yourself", "Notify a member of staff who will help you receive the necessary assistance from one of our trained first aiders."], correct: 1 },
+      { q: "Can you use cameras on site without prior permission?", options: ["No this is strictly prohibited", "Yes, it’s fine"], correct: 0 },
+      { q: "If you need to carry essential medication with you whilst on site, what should you do?", options: ["Keep them out of sight from anybody", "Let your host know"], correct: 1 },
+      { q: "Can you put any waste into any skip or bin on the premises?", options: ["Yes, it’s fine", "No, only if authorised to do so by your host."], correct: 1 }
+    ];
 
     let currentContractor = null;
-
-    const questions = [
-      {
-        q: "Can contractors use Mechanical Handling Aids on Site?",
-        options: [
-          "No, only internally trained employees can use Mechanical Handling Aids on site.",
-          "Yes, contractors can use Mechanical Handling Aids on site"
-        ],
-        correct: 0
-      },
-      {
-        q: "Where can you smoke on site?",
-        options: [
-          "Only in the designated smoking areas, which will be directed by your host",
-          "Anywhere you like"
-        ],
-        correct: 0
-      },
-      {
-        q: "Can you use your mobile phone on site?",
-        options: [
-          "Yes, but ONLY if express permission has been given by your host",
-          "No, the use of mobile phones is strictly prohibited"
-        ],
-        correct: 0
-      },
-      {
-        q: "What should be obtained before carrying out any work on site?",
-        options: [
-          "A medical questionnaire",
-          "A green card",
-          "Permit to work"
-        ],
-        correct: 2
-      },
-      {
-        q: "If your RAMS have not been submitted or are not suitable for the job you are carrying out, what may happen?",
-        options: [
-          "We will let you in anyway, just do better next time",
-          "This will delay starting work or may result in you being turned away from site",
-          "You will be banned from site and asked to retake the induction"
-        ],
-        correct: 1
-      },
-      {
-        q: "What must you do to your boots before entering the site?",
-        options: [
-          "Wash your boots in the boot wash",
-          "Change your boots to your normal shoes"
-        ],
-        correct: 0
-      },
-      {
-        q: "Where can you eat on site?",
-        options: [
-          "Anywhere that is not a food contact area",
-          "Only in the canteen areas provided"
-        ],
-        correct: 1
-      },
-      {
-        q: "If you see a fire, what should you do?",
-        options: [
-          "Run as quick as you can",
-          "Grab all of your belongings",
-          "Raise the alarm by hitting the smash glass alarm point"
-        ],
-        correct: 2
-      },
-      {
-        q: "If you need urgent first aid treatment, what should happen?",
-        options: [
-          "Deal with it yourself",
-          "Notify a member of staff who will help you receive the necessary assistance from one of our trained first aiders."
-        ],
-        correct: 1
-      },
-      {
-        q: "Can you use cameras on site without prior permission?",
-        options: [
-          "No this is strictly prohibited",
-          "Yes, it’s fine"
-        ],
-        correct: 0
-      },
-      {
-        q: "If you need to carry essential medication with you whilst on site, what should you do?",
-        options: [
-          "Keep them out of sight from anybody",
-          "Let your host know"
-        ],
-        correct: 1
-      },
-      {
-        q: "Can you put any waste into any skip or bin on the premises?",
-        options: [
-          "Yes, it’s fine",
-          "No, only if authorised to do so by your host."
-        ],
-        correct: 1
-      }
-    ];
 
     function showMessage(type, text) {
       const box = document.getElementById("passportMessage");
@@ -562,95 +189,182 @@
       box.innerHTML = text;
     }
 
-    function setStatusBadge(elementId, isComplete, completeText, incompleteText) {
-      const el = document.getElementById(elementId);
-      if (!el) return;
+    function formatDate(dateValue) {
+      const d = dateValue ? new Date(dateValue) : new Date();
+      return d.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+    }
 
-      el.className = `status-badge ${isComplete ? "complete" : "incomplete"}`;
-      el.textContent = isComplete ? completeText : incompleteText;
+    function unlockVideo() {
+      document.getElementById("videoStep").classList.remove("locked");
+      document.getElementById("videoLockedText").style.display = "none";
+      document.getElementById("videoContent").style.display = "block";
+    }
+
+    function unlockTest() {
+      document.getElementById("testStep").classList.remove("locked");
+      document.getElementById("testLockedText").style.display = "none";
+      document.getElementById("inductionTestForm").style.display = "block";
+    }
+
+    function unlockCertificate(contractor) {
+      document.getElementById("certificateStep").classList.remove("locked");
+      document.getElementById("certificateLockedText").style.display = "none";
+      document.getElementById("certificateContent").style.display = "block";
+      document.getElementById("certificateName").textContent = contractor.contact_name || "Contractor";
+      document.getElementById("certificateDate").textContent = formatDate(contractor.induction_completed_at);
     }
 
     function renderQuestions() {
-      questionsWrap.innerHTML = "";
+      const wrap = document.getElementById("questionsWrap");
+      wrap.innerHTML = "";
 
       questions.forEach((item, index) => {
-        const card = document.createElement("div");
-        card.className = "question-card";
-
-        const optionsHtml = item.options.map((option, optionIndex) => `
+        const div = document.createElement("div");
+        div.className = "question-card";
+        div.innerHTML = `<h4>${index + 1}. ${item.q}</h4>` + item.options.map((option, optionIndex) => `
           <label class="answer-option">
             <input type="radio" name="question_${index}" value="${optionIndex}">
             ${option}
           </label>
         `).join("");
-
-        card.innerHTML = `
-          <h4>${index + 1}. ${item.q}</h4>
-          ${optionsHtml}
-        `;
-
-        questionsWrap.appendChild(card);
+        wrap.appendChild(div);
       });
     }
 
-    function renderPassport(contractor) {
-      currentContractor = contractor;
-
-      const inductionComplete = contractor.induction_completed === true;
-      const score = contractor.induction_score;
-
-      document.getElementById("inductionSummary").textContent = inductionComplete ? "Complete" : "Not Complete";
-      document.getElementById("scoreSummary").textContent = score === null || score === undefined ? "-" : `${score}%`;
-      document.getElementById("contractorStatus").textContent = contractor.person_status || contractor.status || "Profile Incomplete";
-
-      setStatusBadge("photoStatus", contractor.photo_uploaded, "Photo Uploaded", "Photo Missing");
-      setStatusBadge("inductionStatus", inductionComplete, "Induction Complete", "Not Complete");
-
-      const passportPhoto = document.getElementById("passportPhoto");
-      if (contractor.profile_photo_url && contractor.profile_photo_url.trim()) {
-        passportPhoto.src = contractor.profile_photo_url;
-      } else {
-        passportPhoto.src = "/images/tt-logo.png";
-      }
-
-      if (inductionComplete) {
-        watchedConfirm.checked = true;
-        startTestBtn.disabled = false;
-        document.getElementById("videoMessage").className = "message-box success";
-        document.getElementById("videoMessage").textContent = "Your induction is complete. You can retake the test if needed.";
-      }
-    }
-
     function calculateScore() {
-      let correctCount = 0;
-
+      let correct = 0;
       for (let i = 0; i < questions.length; i++) {
         const selected = document.querySelector(`input[name="question_${i}"]:checked`);
-
-        if (!selected) {
-          return {
-            complete: false,
-            score: 0,
-            correctCount
-          };
-        }
-
-        if (Number(selected.value) === questions[i].correct) {
-          correctCount++;
-        }
+        if (!selected) return { complete: false, score: 0 };
+        if (Number(selected.value) === questions[i].correct) correct++;
       }
-
-      return {
-        complete: true,
-        score: Math.round((correctCount / questions.length) * 100),
-        correctCount
-      };
+      return { complete: true, score: Math.round((correct / questions.length) * 100) };
     }
 
-    async function savePassedInduction() {
+    async function loadPage() {
+      const { data: sessionData } = await client.auth.getSession();
+      if (!sessionData.session) {
+        window.location.href = "/login.html";
+        return;
+      }
+
+      const user = sessionData.session.user;
+
+      const { data: contractor, error } = await client
+        .from("contractors")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (error || !contractor) {
+        showMessage("error", "Unable to load your contractor record.");
+        return;
+      }
+
+      currentContractor = contractor;
+      document.getElementById("welcomeText").textContent = `Welcome, ${(contractor.contact_name || "User").split(" ")[0]} — Contractor`;
+
+      document.getElementById("photoSummary").textContent = contractor.photo_uploaded ? "Uploaded" : "Missing";
+      document.getElementById("inductionSummary").textContent = contractor.induction_completed ? "Complete" : "Not Complete";
+      document.getElementById("scoreSummary").textContent = contractor.induction_score === null || contractor.induction_score === undefined ? "-" : `${contractor.induction_score}%`;
+
+      if (contractor.profile_photo_url) {
+        document.getElementById("photoPreview").src = contractor.profile_photo_url;
+      }
+
+      if (contractor.photo_uploaded) unlockVideo();
+      if (contractor.induction_completed) {
+        unlockVideo();
+        unlockTest();
+        unlockCertificate(contractor);
+      }
+    }
+
+    document.getElementById("uploadPhotoBtn").addEventListener("click", async () => {
       if (!currentContractor) return;
 
-      const { data, error } = await client
+      const file = document.getElementById("photoUpload").files[0];
+      if (!file) {
+        showMessage("error", "Please select a photo first.");
+        return;
+      }
+
+      const fileExt = file.name.split(".").pop();
+      const filePath = `${currentContractor.user_id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await client.storage
+        .from("contractor-photos")
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) {
+        showMessage("error", uploadError.message);
+        return;
+      }
+
+      const { data } = client.storage.from("contractor-photos").getPublicUrl(filePath);
+
+      const { data: updated, error: updateError } = await client
+        .from("contractors")
+        .update({
+          profile_photo_url: data.publicUrl,
+          photo_uploaded: true
+        })
+        .eq("id", currentContractor.id)
+        .select()
+        .single();
+
+      if (updateError) {
+        showMessage("error", updateError.message);
+        return;
+      }
+
+      currentContractor = updated;
+      document.getElementById("photoPreview").src = data.publicUrl;
+      document.getElementById("photoSummary").textContent = "Uploaded";
+      unlockVideo();
+      showMessage("success", "Photo uploaded successfully. The induction video is now unlocked.");
+    });
+
+    document.getElementById("watchedConfirm").addEventListener("change", (e) => {
+      document.getElementById("startTestBtn").disabled = !e.target.checked;
+    });
+
+    document.getElementById("startTestBtn").addEventListener("click", () => {
+      unlockTest();
+      document.getElementById("testStep").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    document.getElementById("resetTestBtn").addEventListener("click", () => {
+      document.getElementById("inductionTestForm").reset();
+      showMessage("info", "Answers reset.");
+    });
+
+    document.getElementById("inductionTestForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const result = calculateScore();
+
+      if (!result.complete) {
+        showMessage("error", "Please answer every question before submitting.");
+        return;
+      }
+
+      if (result.score !== 100) {
+        await client
+          .from("contractors")
+          .update({
+            induction_score: result.score,
+            induction_completed: false,
+            person_status: "Induction Incomplete"
+          })
+          .eq("id", currentContractor.id);
+
+        document.getElementById("scoreSummary").textContent = `${result.score}%`;
+        showMessage("error", `You scored ${result.score}%. You must score 100%. Please review the video and try again.`);
+        return;
+      }
+
+      const { data: updated, error } = await client
         .from("contractors")
         .update({
           induction_completed: true,
@@ -663,110 +377,26 @@
         .single();
 
       if (error) {
-        showMessage("error", "Failed to save induction result: " + error.message);
+        showMessage("error", error.message);
         return;
       }
 
-      renderPassport(data);
-      showMessage("success", "<strong>Induction complete.</strong><br>You scored 100% and your result has been saved.");
-    }
+      currentContractor = updated;
+      document.getElementById("inductionSummary").textContent = "Complete";
+      document.getElementById("scoreSummary").textContent = "100%";
+      unlockCertificate(updated);
 
-    async function saveFailedAttempt(score) {
-      if (!currentContractor) return;
-
-      await client
-        .from("contractors")
-        .update({
-          induction_score: score,
-          person_status: "Induction Incomplete"
-        })
-        .eq("id", currentContractor.id);
-
-      showMessage("error", `<strong>Test not passed.</strong><br>You scored ${score}%. You must score 100%. Please review the video and try again.`);
-    }
-
-    async function loadPassportPage() {
-      const { data: sessionData, error: sessionError } = await client.auth.getSession();
-
-      if (sessionError || !sessionData.session) {
-        window.location.href = "/login.html";
-        return;
-      }
-
-      const currentUser = sessionData.session.user;
-
-      const { data: contractor, error: contractorError } = await client
-        .from("contractors")
-        .select("*")
-        .eq("user_id", currentUser.id)
-        .maybeSingle();
-
-      if (contractorError) {
-        showMessage("error", "Failed to load contractor record: " + contractorError.message);
-        return;
-      }
-
-      if (!contractor) {
-        showMessage("error", "No contractor record found for this login yet.");
-        return;
-      }
-
-      const firstName = contractor.contact_name
-        ? contractor.contact_name.split(" ")[0]
-        : "User";
-
-      welcomeText.textContent = `Welcome, ${firstName} — Contractor`;
-
-      renderPassport(contractor);
-    }
-
-    watchedConfirm.addEventListener("change", () => {
-      startTestBtn.disabled = !watchedConfirm.checked;
-
-      const msg = document.getElementById("videoMessage");
-      if (watchedConfirm.checked) {
-        msg.className = "message-box success";
-        msg.textContent = "Video confirmation complete. You can now start the induction test.";
-      } else {
-        msg.className = "message-box info";
-        msg.textContent = "Tick the confirmation box after watching the video to unlock the test.";
-      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      showMessage("success", "<strong>Induction complete.</strong><br>You scored 100%. You can now print or save your certificate.");
     });
 
-    startTestBtn.addEventListener("click", () => {
-      testPanel.style.display = "block";
-      testPanel.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
-
-    resetTestBtn.addEventListener("click", () => {
-      inductionTestForm.reset();
-      showMessage("info", "Answers reset. You can try again.");
-    });
-
-    inductionTestForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const result = calculateScore();
-
-      if (!result.complete) {
-        showMessage("error", "Please answer every question before submitting the test.");
-        return;
-      }
-
-      if (result.score === 100) {
-        await savePassedInduction();
-      } else {
-        await saveFailedAttempt(result.score);
-      }
-    });
-
-    logoutBtn.addEventListener("click", async () => {
+    document.getElementById("logoutBtn").addEventListener("click", async () => {
       await client.auth.signOut();
       window.location.href = "/login.html";
     });
 
     renderQuestions();
-    loadPassportPage();
+    loadPage();
   </script>
 </body>
 </html>
