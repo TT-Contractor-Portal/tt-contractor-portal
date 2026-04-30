@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contractors - TT Contractor Portal</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar h1 {
+      font-size: 22px;
+      margin: 0 0 30px 0;
+      line-height: 1.3;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo img {
+      max-width: 140px;
+      height: auto;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 30px;
+    }
+
+    .topbar {
+      background: white;
+      padding: 18px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .logout-btn,
+    .action-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .logout-btn:hover,
+    .action-btn:hover {
+      background: #024534;
+    }
+
+    .page-header {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+    }
+
+    .page-header h2 {
+      margin: 0 0 8px 0;
+      font-size: 28px;
+      color: #035740;
+    }
+
+    .page-header p {
+      margin: 0;
+      color: #666;
+      font-size: 15px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 24px;
+    }
+
+    .menu-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+      border-top: 5px solid #035740;
+    }
+
+    .menu-card h3 {
+      margin: 0 0 10px 0;
+      color: #035740;
+      font-size: 24px;
+    }
+
+    .menu-card p {
+      color: #555;
+      font-size: 15px;
+      line-height: 1.5;
+      margin: 0 0 18px 0;
+    }
+
+    .big-number {
+      font-size: 42px;
+      font-weight: 800;
+      margin-bottom: 4px;
+      color: #111;
+    }
+
+    .count-label {
+      color: #666;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 800px) {
+      .sidebar {
+        position: static;
+        width: 100%;
+        height: auto;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .menu-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .topbar-inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="Logo">
+    </div>
+
+    <h1>TT Contractor Portal</h1>
+
+    <a href="/index.html">Dashboard</a>
+    <a href="/admin-users.html" id="adminNavLink" style="display:none;">Admin</a>
+    <a href="/rams/register.html">RAMS</a>
+    <a href="/rams/new.html">New RAMS</a>
+    <a href="/profile/index.html">My Profile</a>
+    <a href="/ttcontractors/index.html">Contractors</a>
+    <a href="/permits/index.html">Permits</a>
+    <a href="/sop/index.html">SOP / SSW</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <strong id="welcomeText">Welcome</strong>
+        <button id="logoutBtn" class="logout-btn" type="button">Log out</button>
+      </div>
+    </div>
+
+    <div class="page-header">
+      <h2>Contractors</h2>
+      <p>Review new contractor applications or view the approved contractor register.</p>
+    </div>
+
+    <div class="menu-grid">
+      <div class="menu-card">
+        <h3>Contractors Awaiting Approval</h3>
+        <p>Review contractors who have completed their required onboarding and are ready for TT approval.</p>
+        <div class="big-number" id="awaitingCount">0</div>
+        <div class="count-label">currently awaiting approval</div>
+        <a class="action-btn" href="/ttcontractors/awaiting-approval.html">Open Awaiting Approval</a>
+      </div>
+
+      <div class="menu-card">
+        <h3>Approved Contractor Register</h3>
+        <p>View approved contractor companies, then drill into each company to see approved contractor employees.</p>
+        <div class="big-number" id="approvedCount">0</div>
+        <div class="count-label">approved contractors</div>
+        <a class="action-btn" href="/ttcontractors/approved.html">Open Approved Register</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const logoutBtn = document.getElementById("logoutBtn");
+    const adminNavLink = document.getElementById("adminNavLink");
+    const welcomeText = document.getElementById("welcomeText");
+    const awaitingCount = document.getElementById("awaitingCount");
+    const approvedCount = document.getElementById("approvedCount");
+
+    async function loadPage() {
+      const { data: sessionData, error: sessionError } = await client.auth.getSession();
+
+      if (sessionError || !sessionData.session) {
+        window.location.href = "/login.html";
+        return null;
+      }
+
+      const currentUser = sessionData.session.user;
+
+      const { data: profile, error: profileError } = await client
+        .from("user_profiles")
+        .select("*")
+        .eq("id", currentUser.id)
+        .single();
+
+      if (profileError || !profile) {
+        alert("Profile not found.");
+        window.location.href = "/login.html";
+        return null;
+      }
+
+      if (profile.is_active === false) {
+        alert("Your account has been deactivated. Please contact an administrator.");
+        await client.auth.signOut();
+        window.location.href = "/login.html";
+        return null;
+      }
+
+      let roleLabel = "View Only";
+      if (profile.role === "admin") roleLabel = "Admin";
+      if (profile.role === "reviewer") roleLabel = "Reviewer";
+
+      const firstName = profile.full_name ? profile.full_name.split(" ")[0] : "User";
+      welcomeText.textContent = `Welcome, ${firstName} — ${roleLabel}`;
+
+      if (profile.role === "admin") {
+        adminNavLink.style.display = "block";
+      }
+
+      if (profile.role !== "admin" && profile.role !== "reviewer") {
+        alert("You do not have permission to view contractor management.");
+        window.location.href = "/index.html";
+        return null;
+      }
+
+      return profile;
+    }
+
+    async function loadCounts() {
+      const { data, error } = await client
+        .from("contractors")
+        .select("id, status");
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      const contractors = data || [];
+
+      awaitingCount.textContent = contractors.filter(c => c.status === "Ready for Review").length;
+      approvedCount.textContent = contractors.filter(c => c.status === "Approved").length;
+    }
+
+    logoutBtn.addEventListener("click", async () => {
+      await client.auth.signOut();
+      window.location.href = "/login.html";
+    });
+
+    async function initPage() {
+      const profile = await loadPage();
+      if (!profile) return;
+      await loadCounts();
+    }
+
+    initPage();
+  </script>
+</body>
+</html>
