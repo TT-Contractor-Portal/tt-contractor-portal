@@ -464,7 +464,7 @@
       const { data, error } = await client
         .from("contractors")
         .select("*")
-        .in("status", ["Ready for Review", "Approved", "Expired"])
+      .eq("status", "Ready for Review")
         .order("company_name", { ascending: true });
 
       if (error) {
