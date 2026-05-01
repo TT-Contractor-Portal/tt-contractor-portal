@@ -976,6 +976,54 @@ if (yellowCardBtn && redCardBtn && clearCardBtn) {
   }, 100);
 }
 
+async function updateCardStatus(cardStatus) {
+  if (!currentContractor) return;
+
+  const reasonBox = document.getElementById("cardReason");
+  const reason = reasonBox ? reasonBox.value.trim() : "";
+
+  if ((cardStatus === "Yellow" || cardStatus === "Red") && !reason) {
+    showReviewMessage("error", "Please add a reason before issuing a card.");
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  const updateData = {
+    card_status: cardStatus,
+    card_reason: cardStatus === "None" ? null : reason,
+    card_issued_at: cardStatus === "None" ? null : now,
+    banned: cardStatus === "Red",
+    banned_at: cardStatus === "Red" ? now : null
+  };
+
+  const { data, error } = await client
+    .from("contractors")
+    .update(updateData)
+    .eq("id", currentContractor.id)
+    .select()
+    .single();
+
+  if (error) {
+    showReviewMessage("error", "Failed to update card status: " + error.message);
+    return;
+  }
+
+  currentContractor = data;
+  renderProfile(data);
+
+  setTimeout(() => {
+    const box = document.getElementById("reviewMessage");
+    if (box) {
+      box.className = "message-box success";
+      box.textContent =
+        cardStatus === "None"
+          ? "Card status cleared and contractor reinstated."
+          : `${cardStatus} card updated successfully.`;
+    }
+  }, 100);
+}
+    
     async function initPage() {
       const ok = await loadPage();
       if (!ok) return;
