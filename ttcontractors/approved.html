@@ -507,7 +507,7 @@ function buildCompanyRegister(contractors) {
       const { data, error } = await client
         .from("contractors")
         .select("*")
-      .eq("status", "Ready for Review")
+     .in("status", ["Approved", "Expired"])
         .order("company_name", { ascending: true });
 
       if (error) {
