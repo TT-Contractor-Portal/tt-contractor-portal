@@ -836,59 +836,85 @@
       renderProfile(data);
     }
 
-    async function approveContractor() {
-      if (!currentContractor) return;
+  async function approveContractor() {
+  if (!currentContractor) return;
 
-      const notes = document.getElementById("reviewerNotes").value.trim();
-      const now = new Date();
-      const expiry = new Date(now);
-      expiry.setFullYear(expiry.getFullYear() + 1);
+  const notes = document.getElementById("reviewerNotes").value.trim();
+  const now = new Date();
+  const expiry = new Date(now);
+  expiry.setFullYear(expiry.getFullYear() + 1);
 
-      const { error } = await client
-        .from("contractors")
-        .update({
-          status: "Approved",
-          reviewer_notes: notes || null,
-          approved_at: now.toISOString(),
-          expires_at: expiry.toISOString()
-        })
-        .eq("id", currentContractor.id);
+  const { data, error } = await client
+    .from("contractors")
+    .update({
+      status: "Approved",
+      reviewer_notes: notes || null,
+      approved_at: now.toISOString(),
+      review_date: now.toISOString(),
+      expires_at: expiry.toISOString()
+    })
+    .eq("id", currentContractor.id)
+    .select()
+    .single();
 
-      if (error) {
-        showReviewMessage("error", "Failed to approve contractor: " + error.message);
-        return;
-      }
+  if (error) {
+    showReviewMessage("error", "Failed to approve contractor: " + error.message);
+    return;
+  }
 
-      showReviewMessage("success", "Contractor approved successfully.");
-      await loadContractor();
+  if (!data) {
+    showReviewMessage("error", "No contractor row was updated. This is probably a Supabase RLS permission issue.");
+    return;
+  }
+
+  currentContractor = data;
+  renderProfile(data);
+
+  setTimeout(() => {
+    const box = document.getElementById("reviewMessage");
+    if (box) {
+      box.className = "message-box success";
+      box.textContent = "Contractor approved successfully.";
     }
+  }, 100);
+}
 
     async function rejectContractor() {
-      if (!currentContractor) return;
+  if (!currentContractor) return;
 
-      const notes = document.getElementById("reviewerNotes").value.trim();
+  const notes = document.getElementById("reviewerNotes").value.trim();
 
-      const { error } = await client
-        .from("contractors")
-        .update({
-          status: "Rejected",
-          reviewer_notes: notes || null
-        })
-        .eq("id", currentContractor.id);
+  const { data, error } = await client
+    .from("contractors")
+    .update({
+      status: "Rejected",
+      reviewer_notes: notes || null
+    })
+    .eq("id", currentContractor.id)
+    .select()
+    .single();
 
-      if (error) {
-        showReviewMessage("error", "Failed to reject contractor: " + error.message);
-        return;
-      }
+  if (error) {
+    showReviewMessage("error", "Failed to reject contractor: " + error.message);
+    return;
+  }
 
-      showReviewMessage("success", "Contractor rejected successfully.");
-      await loadContractor();
+  if (!data) {
+    showReviewMessage("error", "No contractor row was updated. This is probably a Supabase RLS permission issue.");
+    return;
+  }
+
+  currentContractor = data;
+  renderProfile(data);
+
+  setTimeout(() => {
+    const box = document.getElementById("reviewMessage");
+    if (box) {
+      box.className = "message-box success";
+      box.textContent = "Contractor rejected successfully.";
     }
-
-    logoutBtn.addEventListener("click", async () => {
-      await client.auth.signOut();
-      window.location.href = "/login.html";
-    });
+  }, 100);
+}
 
     async function initPage() {
       const ok = await loadPage();
