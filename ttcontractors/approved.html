@@ -519,11 +519,11 @@ function buildCompanyRegister(contractors) {
         return;
       }
 
-      const contractors = data || [];
-      renderCounts(contractors);
-      renderContractors(contractors);
-    }
+     const contractors = data || [];
+const companies = buildCompanyRegister(contractors);
 
+renderCounts(companies);
+renderContractors(companies);
     logoutBtn.addEventListener("click", async () => {
       await client.auth.signOut();
       window.location.href = "/login.html";
