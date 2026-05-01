@@ -784,18 +784,36 @@
         </div>
       `;
 
-      const approveBtn = document.getElementById("approveBtn");
-      const rejectBtn = document.getElementById("rejectBtn");
+    const approveBtn = document.getElementById("approveBtn");
+const rejectBtn = document.getElementById("rejectBtn");
+const yellowCardBtn = document.getElementById("yellowCardBtn");
+const redCardBtn = document.getElementById("redCardBtn");
+const clearCardBtn = document.getElementById("clearCardBtn");
 
-      const canReview = currentProfile && (currentProfile.role === "admin" || currentProfile.role === "reviewer");
+const canReview = currentProfile && (currentProfile.role === "admin" || currentProfile.role === "reviewer");
+const isAdmin = currentProfile && currentProfile.role === "admin";
 
-      if (!canReview) {
-        approveBtn.disabled = true;
-        rejectBtn.disabled = true;
-      } else {
-        approveBtn.addEventListener("click", approveContractor);
-        rejectBtn.addEventListener("click", rejectContractor);
-      }
+if (approveBtn && rejectBtn) {
+  if (!canReview) {
+    approveBtn.disabled = true;
+    rejectBtn.disabled = true;
+  } else {
+    approveBtn.addEventListener("click", approveContractor);
+    rejectBtn.addEventListener("click", rejectContractor);
+  }
+}
+
+if (yellowCardBtn && redCardBtn && clearCardBtn) {
+  if (!isAdmin) {
+    yellowCardBtn.disabled = true;
+    redCardBtn.disabled = true;
+    clearCardBtn.disabled = true;
+  } else {
+    yellowCardBtn.addEventListener("click", () => updateCardStatus("Yellow"));
+    redCardBtn.addEventListener("click", () => updateCardStatus("Red"));
+    clearCardBtn.addEventListener("click", () => updateCardStatus("None"));
+  }
+}
     }
 
     function showReviewMessage(type, text) {
