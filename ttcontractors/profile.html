@@ -717,20 +717,63 @@
               </div>
             </div>
 
-            <div class="panel">
-              <h3>Reviewer Approval</h3>
-              <p style="margin-top: 0; color: #666; font-size: 14px;">
-                Review the contractor’s compliance record and approve or reject their application.
-              </p>
+         <div class="panel">
+  <h3>${contractor.status === "Ready for Review" ? "Reviewer Approval" : "Admin Controls"}</h3>
 
-              <label for="reviewerNotes" class="detail-label" style="margin-top: 16px;">Reviewer Notes</label>
-              <textarea id="reviewerNotes" class="notes-box" placeholder="Add review notes here...">${escapeHtml(contractor.reviewer_notes || "")}</textarea>
+  ${contractor.status === "Ready for Review" ? `
+    <p style="margin-top: 0; color: #666; font-size: 14px;">
+      Review the contractor’s compliance record and approve or reject their application.
+    </p>
 
-              <div class="review-actions">
-                <button class="approve-btn" id="approveBtn" type="button">Approve Contractor</button>
-                <button class="reject-btn" id="rejectBtn" type="button">Reject Contractor</button>
-              </div>
+    <label for="reviewerNotes" class="detail-label" style="margin-top: 16px;">Reviewer Notes</label>
+    <textarea id="reviewerNotes" class="notes-box" placeholder="Add review notes here...">${escapeHtml(contractor.reviewer_notes || "")}</textarea>
 
+    <div class="review-actions">
+      <button class="approve-btn" id="approveBtn" type="button">Approve Contractor</button>
+      <button class="reject-btn" id="rejectBtn" type="button">Reject Contractor</button>
+    </div>
+
+    <p class="small-note">
+      Approval will activate the contractor for 12 months before renewal is required.
+    </p>
+  ` : `
+    <p style="margin-top: 0; color: #666; font-size: 14px;">
+      This contractor has already been reviewed. Admin users can record warnings or ban the contractor from site.
+    </p>
+
+    <div class="review-summary">
+      <div class="summary-row">
+        <strong>Card Status</strong>
+        <span>${escapeHtml(contractor.card_status || "None")}</span>
+      </div>
+
+      <div class="summary-row">
+        <strong>Banned</strong>
+        <span>${contractor.banned ? "Yes" : "No"}</span>
+      </div>
+
+      <div class="summary-row">
+        <strong>Reason</strong>
+        <span>${escapeHtml(contractor.card_reason || "-")}</span>
+      </div>
+    </div>
+
+    <label for="cardReason" class="detail-label" style="margin-top: 16px;">Reason / Notes</label>
+    <textarea id="cardReason" class="notes-box" placeholder="Add reason for warning or ban...">${escapeHtml(contractor.card_reason || "")}</textarea>
+
+    <div class="review-actions">
+      <button class="approve-btn" id="yellowCardBtn" type="button" style="background:#d97706;">Issue Yellow Card</button>
+      <button class="reject-btn" id="redCardBtn" type="button">Issue Red Card / Ban</button>
+      <button class="approve-btn" id="clearCardBtn" type="button">Clear Card / Reinstate</button>
+    </div>
+
+    <p class="small-note">
+      Only admin users can issue or clear cards.
+    </p>
+  `}
+
+  <div id="reviewMessage" class="message-box"></div>
+</div>
               <div id="reviewMessage" class="message-box"></div>
 
               <p class="small-note">
