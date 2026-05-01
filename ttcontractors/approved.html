@@ -411,6 +411,46 @@
   totalCount.textContent = companies.length;
 }
 
+function buildCompanyRegister(contractors) {
+  const companyMap = {};
+
+  contractors.forEach(contractor => {
+    const companyName = contractor.company_name || "Unknown Company";
+
+    if (!companyMap[companyName]) {
+      companyMap[companyName] = {
+        company_name: companyName,
+        main_contact: contractor.contact_name || "-",
+        contractors: [],
+        status: "Approved",
+        expires_at: null
+      };
+    }
+
+    companyMap[companyName].contractors.push(contractor);
+
+    const statuses = companyMap[companyName].contractors.map(c => c.status);
+
+    if (statuses.includes("Expired")) {
+      companyMap[companyName].status = "Expired";
+    } else {
+      companyMap[companyName].status = "Approved";
+    }
+
+    const expiryDates = companyMap[companyName].contractors
+      .map(c => c.expires_at)
+      .filter(Boolean)
+      .sort();
+
+    companyMap[companyName].expires_at = expiryDates.length ? expiryDates[0] : null;
+  });
+
+  return Object.values(companyMap).sort((a, b) =>
+    a.company_name.localeCompare(b.company_name)
+  );
+}
+
+    
     function renderContractors(contractors) {
       contractorTableBody.innerHTML = "";
 
