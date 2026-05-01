@@ -451,44 +451,46 @@ function buildCompanyRegister(contractors) {
 }
 
     
-    function renderContractors(contractors) {
-      contractorTableBody.innerHTML = "";
+  function renderContractors(companies) {
+  contractorTableBody.innerHTML = "";
 
-      if (!contractors.length) {
-        contractorTableBody.innerHTML = `
-          <tr>
-            <td colspan="5">No contractors to show yet.</td>
-          </tr>
-        `;
-        return;
-      }
+  if (!companies.length) {
+    contractorTableBody.innerHTML = `
+      <tr>
+        <td colspan="6">No approved or expired contractor companies to show yet.</td>
+      </tr>
+    `;
+    return;
+  }
 
-      contractors.forEach(contractor => {
-        const row = document.createElement("tr");
+  companies.forEach(company => {
+    const row = document.createElement("tr");
+    const companyUrl = `/ttcontractors/company.html?company=${encodeURIComponent(company.company_name)}`;
 
-        row.innerHTML = `
-          <td>
-            <a class="contractor-link" href="/ttcontractors/profile.html?id=${contractor.id}">
-              ${contractor.company_name || "-"}
-            </a>
-          </td>
-          <td>${contractor.contact_name || "-"}</td>
-          <td>
-            <span class="status ${getStatusClass(contractor.status)}">
-              ${contractor.status || "-"}
-            </span>
-          </td>
-          <td>${formatDate(contractor.expires_at)}</td>
-          <td>
-            <a class="action-btn"href="/ttcontractors/profile.html?id=${contractor.id}">
-              View
-            </a>
-          </td>
-        `;
+    row.innerHTML = `
+      <td>
+        <a class="contractor-link" href="${companyUrl}">
+          ${company.company_name || "-"}
+        </a>
+      </td>
+      <td>${company.main_contact || "-"}</td>
+      <td>${company.contractors.length}</td>
+      <td>
+        <span class="status ${getStatusClass(company.status)}">
+          ${company.status || "-"}
+        </span>
+      </td>
+      <td>${formatDate(company.expires_at)}</td>
+      <td>
+        <a class="action-btn" href="${companyUrl}">
+          View Company
+        </a>
+      </td>
+    `;
 
-        contractorTableBody.appendChild(row);
-      });
-    }
+    contractorTableBody.appendChild(row);
+  });
+}
 
     async function loadContractors(profile) {
       if (!profile) return;
