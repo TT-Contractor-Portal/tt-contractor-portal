@@ -850,7 +850,6 @@
       status: "Approved",
       reviewer_notes: notes || null,
       approved_at: now.toISOString(),
-      review_date: now.toISOString(),
       expires_at: expiry.toISOString()
     })
     .eq("id", currentContractor.id)
