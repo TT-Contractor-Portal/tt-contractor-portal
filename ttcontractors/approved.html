@@ -404,12 +404,12 @@
       return profile;
     }
 
-    function renderCounts(contractors) {
-      readyCount.textContent = contractors.filter(c => c.status === "Ready for Review").length;
-      approvedCount.textContent = contractors.filter(c => c.status === "Approved").length;
-      expiredCount.textContent = contractors.filter(c => c.status === "Expired").length;
-      totalCount.textContent = contractors.length;
-    }
+   function renderCounts(companies) {
+  readyCount.textContent = 0;
+  approvedCount.textContent = companies.filter(c => c.status === "Approved").length;
+  expiredCount.textContent = companies.filter(c => c.status === "Expired").length;
+  totalCount.textContent = companies.length;
+}
 
     function renderContractors(contractors) {
       contractorTableBody.innerHTML = "";
