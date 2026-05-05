@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quality Supplier Register - TT Contractor Portal</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 240px;
+      height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .sidebar-logo img {
+      max-width: 140px;
+    }
+
+    .main {
+      margin-left: 240px;
+      padding: 20px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      width: 300px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card h2 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+
+    .card p {
+      color: #666;
+    }
+
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="TT Logo" />
+    </div>
+
+    <a href="/index.html">Dashboard</a>
+    <a href="/new-rams.html">New RAMS Review</a>
+    <a href="/rams-register.html">RAMS Register</a>
+    <a href="/ttcontractors/index.html">Contractor Register</a>
+    <a href="/quality-suppliers/index.html">Quality Supplier Register</a>
+    <a href="/admin/users.html" id="adminLink">Admin</a>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <div class="topbar">
+      <div id="welcomeText">Welcome</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <h1>Quality Supplier Register</h1>
+
+    <div class="cards">
+
+      <!-- Awaiting Approval -->
+      <div class="card" id="awaitingCard" onclick="location.href='/quality-suppliers/awaiting-approval.html'">
+        <h2>Awaiting Approval</h2>
+        <p>Suppliers ready for review and approval</p>
+      </div>
+
+      <!-- Approved -->
+      <div class="card" onclick="location.href='/quality-suppliers/approved.html'">
+        <h2>Approved Supplier Register</h2>
+        <p>View approved and expired suppliers</p>
+      </div>
+
+    </div>
+
+  </div>
+
+<script>
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  async function init() {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      window.location.href = "/login.html";
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    document.getElementById("welcomeText").innerText =
+      `Welcome, ${profile.full_name} — ${profile.role}`;
+
+    // Hide admin link if not admin
+    if (profile.role !== "admin") {
+      document.getElementById("adminLink").style.display = "none";
+    }
+
+    const canApprove =
+      profile.role === "reviewer" || profile.role === "admin";
+
+    // Hide awaiting approval card if not reviewer/admin
+    if (!canApprove) {
+      document.getElementById("awaitingCard").style.display = "none";
+    }
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = "/login.html";
+  }
+
+  init();
+</script>
+
+</body>
+</html>
