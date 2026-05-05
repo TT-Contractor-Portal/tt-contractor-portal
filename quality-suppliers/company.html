@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quality Supplier Company - TT Contractor Portal</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #222; }
+    .sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: #035740; color: white; padding: 24px 20px; box-sizing: border-box; }
+    .sidebar a { display: block; color: white; text-decoration: none; margin: 14px 0; font-size: 16px; }
+    .sidebar-logo { text-align: center; margin-bottom: 20px; }
+    .sidebar-logo img { max-width: 140px; }
+    .main { margin-left: 240px; padding: 20px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .logout-btn { background: #035740; color: white; border: none; padding: 8px 14px; cursor: pointer; border-radius: 5px; }
+    .back-link { color: #035740; text-decoration: none; font-weight: bold; }
+
+    .summary-card, .table-card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .summary-grid {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .summary-box {
+      background: #f5f5f5;
+      padding: 15px;
+      border-radius: 8px;
+      min-width: 160px;
+    }
+
+    .summary-number {
+      font-size: 24px;
+      font-weight: bold;
+      color: #035740;
+    }
+
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+    th { background: #f0f0f0; }
+
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .badge-approved { background: #d1e7dd; color: #0f5132; }
+    .badge-expired { background: #f8d7da; color: #842029; }
+    .badge-raw { background: #e7f1ff; color: #084298; }
+    .badge-packaging { background: #e9f7ef; color: #0f5132; }
+
+    .btn {
+      background: #035740;
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 14px;
+    }
+
+    .empty { color: #666; padding: 15px 0; }
+    .error {
+      background: #f8d7da;
+      color: #842029;
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <img src="/images/tt-logo.png" alt="TT Logo" />
+    </div>
+
+    <a href="/index.html">Dashboard</a>
+    <a href="/new-rams.html">New RAMS Review</a>
+    <a href="/rams-register.html">RAMS Register</a>
+    <a href="/ttcontractors/index.html">Contractor Register</a>
+    <a href="/quality-suppliers/index.html">Quality Supplier Register</a>
+    <a href="/admin/users.html" id="adminLink">Admin</a>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div id="welcomeText">Welcome</div>
+      <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <a class="back-link" href="/quality-suppliers/approved.html">← Back to Approved Supplier Register</a>
+
+    <h1 id="companyTitle">Supplier Company</h1>
+
+    <div id="errorBox" class="error"></div>
+
+    <div class="summary-card">
+      <h2>Company Summary</h2>
+      <div class="summary-grid">
+        <div class="summary-box">
+          <div class="summary-number" id="approvedCount">0</div>
+          <div>Approved</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-number" id="expiredCount">0</div>
+          <div>Expired</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-number" id="rawCount">0</div>
+          <div>Raw Material</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-number" id="packagingCount">0</div>
+          <div>Packaging</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="table-card">
+      <h2>Supplier Records</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Supplier Type</th>
+            <th>Status</th>
+            <th>Approved</th>
+            <th>Expires</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="supplierTableBody">
+          <tr>
+            <td colspan="7">Loading suppliers...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+
+<script>
+  const SUPABASE_URL = "YOUR_SUPABASE_URL";
+  const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const params = new URLSearchParams(window.location.search);
+  const companyName = params.get("company");
+
+  async function init() {
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+
+    if (userError || !user) {
+      window.location.href = "/login.html";
+      return;
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("user_profiles")
+      .select("*")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      showError("Could not load your user profile.");
+      return;
+    }
+
+    document.getElementById("welcomeText").innerText =
+      `Welcome, ${profile.full_name || "User"} — ${profile.role}`;
+
+    if (profile.role !== "admin") {
+      document.getElementById("adminLink").style.display = "none";
+    }
+
+    if (!companyName) {
+      showError("No company selected.");
+      document.getElementById("supplierTableBody").innerHTML =
+        `<tr><td colspan="7" class="empty">No company selected.</td></tr>`;
+      return;
+    }
+
+    document.getElementById("companyTitle").innerText = companyName;
+
+    await loadCompanySuppliers();
+  }
+
+  async function loadCompanySuppliers() {
+    const tbody = document.getElementById("supplierTableBody");
+
+    const { data: suppliers, error } = await supabase
+      .from("quality_suppliers")
+      .select("*")
+      .eq("company_name", companyName)
+      .in("status", ["Approved", "Expired"])
+      .order("contact_name", { ascending: true });
+
+    if (error) {
+      console.error(error);
+      showError(error.message);
+      tbody.innerHTML = `<tr><td colspan="7">Error loading suppliers.</td></tr>`;
+      return;
+    }
+
+    if (!suppliers || suppliers.length === 0) {
+      tbody.innerHTML =
+        `<tr><td colspan="7" class="empty">No approved or expired suppliers found for this company.</td></tr>`;
+      return;
+    }
+
+    document.getElementById("approvedCount").innerText =
+      suppliers.filter(s => s.status === "Approved").length;
+
+    document.getElementById("expiredCount").innerText =
+      suppliers.filter(s => s.status === "Expired").length;
+
+    document.getElementById("rawCount").innerText =
+      suppliers.filter(s => s.supplier_type === "Raw Material Supplier").length;
+
+    document.getElementById("packagingCount").innerText =
+      suppliers.filter(s => s.supplier_type === "Packaging Supplier").length;
+
+    tbody.innerHTML = suppliers.map(supplier => {
+      const typeClass = supplier.supplier_type === "Raw Material Supplier"
+        ? "badge-raw"
+        : "badge-packaging";
+
+      const statusClass = supplier.status === "Approved"
+        ? "badge-approved"
+        : "badge-expired";
+
+      return `
+        <tr>
+          <td>${escapeHtml(supplier.contact_name || "-")}</td>
+          <td>${escapeHtml(supplier.email || "-")}</td>
+          <td><span class="badge ${typeClass}">${escapeHtml(supplier.supplier_type || "-")}</span></td>
+          <td><span class="badge ${statusClass}">${escapeHtml(supplier.status || "-")}</span></td>
+          <td>${formatDate(supplier.approved_at)}</td>
+          <td>${formatDate(supplier.expires_at)}</td>
+          <td>
+            <a class="btn" href="/quality-suppliers/profile.html?id=${supplier.id}">
+              View Profile
+            </a>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  }
+
+  function formatDate(value) {
+    if (!value) return "-";
+    return new Date(value).toLocaleDateString("en-GB");
+  }
+
+  function showError(message) {
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.innerText = message;
+  }
+
+  function escapeHtml(value) {
+    return String(value)
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  async function logout() {
+    await supabase.auth.signOut();
+    window.location.href = "/login.html";
+  }
+
+  init();
+</script>
+
+</body>
+</html>
