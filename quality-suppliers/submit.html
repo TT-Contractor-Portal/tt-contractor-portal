@@ -189,7 +189,7 @@ async function init() {
 }
 
 async function loadExistingSupplier() {
-  const { data } = await supabase
+  const { data } = await db
     .from("quality_suppliers")
     .select("*")
     .eq("created_by", currentUser.id)
@@ -235,7 +235,7 @@ async function saveSupplier() {
   }
 
   if (supplier) {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("quality_suppliers")
       .update(payload)
       .eq("id", supplier.id)
@@ -245,7 +245,7 @@ async function saveSupplier() {
     if (error) return showError(error.message);
     supplier = data;
   } else {
-    const { data, error } = await supabase
+    const { data, error } = await db
       .from("quality_suppliers")
       .insert(payload)
       .select()
@@ -321,7 +321,7 @@ async function uploadDocument(documentType, multipleAllowed) {
   if (!files.length) return showError("Please choose a file first.");
 
   if (!multipleAllowed) {
-    await supabase
+    await db
       .from("quality_supplier_documents")
       .delete()
       .eq("supplier_id", supplier.id)
@@ -338,7 +338,7 @@ async function uploadDocument(documentType, multipleAllowed) {
 
     if (uploadError) return showError(uploadError.message);
 
-    const { error: insertError } = await supabase
+    const { error: insertError } = await db
       .from("quality_supplier_documents")
       .insert({
         supplier_id: supplier.id,
@@ -359,7 +359,7 @@ async function uploadDocument(documentType, multipleAllowed) {
 }
 
 async function loadDocuments() {
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("quality_supplier_documents")
     .select("*")
     .eq("supplier_id", supplier.id);
@@ -375,7 +375,7 @@ async function saveGfsi() {
   const value = document.getElementById("gfsi_certified").value;
   if (value === "") return;
 
-  const { error } = await supabase
+  const { error } = await db
     .from("quality_suppliers")
     .update({ gfsi_certified: value === "true" })
     .eq("id", supplier.id);
@@ -422,7 +422,7 @@ async function addAllergenProduct() {
     payload[key] = value;
   }
 
-  const { error } = await supabase
+  const { error } = await db
     .from("quality_supplier_allergens")
     .insert(payload);
 
@@ -439,7 +439,7 @@ async function addAllergenProduct() {
 async function loadSavedAllergens() {
   if (!supplier || supplier.supplier_type !== "Raw Material Supplier") return;
 
-  const { data, error } = await supabase
+  const { data, error } = await db
     .from("quality_supplier_allergens")
     .select("*")
     .eq("supplier_id", supplier.id)
@@ -466,7 +466,7 @@ async function loadSavedAllergens() {
 }
 
 async function reloadSupplier() {
-  const { data } = await supabase
+  const { data } = await db
     .from("quality_suppliers")
     .select("*")
     .eq("id", supplier.id)
