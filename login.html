@@ -471,8 +471,11 @@ if (params.get("mode") === "contractor-signup") {
     loginBtn.style.display = "none";
     showSignupBtn.style.display = "none";
     signupBtn.style.display = "block";
+
+    // 👇 THIS is the key bit
     backToLoginWrap.style.display = "block";
     forgotPasswordWrap.style.display = "none";
+
     formSubtitle.textContent = "Create an external contractor account";
   });
 }
