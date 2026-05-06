@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TT Staff Signup</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: url("/images/tt-background.jpg") center / cover no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  .card {
+    background: rgba(255,255,255,0.95);
+    padding: 30px;
+    border-radius: 14px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  h1 {
+    text-align: center;
+    color: #035740;
+  }
+
+  label {
+    font-weight: bold;
+    display: block;
+    margin-top: 15px;
+  }
+
+  input, select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+  }
+
+  button {
+    width: 100%;
+    padding: 12px;
+    margin-top: 20px;
+    background: #035740;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  button:hover {
+    background: #024534;
+  }
+
+  .back {
+    margin-top: 15px;
+    text-align: center;
+  }
+
+  .back a {
+    color: #035740;
+    text-decoration: none;
+    font-weight: bold;
+  }
+
+  .message {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 8px;
+    display: none;
+  }
+
+  .success { background: #e6f9f0; color: #065f46; }
+  .error { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>TT Staff Signup</h1>
+
+  <label>Email</label>
+  <input type="email" id="email">
+
+  <label>Password</label>
+  <input type="password" id="password">
+
+  <label>Full Name</label>
+  <input type="text" id="fullName">
+
+  <label>Contractor Induction Completed?</label>
+  <select id="induction">
+    <option value="">Select</option>
+    <option value="true">Yes</option>
+    <option value="false">No</option>
+  </select>
+
+  <label>Permit to Work Training Completed?</label>
+  <select id="ptw">
+    <option value="">Select</option>
+    <option value="true">Yes</option>
+    <option value="false">No</option>
+  </select>
+
+  <button id="signupBtn">Create Account</button>
+
+  <div id="message" class="message"></div>
+
+  <div class="back">
+    <a href="/login.html">← Back to Login</a>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const supabase = window.supabase.createClient(
+  "https://rfcwfbdcdnjpaxwztvfr.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ"
+);
+
+const message = document.getElementById("message");
+
+function showMessage(text, type) {
+  message.className = "message " + type;
+  message.innerHTML = text;
+  message.style.display = "block";
+}
+
+function isTTEmail(email) {
+  return email.endsWith("@timtaylors.co.uk");
+}
+
+document.getElementById("signupBtn").addEventListener("click", async () => {
+
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const password = document.getElementById("password").value;
+  const fullName = document.getElementById("fullName").value;
+  const induction = document.getElementById("induction").value;
+  const ptw = document.getElementById("ptw").value;
+
+  if (!email || !password || !fullName) {
+    showMessage("Please complete all fields", "error");
+    return;
+  }
+
+  if (!isTTEmail(email)) {
+    showMessage("Must use @timtaylors.co.uk email", "error");
+    return;
+  }
+
+  if (induction === "" || ptw === "") {
+    showMessage("Please answer training questions", "error");
+    return;
+  }
+
+  showMessage("Creating account...", "success");
+
+  const reviewerRequested = (induction === "true" && ptw === "true");
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        full_name: fullName,
+        induction_complete: induction === "true",
+        ptw_complete: ptw === "true",
+        reviewer_requested: reviewerRequested
+      }
+    }
+  });
+
+  if (error) {
+    showMessage(error.message, "error");
+    return;
+  }
+
+  showMessage("✅ Account created. You can now log in.", "success");
+
+  setTimeout(() => {
+    window.location.href = "/login.html";
+  }, 3000);
+});
+</script>
+
+</body>
+</html>
