@@ -448,12 +448,16 @@ function hideMessage() {
     window.location.href = "/contractors/index.html";
   });
 
-  backToLogin.addEventListener("click", (e) => {
-    e.preventDefault();
-    switchToLoginMode();
-   document.getElementById("messageBox").style.display = "none";
-    resetSignupFields();
-  });
+ backToLogin.addEventListener("click", (e) => {
+  e.preventDefault();
+
+  // Clear URL params so you don't get stuck in signup mode
+  window.history.replaceState({}, document.title, "/login.html");
+
+  switchToLoginMode();
+  hideMessage();
+  resetSignupFields();
+});
 
   emailInput.addEventListener("input", () => {
     if (signupFields.style.display === "block") {
