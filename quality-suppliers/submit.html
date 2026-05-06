@@ -271,9 +271,58 @@ function renderPage() {
   document.getElementById("statusCard").style.display = "block";
   document.getElementById("documentsCard").style.display = "block";
 
-  document.getElementById("statusText").innerHTML =
-    `<strong>Status:</strong> ${escapeHtml(supplier.status)}<br>
-     <span class="muted">When all mandatory items are complete, this will automatically become Ready for Review.</span>`;
+  let statusMessage = "";
+
+if (supplier.status === "In Progress") {
+  statusMessage = `
+    <strong>Status:</strong> In Progress<br><br>
+    <span class="muted">
+      Please complete all required sections below.<br>
+      Your submission will automatically move to approval once complete.
+    </span>
+  `;
+}
+
+if (supplier.status === "Ready for Review") {
+  statusMessage = `
+    <strong>Status:</strong> Ready for Review<br><br>
+    <span style="color: green; font-weight: bold;">
+      ✔ Your submission is complete and has been sent for approval.
+    </span><br><br>
+    <span class="muted">
+      You will be notified once your supplier account has been reviewed.
+    </span><br><br>
+    <button class="btn" onclick="window.location.href='/login.html'">
+      Return to Login
+    </button>
+  `;
+}
+
+if (supplier.status === "Approved") {
+  statusMessage = `
+    <strong>Status:</strong> Approved<br><br>
+    <span style="color: green; font-weight: bold;">
+      ✔ Your company is an approved supplier.
+    </span><br><br>
+    <button class="btn" onclick="window.location.href='/login.html'">
+      Return to Login
+    </button>
+  `;
+}
+
+if (supplier.status === "Rejected") {
+  statusMessage = `
+    <strong>Status:</strong> Rejected<br><br>
+    <span style="color: red; font-weight: bold;">
+      ✖ Your submission has been rejected.
+    </span><br><br>
+    <span class="muted">
+      Please review the feedback and update your documents.
+    </span>
+  `;
+}
+
+document.getElementById("statusText").innerHTML = statusMessage;
 
   const isRaw = supplier.supplier_type === "Raw Material Supplier";
 
