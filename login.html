@@ -461,6 +461,22 @@ function hideMessage() {
     }
   });
 
+const params = new URLSearchParams(window.location.search);
+
+if (params.get("mode") === "contractor-signup") {
+  loadCompaniesForSignup().then(() => {
+    signupFields.style.display = "block";
+    contractorSignupFields.style.display = "block";
+    ttSignupFields.style.display = "none";
+    loginBtn.style.display = "none";
+    showSignupBtn.style.display = "none";
+    signupBtn.style.display = "block";
+    backToLoginWrap.style.display = "block";
+    forgotPasswordWrap.style.display = "none";
+    formSubtitle.textContent = "Create an external contractor account";
+  });
+}
+  
   signupBtn.addEventListener("click", async () => {
     try {
       const email = document.getElementById("email").value.trim().toLowerCase();
