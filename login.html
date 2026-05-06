@@ -439,16 +439,36 @@ function hideMessage() {
       return;
     }
 
-    const contractorResult = await ensureContractorRecord(user);
+  // First check whether this non-TT user is a quality supplier
+const { data: qualitySupplier, error: qualitySupplierError } = await client
+  .from("quality_suppliers")
+  .select("id, supplier_type, status")
+  .eq("created_by", user.id)
+  .maybeSingle();
 
-    if (!contractorResult.ok) {
-      setMessage(contractorResult.message, "#b42318");
-      await client.auth.signOut();
-      return;
-    }
+if (qualitySupplierError) {
+  setMessage("Unable to check supplier account: " + qualitySupplierError.message, "error");
+  await client.auth.signOut();
+  return;
+}
 
-    setMessage("Login successful...");
-    window.location.href = "/contractors/index.html";
+if (qualitySupplier) {
+  setMessage("Login successful...");
+  window.location.href = "/quality-suppliers/submit.html";
+  return;
+}
+
+// If not a quality supplier, treat as a service contractor
+const contractorResult = await ensureContractorRecord(user);
+
+if (!contractorResult.ok) {
+  setMessage(contractorResult.message, "error");
+  await client.auth.signOut();
+  return;
+}
+
+setMessage("Login successful...");
+window.location.href = "/contractors/index.html";
   });
 
  backToLogin.addEventListener("click", (e) => {
