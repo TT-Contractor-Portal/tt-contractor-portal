@@ -1,0 +1,520 @@
+<!-- FULL FILE: /quality-suppliers/submit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quality Supplier Submission - TT Contractor Portal</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#f5f5f5; color:#222; }
+    .main { max-width:1100px; margin:0 auto; padding:24px; }
+    .card { background:#fff; padding:20px; border-radius:10px; margin-bottom:18px; box-shadow:0 2px 6px rgba(0,0,0,.1); }
+    h1,h2,h3 { margin-top:0; }
+    label { display:block; font-weight:bold; margin:12px 0 6px; }
+    input, select, textarea { width:100%; padding:10px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .btn { background:#035740; color:white; border:0; padding:10px 14px; border-radius:6px; cursor:pointer; margin-top:10px; }
+    .btn-danger { background:#842029; }
+    .muted { color:#666; font-size:14px; }
+    .status { padding:10px; border-radius:8px; background:#eef; margin-bottom:14px; }
+    .doc-line { display:flex; justify-content:space-between; align-items:center; gap:10px; border-bottom:1px solid #eee; padding:10px 0; }
+    .required { color:#842029; }
+    .success { background:#d1e7dd; color:#0f5132; padding:10px; border-radius:8px; display:none; margin-bottom:12px; }
+    .error { background:#f8d7da; color:#842029; padding:10px; border-radius:8px; display:none; margin-bottom:12px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th,td { border-bottom:1px solid #ddd; padding:8px; text-align:left; vertical-align:top; }
+    th { background:#f0f0f0; }
+    .small-select { min-width:170px; }
+  </style>
+</head>
+
+<body>
+<div class="main">
+  <h1>Quality Supplier Submission</h1>
+  <p class="muted">Complete all mandatory sections. Once complete, your submission will automatically move to awaiting approval.</p>
+
+  <div id="successBox" class="success"></div>
+  <div id="errorBox" class="error"></div>
+
+  <div class="card">
+    <h2>Supplier Details</h2>
+
+    <div class="row">
+      <div>
+        <label>Company Name <span class="required">*</span></label>
+        <input id="company_name" />
+      </div>
+      <div>
+        <label>Supplier Type <span class="required">*</span></label>
+        <select id="supplier_type" onchange="onSupplierTypeChange()">
+          <option value="">Select...</option>
+          <option value="Raw Material Supplier">Raw Material Supplier</option>
+          <option value="Packaging Supplier">Packaging Supplier</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Contact Name</label>
+        <input id="contact_name" />
+      </div>
+      <div>
+        <label>Email</label>
+        <input id="email" type="email" />
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label>Phone</label>
+        <input id="phone" />
+      </div>
+      <div>
+        <label>Address</label>
+        <input id="address" />
+      </div>
+    </div>
+
+    <button class="btn" onclick="saveSupplier()">Save Supplier Details</button>
+  </div>
+
+  <div id="statusCard" class="card" style="display:none;">
+    <h2>Current Status</h2>
+    <div id="statusText" class="status"></div>
+  </div>
+
+  <div id="documentsCard" class="card" style="display:none;">
+    <h2>Document Uploads</h2>
+    <p class="muted">Upload the required documents for your supplier type.</p>
+    <div id="documentList"></div>
+  </div>
+
+  <div id="gfsiCard" class="card" style="display:none;">
+    <h2>GFSI Certification</h2>
+    <label>Are you GFSI certified? <span class="required">*</span></label>
+    <select id="gfsi_certified" onchange="saveGfsi()">
+      <option value="">Select...</option>
+      <option value="true">Yes</option>
+      <option value="false">No</option>
+    </select>
+    <p class="muted">If no, traceability documents are required.</p>
+  </div>
+
+  <div id="allergenCard" class="card" style="display:none;">
+    <h2>Allergen Information</h2>
+    <p class="muted">Add one row per product. For each allergen, select the correct status.</p>
+
+    <label>Product Name</label>
+    <input id="product_name" placeholder="Example: Malted Barley" />
+
+    <table>
+      <thead>
+        <tr>
+          <th>Allergen</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="allergenInputs"></tbody>
+    </table>
+
+    <button class="btn" onclick="addAllergenProduct()">Add Product Allergen Record</button>
+
+    <h3 style="margin-top:20px;">Saved Products</h3>
+    <div id="savedAllergens">No allergen records yet.</div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const BUCKET = "quality-supplier-documents";
+
+let currentUser = null;
+let supplier = null;
+
+const allergenFields = [
+  ["celery", "Celery"],
+  ["cereals_containing_gluten", "Cereals containing gluten"],
+  ["crustaceans", "Crustaceans"],
+  ["eggs", "Eggs"],
+  ["fish", "Fish"],
+  ["lupin", "Lupin"],
+  ["milk", "Milk"],
+  ["molluscs", "Molluscs"],
+  ["mustard", "Mustard"],
+  ["nuts", "Nuts"],
+  ["peanuts", "Peanuts"],
+  ["sesame", "Sesame"],
+  ["soya", "Soya"],
+  ["sulphur_dioxide_sulphites", "Sulphur dioxide / sulphites"]
+];
+
+const rawDocs = [
+  ["3rd Party Accreditation", true, true],
+  ["Specification Documents", true, true],
+  ["Quality Policy", true, false],
+  ["Ethical Policy", true, false],
+  ["HACCP RA", true, false],
+  ["Traceability", false, true],
+  ["Raw Materials SAQ", true, false]
+];
+
+const packagingDocs = [
+  ["3rd Party Accreditation", true, true],
+  ["Specification Documents", true, true],
+  ["Quality Policy", true, false],
+  ["Ethical Policy", true, false],
+  ["HACCP RA", false, false],
+  ["Declaration of Compliance", true, false]
+];
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  currentUser = user;
+  document.getElementById("email").value = user.email || "";
+
+  buildAllergenInputs();
+  await loadExistingSupplier();
+}
+
+async function loadExistingSupplier() {
+  const { data } = await supabase
+    .from("quality_suppliers")
+    .select("*")
+    .eq("created_by", currentUser.id)
+    .order("created_at", { ascending:false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data) return;
+
+  supplier = data;
+
+  document.getElementById("company_name").value = supplier.company_name || "";
+  document.getElementById("supplier_type").value = supplier.supplier_type || "";
+  document.getElementById("contact_name").value = supplier.contact_name || "";
+  document.getElementById("email").value = supplier.email || "";
+  document.getElementById("phone").value = supplier.phone || "";
+  document.getElementById("address").value = supplier.address || "";
+
+  if (supplier.gfsi_certified === true) document.getElementById("gfsi_certified").value = "true";
+  if (supplier.gfsi_certified === false) document.getElementById("gfsi_certified").value = "false";
+
+  renderPage();
+  await loadDocuments();
+  await loadSavedAllergens();
+}
+
+async function saveSupplier() {
+  clearMessages();
+
+  const payload = {
+    company_name: getValue("company_name"),
+    supplier_type: getValue("supplier_type"),
+    contact_name: getValue("contact_name"),
+    email: getValue("email"),
+    phone: getValue("phone"),
+    address: getValue("address"),
+    created_by: currentUser.id
+  };
+
+  if (!payload.company_name || !payload.supplier_type) {
+    showError("Company name and supplier type are required.");
+    return;
+  }
+
+  if (supplier) {
+    const { data, error } = await supabase
+      .from("quality_suppliers")
+      .update(payload)
+      .eq("id", supplier.id)
+      .select()
+      .single();
+
+    if (error) return showError(error.message);
+    supplier = data;
+  } else {
+    const { data, error } = await supabase
+      .from("quality_suppliers")
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) return showError(error.message);
+    supplier = data;
+  }
+
+  showSuccess("Supplier details saved.");
+  renderPage();
+  await loadDocuments();
+  await loadSavedAllergens();
+}
+
+function onSupplierTypeChange() {
+  if (supplier) saveSupplier();
+}
+
+function renderPage() {
+  if (!supplier) return;
+
+  document.getElementById("statusCard").style.display = "block";
+  document.getElementById("documentsCard").style.display = "block";
+
+  document.getElementById("statusText").innerHTML =
+    `<strong>Status:</strong> ${escapeHtml(supplier.status)}<br>
+     <span class="muted">When all mandatory items are complete, this will automatically become Ready for Review.</span>`;
+
+  const isRaw = supplier.supplier_type === "Raw Material Supplier";
+
+  document.getElementById("gfsiCard").style.display = isRaw ? "block" : "none";
+  document.getElementById("allergenCard").style.display = isRaw ? "block" : "none";
+
+  buildDocumentList();
+}
+
+function buildDocumentList(existingDocs = []) {
+  const docs = supplier.supplier_type === "Raw Material Supplier" ? rawDocs : packagingDocs;
+
+  const gfsiValue = document.getElementById("gfsi_certified").value;
+  const traceabilityRequired = supplier.supplier_type === "Raw Material Supplier" && gfsiValue === "false";
+
+  document.getElementById("documentList").innerHTML = docs.map(([type, normallyRequired, multiple]) => {
+    const required = type === "Traceability" ? traceabilityRequired : normallyRequired;
+    const uploaded = existingDocs.filter(d => d.document_type === type);
+
+    return `
+      <div class="doc-line">
+        <div>
+          <strong>${escapeHtml(type)}</strong>
+          ${required ? `<span class="required"> *mandatory</span>` : `<span class="muted"> optional</span>`}
+          ${multiple ? `<div class="muted">Multiple documents allowed</div>` : `<div class="muted">Single document</div>`}
+          <div class="muted">${uploaded.length ? uploaded.length + " uploaded" : "None uploaded"}</div>
+        </div>
+        <div>
+          <input type="file" id="file_${slug(type)}" ${multiple ? "multiple" : ""} />
+          <button class="btn" onclick="uploadDocument('${escapeJs(type)}', ${multiple})">Upload</button>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function uploadDocument(documentType, multipleAllowed) {
+  clearMessages();
+
+  if (!supplier) return showError("Save supplier details first.");
+
+  const input = document.getElementById("file_" + slug(documentType));
+  const files = Array.from(input.files || []);
+
+  if (!files.length) return showError("Please choose a file first.");
+
+  if (!multipleAllowed) {
+    await supabase
+      .from("quality_supplier_documents")
+      .delete()
+      .eq("supplier_id", supplier.id)
+      .eq("document_type", documentType);
+  }
+
+  for (const file of files) {
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, "_");
+    const filePath = `${supplier.id}/${slug(documentType)}/${Date.now()}_${safeName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(filePath, file, { upsert:false });
+
+    if (uploadError) return showError(uploadError.message);
+
+    const { error: insertError } = await supabase
+      .from("quality_supplier_documents")
+      .insert({
+        supplier_id: supplier.id,
+        document_type: documentType,
+        file_name: file.name,
+        file_path: filePath,
+        mime_type: file.type,
+        file_size: file.size,
+        uploaded_by: currentUser.id
+      });
+
+    if (insertError) return showError(insertError.message);
+  }
+
+  showSuccess("Document uploaded.");
+  await reloadSupplier();
+  await loadDocuments();
+}
+
+async function loadDocuments() {
+  const { data, error } = await supabase
+    .from("quality_supplier_documents")
+    .select("*")
+    .eq("supplier_id", supplier.id);
+
+  if (error) return showError(error.message);
+
+  buildDocumentList(data || []);
+}
+
+async function saveGfsi() {
+  if (!supplier) return;
+
+  const value = document.getElementById("gfsi_certified").value;
+  if (value === "") return;
+
+  const { error } = await supabase
+    .from("quality_suppliers")
+    .update({ gfsi_certified: value === "true" })
+    .eq("id", supplier.id);
+
+  if (error) return showError(error.message);
+
+  showSuccess("GFSI answer saved.");
+  await reloadSupplier();
+  await loadDocuments();
+}
+
+function buildAllergenInputs() {
+  document.getElementById("allergenInputs").innerHTML = allergenFields.map(([key, label]) => `
+    <tr>
+      <td>${label}</td>
+      <td>
+        <select class="small-select" id="allergen_${key}">
+          <option value="">Select...</option>
+          <option value="Contains">Contains</option>
+          <option value="Contained within factory">Contained within factory</option>
+          <option value="Does not contain">Does not contain</option>
+        </select>
+      </td>
+    </tr>
+  `).join("");
+}
+
+async function addAllergenProduct() {
+  clearMessages();
+
+  if (!supplier) return showError("Save supplier details first.");
+
+  const productName = getValue("product_name");
+  if (!productName) return showError("Product name is required.");
+
+  const payload = {
+    supplier_id: supplier.id,
+    product_name: productName
+  };
+
+  for (const [key] of allergenFields) {
+    const value = document.getElementById("allergen_" + key).value;
+    if (!value) return showError("Please complete every allergen status.");
+    payload[key] = value;
+  }
+
+  const { error } = await supabase
+    .from("quality_supplier_allergens")
+    .insert(payload);
+
+  if (error) return showError(error.message);
+
+  document.getElementById("product_name").value = "";
+  allergenFields.forEach(([key]) => document.getElementById("allergen_" + key).value = "");
+
+  showSuccess("Allergen product record added.");
+  await reloadSupplier();
+  await loadSavedAllergens();
+}
+
+async function loadSavedAllergens() {
+  if (!supplier || supplier.supplier_type !== "Raw Material Supplier") return;
+
+  const { data, error } = await supabase
+    .from("quality_supplier_allergens")
+    .select("*")
+    .eq("supplier_id", supplier.id)
+    .order("created_at", { ascending:false });
+
+  if (error) return showError(error.message);
+
+  if (!data || !data.length) {
+    document.getElementById("savedAllergens").innerText = "No allergen records yet.";
+    return;
+  }
+
+  document.getElementById("savedAllergens").innerHTML = data.map(row => `
+    <div class="card">
+      <strong>${escapeHtml(row.product_name)}</strong>
+      <p class="muted">
+        Milk: ${escapeHtml(row.milk)} |
+        Nuts: ${escapeHtml(row.nuts)} |
+        Gluten: ${escapeHtml(row.cereals_containing_gluten)} |
+        Eggs: ${escapeHtml(row.eggs)}
+      </p>
+    </div>
+  `).join("");
+}
+
+async function reloadSupplier() {
+  const { data } = await supabase
+    .from("quality_suppliers")
+    .select("*")
+    .eq("id", supplier.id)
+    .single();
+
+  supplier = data;
+  renderPage();
+}
+
+function getValue(id) {
+  return document.getElementById(id).value.trim();
+}
+
+function slug(value) {
+  return String(value).toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function escapeJs(value) {
+  return String(value).replaceAll("'", "\\'");
+}
+
+function showSuccess(message) {
+  const box = document.getElementById("successBox");
+  box.style.display = "block";
+  box.innerText = message;
+}
+
+function showError(message) {
+  const box = document.getElementById("errorBox");
+  box.style.display = "block";
+  box.innerText = message;
+}
+
+function clearMessages() {
+  document.getElementById("successBox").style.display = "none";
+  document.getElementById("errorBox").style.display = "none";
+}
+
+init();
+</script>
+</body>
+</html>
