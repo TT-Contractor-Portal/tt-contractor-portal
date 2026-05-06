@@ -249,18 +249,58 @@ async function reject() {
 }
 
 async function loadDocuments() {
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("quality_supplier_documents")
     .select("*")
-    .eq("supplier_id", supplierId);
+    .eq("supplier_id", supplierId)
+    .order("uploaded_at", { ascending: false });
 
-  document.getElementById("docsTable").innerHTML =
-    data.map(doc => `
+  if (error) {
+    console.error(error);
+    document.getElementById("docsTable").innerHTML = `
       <tr>
-        <td>${doc.document_type}</td>
-        <td><a href="${doc.file_path}" target="_blank">View</a></td>
+        <td colspan="2">Error loading documents.</td>
       </tr>
-    `).join("");
+    `;
+    return;
+  }
+
+  if (!data || data.length === 0) {
+    document.getElementById("docsTable").innerHTML = `
+      <tr>
+        <td colspan="2">No documents uploaded.</td>
+      </tr>
+    `;
+    return;
+  }
+
+  const rows = await Promise.all(data.map(async (doc) => {
+    const { data: signedData, error: signedError } = await supabase.storage
+      .from("quality-supplier-documents")
+      .createSignedUrl(doc.file_path, 60 * 60);
+
+    if (signedError || !signedData?.signedUrl) {
+      return `
+        <tr>
+          <td>${escapeHtml(doc.document_type || "-")}</td>
+          <td>Unable to open document</td>
+        </tr>
+      `;
+    }
+
+    return `
+      <tr>
+        <td>${escapeHtml(doc.document_type || "-")}</td>
+        <td>
+          <a href="${signedData.signedUrl}" target="_blank">
+            ${escapeHtml(doc.file_name || "View document")}
+          </a>
+        </td>
+      </tr>
+    `;
+  }));
+
+  document.getElementById("docsTable").innerHTML = rows.join("");
 }
 
 async function loadAllergens() {
