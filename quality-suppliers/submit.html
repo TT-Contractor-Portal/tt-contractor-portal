@@ -128,6 +128,24 @@
 </div>
 
 <script>
+const { data: { user } } = await client.auth.getUser();
+
+if (!user) {
+  window.location.href = "/login.html";
+}
+
+// Check they are actually a quality supplier
+const { data: supplier } = await client
+  .from("quality_suppliers")
+  .select("id")
+  .eq("created_by", user.id)
+  .maybeSingle();
+
+if (!supplier) {
+  window.location.href = "/login.html";
+}
+
+  
 const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
