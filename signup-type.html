@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Choose Account Type - TT Contractor Portal</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 60px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .intro {
+      text-align: center;
+      color: #666;
+      margin-bottom: 35px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 28px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+      cursor: pointer;
+      transition: 0.2s;
+      border-top: 6px solid #035740;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+    }
+
+    .card h2 {
+      margin-top: 0;
+      color: #035740;
+    }
+
+    .card p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 30px;
+    }
+
+    .login-link a {
+      color: #035740;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>Create an Account</h1>
+  <p class="intro">Please choose the type of supplier or contractor account you need.</p>
+
+  <div class="cards">
+
+    <div class="card" onclick="location.href='/quality-suppliers/signup.html?type=raw'">
+      <h2>Raw Material Supplier</h2>
+      <p>For suppliers providing raw materials used in Timothy Taylor products.</p>
+    </div>
+
+    <div class="card" onclick="location.href='/quality-suppliers/signup.html?type=packaging'">
+      <h2>Packaging Supplier</h2>
+      <p>For suppliers providing packaging materials for Timothy Taylor products.</p>
+    </div>
+
+    <div class="card" onclick="location.href='/contractor-signup.html'">
+      <h2>Service Contractor / Supplier</h2>
+      <p>For contractors working on site, machinery suppliers, engineers, or other service providers.</p>
+    </div>
+
+  </div>
+
+  <div class="login-link">
+    Already have an account? <a href="/login.html">Log in</a>
+  </div>
+</div>
+
+</body>
+</html>
