@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quality Supplier Signup - TT Contractor Portal</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .container {
+      max-width: 620px;
+      margin: 50px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      margin-top: 0;
+      color: #035740;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin: 14px 0 6px;
+    }
+
+    input {
+      width: 100%;
+      padding: 11px;
+      box-sizing: border-box;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 15px;
+    }
+
+    .btn {
+      width: 100%;
+      background: #035740;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .error {
+      display: none;
+      background: #f8d7da;
+      color: #842029;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .success {
+      display: none;
+      background: #d1e7dd;
+      color: #0f5132;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 15px;
+      color: #035740;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1 id="pageTitle">Quality Supplier Signup</h1>
+  <p class="muted">Create your login account. After this you will complete your supplier compliance submission.</p>
+
+  <div id="errorBox" class="error"></div>
+  <div id="successBox" class="success"></div>
+
+  <label>Email address</label>
+  <input id="email" type="email" />
+
+  <label>Password</label>
+  <input id="password" type="password" />
+
+  <label>Full name</label>
+  <input id="contact_name" />
+
+  <label>Company name</label>
+  <input id="company_name" />
+
+  <label>Phone</label>
+  <input id="phone" />
+
+  <label>Address</label>
+  <input id="address" />
+
+  <button class="btn" onclick="createAccount()">Create Account</button>
+
+  <a class="back-link" href="/signup-type.html">← Back</a>
+</div>
+
+<script>
+const SUPABASE_URL = "YOUR_SUPABASE_URL";
+const SUPABASE_ANON_KEY = "YOUR_SUPABASE_ANON_KEY";
+
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const typeParam = params.get("type");
+
+let supplierType = "";
+
+if (typeParam === "raw") {
+  supplierType = "Raw Material Supplier";
+}
+
+if (typeParam === "packaging") {
+  supplierType = "Packaging Supplier";
+}
+
+if (!supplierType) {
+  window.location.href = "/signup-type.html";
+}
+
+document.getElementById("pageTitle").innerText = supplierType + " Signup";
+
+async function createAccount() {
+  clearMessages();
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value.trim();
+  const contactName = document.getElementById("contact_name").value.trim();
+  const companyName = document.getElementById("company_name").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const address = document.getElementById("address").value.trim();
+
+  if (!email || !password || !contactName || !companyName) {
+    showError("Email, password, full name and company name are required.");
+    return;
+  }
+
+  const { data: signUpData, error: signUpError } = await db.auth.signUp({
+    email: email,
+    password: password
+  });
+
+  if (signUpError) {
+    showError(signUpError.message);
+    return;
+  }
+
+  const user = signUpData.user;
+
+  if (!user) {
+    showError("Account created, but user session was not returned. Please check your email, then log in.");
+    return;
+  }
+
+  const { error: supplierError } = await db
+    .from("quality_suppliers")
+    .insert({
+      company_name: companyName,
+      contact_name: contactName,
+      email: email,
+      phone: phone,
+      address: address,
+      supplier_type: supplierType,
+      status: "In Progress",
+      created_by: user.id
+    });
+
+  if (supplierError) {
+    showError(supplierError.message);
+    return;
+  }
+
+  showSuccess("Account created. Taking you to your supplier submission...");
+
+  setTimeout(() => {
+    window.location.href = "/quality-suppliers/submit.html";
+  }, 1200);
+}
+
+function showError(message) {
+  const box = document.getElementById("errorBox");
+  box.style.display = "block";
+  box.innerText = message;
+}
+
+function showSuccess(message) {
+  const box = document.getElementById("successBox");
+  box.style.display = "block";
+  box.innerText = message;
+}
+
+function clearMessages() {
+  document.getElementById("errorBox").style.display = "none";
+  document.getElementById("successBox").style.display = "none";
+}
+</script>
+
+</body>
+</html>
