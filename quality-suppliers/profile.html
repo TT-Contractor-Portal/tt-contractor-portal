@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quality Supplier Profile - TT Contractor Portal</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #222; }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: 240px; height: 100vh;
+      background: #035740;
+      color: white;
+      padding: 24px 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 14px 0;
+      font-size: 16px;
+    }
+
+    .sidebar-logo { text-align: center; margin-bottom: 20px; }
+    .sidebar-logo img { max-width: 140px; }
+
+    .main { margin-left: 240px; padding: 20px; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .approved { background: #d1e7dd; color: #0f5132; }
+    .expired { background: #f8d7da; color: #842029; }
+    .ready { background: #fff3cd; color: #856404; }
+
+    .btn {
+      background: #035740;
+      color: white;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    .btn-danger {
+      background: #842029;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+
+    .section-title { margin-bottom: 10px; font-size: 18px; }
+
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <img src="/images/tt-logo.png" />
+  </div>
+
+  <a href="/index.html">Dashboard</a>
+  <a href="/ttcontractors/index.html">Contractor Register</a>
+  <a href="/quality-suppliers/index.html">Quality Supplier Register</a>
+  <a href="/admin/users.html" id="adminLink">Admin</a>
+</div>
+
+<div class="main">
+
+  <div class="topbar">
+    <div id="welcomeText">Welcome</div>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+  </div>
+
+  <a href="/quality-suppliers/approved.html">← Back</a>
+
+  <div id="profileCard" class="card">
+    Loading...
+  </div>
+
+  <div class="card">
+    <div class="section-title">Documents</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>File</th>
+        </tr>
+      </thead>
+      <tbody id="docsTable"></tbody>
+    </table>
+  </div>
+
+  <div class="card" id="allergenCard" style="display:none;">
+    <div class="section-title">Allergen Information</div>
+    <div id="allergenTable"></div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(window.location.search);
+const supplierId = params.get("id");
+
+let currentProfile = null;
+let supplier = null;
+
+async function init() {
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("id", user.id)
+    .single();
+
+  currentProfile = profile;
+
+  document.getElementById("welcomeText").innerText =
+    `Welcome, ${profile.full_name} — ${profile.role}`;
+
+  if (profile.role !== "admin") {
+    document.getElementById("adminLink").style.display = "none";
+  }
+
+  loadSupplier();
+}
+
+async function loadSupplier() {
+  const { data, error } = await supabase
+    .from("quality_suppliers")
+    .select("*")
+    .eq("id", supplierId)
+    .single();
+
+  supplier = data;
+
+  const badgeClass =
+    supplier.status === "Approved" ? "approved" :
+    supplier.status === "Expired" ? "expired" :
+    "ready";
+
+  document.getElementById("profileCard").innerHTML = `
+    <h2>${supplier.company_name}</h2>
+    <p><strong>Contact:</strong> ${supplier.contact_name || "-"}</p>
+    <p><strong>Email:</strong> ${supplier.email || "-"}</p>
+    <p><strong>Type:</strong> ${supplier.supplier_type}</p>
+    <p><strong>Status:</strong> <span class="badge ${badgeClass}">${supplier.status}</span></p>
+    <br>
+    ${buildActions()}
+  `;
+
+  loadDocuments();
+  loadAllergens();
+}
+
+function buildActions() {
+  const canApprove =
+    currentProfile.role === "admin" ||
+    currentProfile.role === "reviewer";
+
+  if (!canApprove) return "";
+
+  if (supplier.status !== "Ready for Review") return "";
+
+  return `
+    <button class="btn" onclick="approve()">Approve</button>
+    <button class="btn btn-danger" onclick="reject()">Reject</button>
+  `;
+}
+
+async function approve() {
+  if (!confirm("Approve this supplier?")) return;
+
+  await supabase
+    .from("quality_suppliers")
+    .update({
+      status: "Approved",
+      approved_at: new Date().toISOString(),
+      approved_by: currentProfile.id,
+      approved_by_name: currentProfile.full_name
+    })
+    .eq("id", supplierId);
+
+  location.reload();
+}
+
+async function reject() {
+  const reason = prompt("Enter rejection reason:");
+  if (!reason) return;
+
+  await supabase
+    .from("quality_suppliers")
+    .update({
+      status: "Rejected",
+      reviewer_notes: reason
+    })
+    .eq("id", supplierId);
+
+  location.reload();
+}
+
+async function loadDocuments() {
+  const { data } = await supabase
+    .from("quality_supplier_documents")
+    .select("*")
+    .eq("supplier_id", supplierId);
+
+  document.getElementById("docsTable").innerHTML =
+    data.map(doc => `
+      <tr>
+        <td>${doc.document_type}</td>
+        <td><a href="${doc.file_path}" target="_blank">View</a></td>
+      </tr>
+    `).join("");
+}
+
+async function loadAllergens() {
+  const { data } = await supabase
+    .from("quality_supplier_allergens")
+    .select("*")
+    .eq("supplier_id", supplierId);
+
+  if (!data.length) return;
+
+  document.getElementById("allergenCard").style.display = "block";
+
+  document.getElementById("allergenTable").innerHTML =
+    data.map(row => `
+      <div class="card">
+        <strong>${row.product_name}</strong><br>
+        Milk: ${row.milk} | Nuts: ${row.nuts} | Gluten: ${row.cereals_containing_gluten}
+      </div>
+    `).join("");
+}
+
+async function logout() {
+  await supabase.auth.signOut();
+  window.location.href = "/login.html";
+}
+
+init();
+</script>
+
+</body>
+</html>
