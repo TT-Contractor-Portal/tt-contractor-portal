@@ -451,22 +451,6 @@ function hideMessage() {
     window.location.href = "/contractors/index.html";
   });
 
-  showSignupBtn.addEventListener("click", async (e) => {
-    e.preventDefault();
-
-    await loadCompaniesForSignup();
-
-    signupFields.style.display = "block";
-    loginBtn.style.display = "none";
-    showSignupBtn.style.display = "none";
-    signupBtn.style.display = "block";
-    backToLoginWrap.style.display = "block";
-    forgotPasswordWrap.style.display = "none";
-   document.getElementById("messageBox").style.display = "none";
-
-    updateSignupMode();
-  });
-
   backToLogin.addEventListener("click", (e) => {
     e.preventDefault();
     switchToLoginMode();
