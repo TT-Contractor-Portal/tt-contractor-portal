@@ -496,9 +496,10 @@ async function uploadDocument(documentType, multipleAllowed) {
     if (insertError) return showError(insertError.message);
   }
 
-  showSuccess("Document uploaded.");
-  await reloadSupplier();
-  await loadDocuments();
+showSuccess("Document uploaded.");
+await reloadSupplier();
+await loadDocuments();
+await checkAndUpdateSubmissionStatus();
 }
 
 async function loadDocuments() {
