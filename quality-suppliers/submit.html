@@ -615,8 +615,9 @@ async function saveGfsi() {
   if (error) return showError(error.message);
 
   showSuccess("GFSI answer saved.");
-  await reloadSupplier();
-  await loadDocuments();
+await reloadSupplier();
+await loadDocuments();
+await checkAndUpdateSubmissionStatus();
 }
 
 function buildAllergenInputs() {
