@@ -286,46 +286,73 @@ async function loadExistingSupplier() {
 async function saveSupplier() {
   clearMessages();
 
-  const payload = {
+  if (!supplierCompany || !supplier) {
+    showError("Supplier profile has not loaded yet.");
+    return;
+  }
+
+  const companyPayload = {
+    company_name: getValue("company_name"),
+    supplier_type: getValue("supplier_type"),
+    phone: getValue("phone"),
+    company_address: getValue("address"),
+    main_email: getValue("email")
+  };
+
+  const supplierPayload = {
     company_name: getValue("company_name"),
     supplier_type: getValue("supplier_type"),
     contact_name: getValue("contact_name"),
     email: getValue("email"),
     phone: getValue("phone"),
-    address: getValue("address"),
-    created_by: currentUser.id
+    address: getValue("address")
   };
 
-  if (!payload.company_name || !payload.supplier_type) {
+  if (!companyPayload.company_name || !companyPayload.supplier_type) {
     showError("Company name and supplier type are required.");
     return;
   }
 
-  if (supplier) {
-    const { data, error } = await db
-      .from("quality_suppliers")
-      .update(payload)
-      .eq("id", supplier.id)
-      .select()
-      .single();
+  const { error: companyError } = await db
+    .from("quality_supplier_companies")
+    .update(companyPayload)
+    .eq("id", supplierCompany.id);
 
-    if (error) return showError(error.message);
-    supplier = data;
-  } else {
-    const { data, error } = await db
-      .from("quality_suppliers")
-      .insert(payload)
-      .select()
-      .single();
+  if (companyError) {
+    showError(companyError.message);
+    return;
+  }
 
-    if (error) return showError(error.message);
-    supplier = data;
+  const { data: updatedSupplier, error: supplierError } = await db
+    .from("quality_suppliers")
+    .update(supplierPayload)
+    .eq("id", supplier.id)
+    .select()
+    .single();
+
+  if (supplierError) {
+    showError(supplierError.message);
+    return;
+  }
+
+  supplier = updatedSupplier;
+
+  const { error: userLinkError } = await db
+    .from("quality_supplier_users")
+    .update({
+      full_name: getValue("contact_name"),
+      email: getValue("email")
+    })
+    .eq("company_id", supplierCompany.id)
+    .eq("user_id", currentUser.id);
+
+  if (userLinkError) {
+    showError(userLinkError.message);
+    return;
   }
 
   showSuccess("Supplier details saved.");
-  renderPage();
-  await loadDocuments();
-  await loadSavedAllergens();
+  await loadExistingSupplier();
 }
 
 function onSupplierTypeChange() {
