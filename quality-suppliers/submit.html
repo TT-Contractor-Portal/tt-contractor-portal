@@ -209,27 +209,74 @@ async function init() {
 }
 
 async function loadExistingSupplier() {
-  const { data } = await db
+  const { data: company, error: companyError } = await db
+    .from("quality_supplier_companies")
+    .select("*")
+    .eq("id", supplierUserLink.company_id)
+    .maybeSingle();
+
+  if (companyError || !company) {
+    showError("Unable to load supplier company profile.");
+    return;
+  }
+
+  supplierCompany = company;
+
+  let { data: supplierRecord, error: supplierError } = await db
     .from("quality_suppliers")
     .select("*")
-    .eq("created_by", currentUser.id)
-    .order("created_at", { ascending:false })
+    .eq("company_id", company.id)
+    .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
-  if (!data) return;
+  if (supplierError) {
+    showError("Unable to load supplier record: " + supplierError.message);
+    return;
+  }
 
-  supplier = data;
+  // Safety fallback: if old supplier record does not exist, create one
+  if (!supplierRecord) {
+    const { data: createdSupplier, error: createError } = await db
+      .from("quality_suppliers")
+      .insert({
+        company_id: company.id,
+        company_name: company.company_name,
+        contact_name: supplierUserLink.full_name,
+        email: supplierUserLink.email,
+        phone: company.phone,
+        address: company.company_address,
+        supplier_type: company.supplier_type,
+        status: company.status || "In Progress",
+        created_by: currentUser.id
+      })
+      .select()
+      .single();
 
-  document.getElementById("company_name").value = supplier.company_name || "";
-  document.getElementById("supplier_type").value = supplier.supplier_type || "";
-  document.getElementById("contact_name").value = supplier.contact_name || "";
-  document.getElementById("email").value = supplier.email || "";
-  document.getElementById("phone").value = supplier.phone || "";
-  document.getElementById("address").value = supplier.address || "";
+    if (createError) {
+      showError("Unable to create supplier profile: " + createError.message);
+      return;
+    }
 
-  if (supplier.gfsi_certified === true) document.getElementById("gfsi_certified").value = "true";
-  if (supplier.gfsi_certified === false) document.getElementById("gfsi_certified").value = "false";
+    supplierRecord = createdSupplier;
+  }
+
+  supplier = supplierRecord;
+
+  document.getElementById("company_name").value = company.company_name || "";
+  document.getElementById("supplier_type").value = company.supplier_type || "";
+  document.getElementById("contact_name").value = supplierUserLink.full_name || supplier.contact_name || "";
+  document.getElementById("email").value = supplierUserLink.email || supplier.email || "";
+  document.getElementById("phone").value = company.phone || supplier.phone || "";
+  document.getElementById("address").value = company.company_address || supplier.address || "";
+
+  if (supplier.gfsi_certified === true) {
+    document.getElementById("gfsi_certified").value = "true";
+  }
+
+  if (supplier.gfsi_certified === false) {
+    document.getElementById("gfsi_certified").value = "false";
+  }
 
   renderPage();
   await loadDocuments();
