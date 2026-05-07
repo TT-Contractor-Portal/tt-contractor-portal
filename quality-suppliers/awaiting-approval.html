@@ -1,3 +1,4 @@
+<!-- FULL FILE: /quality-suppliers/awaiting-approval.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -29,7 +30,7 @@
     }
 
     table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+    th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; vertical-align: top; }
     th { background: #f0f0f0; }
 
     .badge {
@@ -43,6 +44,7 @@
     .badge-ready { background: #fff3cd; color: #856404; }
     .badge-raw { background: #e7f1ff; color: #084298; }
     .badge-packaging { background: #e9f7ef; color: #0f5132; }
+    .badge-service { background: #f3e8ff; color: #581c87; }
 
     .btn {
       background: #035740;
@@ -68,6 +70,12 @@
       border-radius: 8px;
       margin-top: 15px;
       display: none;
+    }
+
+    .muted {
+      color: #666;
+      font-size: 13px;
+      margin-top: 4px;
     }
   </style>
 </head>
@@ -95,7 +103,7 @@
     <div class="page-header">
       <div>
         <h1>Quality Suppliers Awaiting Approval</h1>
-        <p>Suppliers who have completed all mandatory quality requirements.</p>
+        <p>Supplier companies that have completed all mandatory quality requirements.</p>
       </div>
       <a class="back-link" href="/quality-suppliers/index.html">← Back to Quality Supplier Register</a>
     </div>
@@ -107,7 +115,7 @@
         <thead>
           <tr>
             <th>Company</th>
-            <th>Contact</th>
+            <th>Primary Contact</th>
             <th>Email</th>
             <th>Supplier Type</th>
             <th>Status</th>
@@ -126,7 +134,7 @@
 
 <script>
   const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -173,9 +181,22 @@
   async function loadSuppliers() {
     const tbody = document.getElementById("supplierTableBody");
 
-    const { data: suppliers, error } = await client
-      .from("quality_suppliers")
-      .select("*")
+    const { data: companies, error } = await client
+      .from("quality_supplier_companies")
+      .select(`
+        id,
+        company_name,
+        supplier_type,
+        status,
+        created_at,
+        quality_suppliers (
+          id,
+          contact_name,
+          email,
+          phone,
+          status
+        )
+      `)
       .eq("status", "Ready for Review")
       .order("created_at", { ascending: true });
 
@@ -186,37 +207,53 @@
       return;
     }
 
-    if (!suppliers || suppliers.length === 0) {
-      tbody.innerHTML = `<tr><td colspan="7" class="empty">No quality suppliers are currently awaiting approval.</td></tr>`;
+    if (!companies || companies.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="7" class="empty">No quality supplier companies are currently awaiting approval.</td></tr>`;
       return;
     }
 
-    tbody.innerHTML = suppliers.map(supplier => {
-      const submittedDate = supplier.created_at
-        ? new Date(supplier.created_at).toLocaleDateString("en-GB")
+    tbody.innerHTML = companies.map(company => {
+      const primaryContact = getPrimaryContact(company);
+
+      const submittedDate = company.created_at
+        ? new Date(company.created_at).toLocaleDateString("en-GB")
         : "-";
 
-      const typeBadgeClass =
-        supplier.supplier_type === "Raw Material Supplier"
-          ? "badge-raw"
-          : "badge-packaging";
+      const typeBadgeClass = getTypeBadgeClass(company.supplier_type);
 
       return `
         <tr>
-          <td><strong>${escapeHtml(supplier.company_name || "-")}</strong></td>
-          <td>${escapeHtml(supplier.contact_name || "-")}</td>
-          <td>${escapeHtml(supplier.email || "-")}</td>
-          <td><span class="badge ${typeBadgeClass}">${escapeHtml(supplier.supplier_type || "-")}</span></td>
+          <td>
+            <strong>${escapeHtml(company.company_name || "-")}</strong>
+            <div class="muted">Company record</div>
+          </td>
+          <td>${escapeHtml(primaryContact?.contact_name || "-")}</td>
+          <td>${escapeHtml(primaryContact?.email || "-")}</td>
+          <td><span class="badge ${typeBadgeClass}">${escapeHtml(company.supplier_type || "-")}</span></td>
           <td><span class="badge badge-ready">Ready for Review</span></td>
           <td>${submittedDate}</td>
           <td>
-            <a class="btn" href="/quality-suppliers/profile.html?id=${supplier.id}">
+            <a class="btn" href="/quality-suppliers/profile.html?company_id=${company.id}">
               Review
             </a>
           </td>
         </tr>
       `;
     }).join("");
+  }
+
+  function getPrimaryContact(company) {
+    if (!company.quality_suppliers || company.quality_suppliers.length === 0) {
+      return null;
+    }
+
+    return company.quality_suppliers[0];
+  }
+
+  function getTypeBadgeClass(type) {
+    if (type === "Raw Material Supplier") return "badge-raw";
+    if (type === "Packaging Supplier") return "badge-packaging";
+    return "badge-service";
   }
 
   function showError(message) {
