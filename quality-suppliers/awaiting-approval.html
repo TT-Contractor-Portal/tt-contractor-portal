@@ -133,14 +133,14 @@
   let currentProfile = null;
 
   async function init() {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await client.auth.getUser();
 
     if (userError || !user) {
       window.location.href = "/login.html";
       return;
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await client
       .from("user_profiles")
       .select("*")
       .eq("id", user.id)
@@ -173,7 +173,7 @@
   async function loadSuppliers() {
     const tbody = document.getElementById("supplierTableBody");
 
-    const { data: suppliers, error } = await supabase
+    const { data: suppliers, error } = await client
       .from("quality_suppliers")
       .select("*")
       .eq("status", "Ready for Review")
@@ -235,7 +235,7 @@
   }
 
   async function logout() {
-    await supabase.auth.signOut();
+    await client.auth.signOut();
     window.location.href = "/login.html";
   }
 
