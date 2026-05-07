@@ -512,6 +512,94 @@ async function loadDocuments() {
   buildDocumentList(data || []);
 }
 
+async function checkAndUpdateSubmissionStatus() {
+  if (!supplier || !supplierCompany) return;
+
+  const docs = supplier.supplier_type === "Raw Material Supplier" ? rawDocs : packagingDocs;
+
+  const { data: uploadedDocs, error: docsError } = await db
+    .from("quality_supplier_documents")
+    .select("document_type")
+    .eq("supplier_id", supplier.id);
+
+  if (docsError) {
+    showError(docsError.message);
+    return;
+  }
+
+  const uploadedTypes = (uploadedDocs || []).map(d => d.document_type);
+
+  const gfsiValue = supplier.gfsi_certified;
+  const traceabilityRequired =
+    supplier.supplier_type === "Raw Material Supplier" && gfsiValue === false;
+
+  const mandatoryDocs = docs
+    .filter(([type, normallyRequired]) => {
+      if (type === "Traceability") return traceabilityRequired;
+      return normallyRequired;
+    })
+    .map(([type]) => type);
+
+  const allMandatoryDocsUploaded = mandatoryDocs.every(type =>
+    uploadedTypes.includes(type)
+  );
+
+  let rawMaterialRequirementsComplete = true;
+
+  if (supplier.supplier_type === "Raw Material Supplier") {
+    if (supplier.gfsi_certified !== true && supplier.gfsi_certified !== false) {
+      rawMaterialRequirementsComplete = false;
+    }
+
+    const { data: allergens, error: allergenError } = await db
+      .from("quality_supplier_allergens")
+      .select("id")
+      .eq("supplier_id", supplier.id)
+      .limit(1);
+
+    if (allergenError) {
+      showError(allergenError.message);
+      return;
+    }
+
+    if (!allergens || allergens.length === 0) {
+      rawMaterialRequirementsComplete = false;
+    }
+  }
+
+  const isComplete = allMandatoryDocsUploaded && rawMaterialRequirementsComplete;
+
+  if (!isComplete) return;
+
+  if (supplier.status === "Ready for Review" || supplierCompany.status === "Ready for Review") {
+    return;
+  }
+
+  const { error: supplierError } = await db
+    .from("quality_suppliers")
+    .update({ status: "Ready for Review" })
+    .eq("id", supplier.id);
+
+  if (supplierError) {
+    showError(supplierError.message);
+    return;
+  }
+
+  const { error: companyError } = await db
+    .from("quality_supplier_companies")
+    .update({ status: "Ready for Review" })
+    .eq("id", supplierCompany.id);
+
+  if (companyError) {
+    showError(companyError.message);
+    return;
+  }
+
+  showSuccess("Your submission is complete and has been sent for review.");
+
+  await loadExistingSupplier();
+}
+  
 async function saveGfsi() {
   if (!supplier) return;
 
