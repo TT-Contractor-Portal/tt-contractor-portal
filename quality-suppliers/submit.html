@@ -177,16 +177,32 @@ const packagingDocs = [
 ];
 
 async function init() {
- const { data, error } = await db.auth.getUser();
-const user = data?.user;
+  const { data, error } = await db.auth.getUser();
+  const user = data?.user;
 
-  if (!user) {
+  if (error || !user) {
     window.location.href = "/login.html";
     return;
   }
 
   currentUser = user;
-  document.getElementById("email").value = user.email || "";
+
+  const { data: link, error: linkError } = await db
+    .from("quality_supplier_users")
+    .select("company_id, full_name, email, role, is_active")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (linkError || !link) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  supplierUserLink = link;
+
+  document.getElementById("email").value = link.email || user.email || "";
+  document.getElementById("contact_name").value = link.full_name || "";
 
   buildAllergenInputs();
   await loadExistingSupplier();
