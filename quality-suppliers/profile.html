@@ -1,3 +1,4 @@
+<!-- FULL FILE: /quality-suppliers/profile.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,85 +10,33 @@
 
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #222; }
-
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: 240px; height: 100vh;
-      background: #035740;
-      color: white;
-      padding: 24px 20px;
-      box-sizing: border-box;
-    }
-
-    .sidebar a {
-      display: block;
-      color: white;
-      text-decoration: none;
-      margin: 14px 0;
-      font-size: 16px;
-    }
-
+    .sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: #035740; color: white; padding: 24px 20px; box-sizing: border-box; }
+    .sidebar a { display: block; color: white; text-decoration: none; margin: 14px 0; font-size: 16px; }
     .sidebar-logo { text-align: center; margin-bottom: 20px; }
     .sidebar-logo img { max-width: 140px; }
-
     .main { margin-left: 240px; padding: 20px; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .logout-btn { background: #035740; color: white; border: none; padding: 8px 14px; cursor: pointer; border-radius: 5px; }
 
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .logout-btn {
-      background: #035740;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-
-    .card {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: bold;
-    }
-
+    .card { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .badge { display: inline-block; padding: 6px 10px; border-radius: 999px; font-size: 12px; font-weight: bold; }
     .approved { background: #d1e7dd; color: #0f5132; }
     .expired { background: #f8d7da; color: #842029; }
     .ready { background: #fff3cd; color: #856404; }
+    .rejected { background: #f8d7da; color: #842029; }
+    .progress { background: #e2e3e5; color: #41464b; }
 
-    .btn {
-      background: #035740;
-      color: white;
-      border: none;
-      padding: 10px 14px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-
-    .btn-danger {
-      background: #842029;
-    }
+    .btn { background: #035740; color: white; border: none; padding: 10px 14px; border-radius: 6px; cursor: pointer; margin-right: 10px; }
+    .btn-danger { background: #842029; }
 
     table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; }
+    th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: top; }
+    th { background: #f0f0f0; }
 
-    .section-title { margin-bottom: 10px; font-size: 18px; }
-
+    .section-title { margin-bottom: 10px; font-size: 18px; font-weight: bold; }
+    .error { background: #f8d7da; color: #842029; padding: 12px; border-radius: 8px; margin-bottom: 15px; display: none; }
+    .muted { color: #666; font-size: 13px; }
+    a { color: #035740; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -110,10 +59,25 @@
     <button class="logout-btn" onclick="logout()">Logout</button>
   </div>
 
-  <a href="/quality-suppliers/approved.html">← Back</a>
+  <p><a href="/quality-suppliers/index.html">← Back to Quality Supplier Register</a></p>
 
-  <div id="profileCard" class="card">
-    Loading...
+  <div id="errorBox" class="error"></div>
+
+  <div id="profileCard" class="card">Loading...</div>
+
+  <div class="card">
+    <div class="section-title">Supplier Contacts</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="contactsTable"></tbody>
+    </table>
   </div>
 
   <div class="card">
@@ -123,6 +87,7 @@
         <tr>
           <th>Type</th>
           <th>File</th>
+          <th>Uploaded</th>
         </tr>
       </thead>
       <tbody id="docsTable"></tbody>
@@ -138,78 +103,134 @@
 
 <script>
 const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+const SUPABASE_ANON_KEY = "PASTE_YOUR_SUPABASE_ANON_KEY_HERE";
 
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const params = new URLSearchParams(window.location.search);
-const supplierId = params.get("id");
+const companyId = params.get("company_id") || params.get("id");
 
 let currentProfile = null;
-let supplier = null;
+let company = null;
+let suppliers = [];
 
 async function init() {
-  const { data: { user } } = await client.auth.getUser();
+  const { data: { user }, error: userError } = await client.auth.getUser();
 
-  if (!user) {
+  if (userError || !user) {
     window.location.href = "/login.html";
     return;
   }
 
-  const { data: profile } = await client
+  const { data: profile, error: profileError } = await client
     .from("user_profiles")
     .select("*")
     .eq("id", user.id)
     .single();
 
+  if (profileError || !profile) {
+    showError("Could not load your user profile.");
+    return;
+  }
+
   currentProfile = profile;
 
   document.getElementById("welcomeText").innerText =
-    `Welcome, ${profile.full_name} — ${profile.role}`;
+    `Welcome, ${profile.full_name || "User"} — ${profile.role}`;
 
   if (profile.role !== "admin") {
     document.getElementById("adminLink").style.display = "none";
   }
 
-  loadSupplier();
+  if (!companyId) {
+    showError("No supplier company ID was provided.");
+    document.getElementById("profileCard").innerHTML = "Supplier company not found.";
+    return;
+  }
+
+  await loadCompany();
 }
 
-async function loadSupplier() {
+async function loadCompany() {
   const { data, error } = await client
-    .from("quality_suppliers")
-    .select("*")
-    .eq("id", supplierId)
+    .from("quality_supplier_companies")
+    .select(`
+      *,
+      quality_suppliers (
+        id,
+        contact_name,
+        email,
+        phone,
+        status,
+        created_at
+      )
+    `)
+    .eq("id", companyId)
     .single();
 
-  supplier = data;
+  if (error || !data) {
+    console.error(error);
+    showError("Could not load supplier company.");
+    document.getElementById("profileCard").innerHTML = "Supplier company not found.";
+    return;
+  }
 
-  const badgeClass =
-    supplier.status === "Approved" ? "approved" :
-    supplier.status === "Expired" ? "expired" :
-    "ready";
+  company = data;
+  suppliers = data.quality_suppliers || [];
+
+  renderProfile();
+  renderContacts();
+  await loadDocuments();
+  await loadAllergens();
+}
+
+function renderProfile() {
+  const badgeClass = getStatusClass(company.status);
+
+  const approvedDate = company.approved_at
+    ? new Date(company.approved_at).toLocaleDateString("en-GB")
+    : "-";
+
+  const expiryDate = company.expires_at
+    ? new Date(company.expires_at).toLocaleDateString("en-GB")
+    : "-";
 
   document.getElementById("profileCard").innerHTML = `
-    <h2>${supplier.company_name}</h2>
-    <p><strong>Contact:</strong> ${supplier.contact_name || "-"}</p>
-    <p><strong>Email:</strong> ${supplier.email || "-"}</p>
-    <p><strong>Type:</strong> ${supplier.supplier_type}</p>
-    <p><strong>Status:</strong> <span class="badge ${badgeClass}">${supplier.status}</span></p>
+    <h2>${escapeHtml(company.company_name || "-")}</h2>
+    <p><strong>Type:</strong> ${escapeHtml(company.supplier_type || "-")}</p>
+    <p><strong>Status:</strong> <span class="badge ${badgeClass}">${escapeHtml(company.status || "-")}</span></p>
+    <p><strong>Approved:</strong> ${approvedDate}</p>
+    <p><strong>Expires:</strong> ${expiryDate}</p>
+    <p><strong>Approved By:</strong> ${escapeHtml(company.approved_by_name || "-")}</p>
+    ${company.reviewer_notes ? `<p><strong>Reviewer Notes:</strong> ${escapeHtml(company.reviewer_notes)}</p>` : ""}
     <br>
     ${buildActions()}
   `;
+}
 
-  loadDocuments();
-  loadAllergens();
+function renderContacts() {
+  const table = document.getElementById("contactsTable");
+
+  if (!suppliers.length) {
+    table.innerHTML = `<tr><td colspan="4">No supplier contacts found.</td></tr>`;
+    return;
+  }
+
+  table.innerHTML = suppliers.map(s => `
+    <tr>
+      <td>${escapeHtml(s.contact_name || "-")}</td>
+      <td>${escapeHtml(s.email || "-")}</td>
+      <td>${escapeHtml(s.phone || "-")}</td>
+      <td><span class="badge ${getStatusClass(s.status)}">${escapeHtml(s.status || "-")}</span></td>
+    </tr>
+  `).join("");
 }
 
 function buildActions() {
-  const canApprove =
-    currentProfile.role === "admin" ||
-    currentProfile.role === "reviewer";
+  const canApprove = currentProfile.role === "admin" || currentProfile.role === "reviewer";
 
   if (!canApprove) return "";
-
-  if (supplier.status !== "Ready for Review") return "";
+  if (company.status !== "Ready for Review") return "";
 
   return `
     <button class="btn" onclick="approve()">Approve</button>
@@ -218,17 +239,41 @@ function buildActions() {
 }
 
 async function approve() {
-  if (!confirm("Approve this supplier?")) return;
+  if (!confirm("Approve this supplier company?")) return;
 
-  await client
-    .from("quality_suppliers")
+  const now = new Date();
+  const expiresAt = new Date();
+  expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+
+  const supplierIds = suppliers.map(s => s.id);
+
+  const { error: companyError } = await client
+    .from("quality_supplier_companies")
     .update({
       status: "Approved",
-      approved_at: new Date().toISOString(),
+      approved_at: now.toISOString(),
+      expires_at: expiresAt.toISOString(),
       approved_by: currentProfile.id,
       approved_by_name: currentProfile.full_name
     })
-    .eq("id", supplierId);
+    .eq("id", companyId);
+
+  if (companyError) {
+    showError(companyError.message);
+    return;
+  }
+
+  if (supplierIds.length > 0) {
+    const { error: supplierError } = await client
+      .from("quality_suppliers")
+      .update({ status: "Approved" })
+      .in("id", supplierIds);
+
+    if (supplierError) {
+      showError(supplierError.message);
+      return;
+    }
+  }
 
   location.reload();
 }
@@ -237,65 +282,82 @@ async function reject() {
   const reason = prompt("Enter rejection reason:");
   if (!reason) return;
 
-  await client
-    .from("quality_suppliers")
+  const supplierIds = suppliers.map(s => s.id);
+
+  const { error: companyError } = await client
+    .from("quality_supplier_companies")
     .update({
       status: "Rejected",
       reviewer_notes: reason
     })
-    .eq("id", supplierId);
+    .eq("id", companyId);
+
+  if (companyError) {
+    showError(companyError.message);
+    return;
+  }
+
+  if (supplierIds.length > 0) {
+    const { error: supplierError } = await client
+      .from("quality_suppliers")
+      .update({
+        status: "Rejected",
+        reviewer_notes: reason
+      })
+      .in("id", supplierIds);
+
+    if (supplierError) {
+      showError(supplierError.message);
+      return;
+    }
+  }
 
   location.reload();
 }
 
 async function loadDocuments() {
+  const supplierIds = suppliers.map(s => s.id);
+
+  if (!supplierIds.length) {
+    document.getElementById("docsTable").innerHTML = `<tr><td colspan="3">No documents uploaded.</td></tr>`;
+    return;
+  }
+
   const { data, error } = await client
     .from("quality_supplier_documents")
     .select("*")
-    .eq("supplier_id", supplierId)
+    .in("supplier_id", supplierIds)
     .order("uploaded_at", { ascending: false });
 
   if (error) {
     console.error(error);
-    document.getElementById("docsTable").innerHTML = `
-      <tr>
-        <td colspan="2">Error loading documents.</td>
-      </tr>
-    `;
+    document.getElementById("docsTable").innerHTML = `<tr><td colspan="3">Error loading documents.</td></tr>`;
     return;
   }
 
   if (!data || data.length === 0) {
-    document.getElementById("docsTable").innerHTML = `
-      <tr>
-        <td colspan="2">No documents uploaded.</td>
-      </tr>
-    `;
+    document.getElementById("docsTable").innerHTML = `<tr><td colspan="3">No documents uploaded.</td></tr>`;
     return;
   }
 
   const rows = await Promise.all(data.map(async (doc) => {
+    const uploadedDate = doc.uploaded_at
+      ? new Date(doc.uploaded_at).toLocaleDateString("en-GB")
+      : "-";
+
     const { data: signedData, error: signedError } = await client.storage
       .from("quality-supplier-documents")
       .createSignedUrl(doc.file_path, 60 * 60);
 
-    if (signedError || !signedData?.signedUrl) {
-      return `
-        <tr>
-          <td>${escapeHtml(doc.document_type || "-")}</td>
-          <td>Unable to open document</td>
-        </tr>
-      `;
-    }
+    const fileCell = signedError || !signedData?.signedUrl
+      ? "Unable to open document"
+      : `<a href="${signedData.signedUrl}" target="_blank">${escapeHtml(doc.file_name || "View document")}</a>`;
 
     return `
       <tr>
         <td>${escapeHtml(doc.document_type || "-")}</td>
-        <td>
-          <a href="${signedData.signedUrl}" target="_blank">
-            ${escapeHtml(doc.file_name || "View document")}
-          </a>
-        </td>
+        <td>${fileCell}</td>
+        <td>${uploadedDate}</td>
       </tr>
     `;
   }));
@@ -304,22 +366,48 @@ async function loadDocuments() {
 }
 
 async function loadAllergens() {
-  const { data } = await client
+  const supplierIds = suppliers.map(s => s.id);
+
+  if (!supplierIds.length) return;
+
+  const { data, error } = await client
     .from("quality_supplier_allergens")
     .select("*")
-    .eq("supplier_id", supplierId);
+    .in("supplier_id", supplierIds);
 
-  if (!data.length) return;
+  if (error || !data || data.length === 0) return;
 
   document.getElementById("allergenCard").style.display = "block";
 
   document.getElementById("allergenTable").innerHTML =
     data.map(row => `
       <div class="card">
-        <strong>${row.product_name}</strong><br>
-        Milk: ${row.milk} | Nuts: ${row.nuts} | Gluten: ${row.cereals_containing_gluten}
+        <strong>${escapeHtml(row.product_name || "Product")}</strong><br>
+        Milk: ${displayBool(row.milk)} |
+        Nuts: ${displayBool(row.nuts)} |
+        Gluten: ${displayBool(row.cereals_containing_gluten)}
       </div>
     `).join("");
+}
+
+function getStatusClass(status) {
+  if (status === "Approved") return "approved";
+  if (status === "Expired") return "expired";
+  if (status === "Rejected") return "rejected";
+  if (status === "Ready for Review") return "ready";
+  return "progress";
+}
+
+function displayBool(value) {
+  if (value === true) return "Yes";
+  if (value === false) return "No";
+  return "-";
+}
+
+function showError(message) {
+  const box = document.getElementById("errorBox");
+  box.style.display = "block";
+  box.innerText = message;
 }
 
 function escapeHtml(value) {
@@ -330,7 +418,7 @@ function escapeHtml(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
 }
-  
+
 async function logout() {
   await client.auth.signOut();
   window.location.href = "/login.html";
