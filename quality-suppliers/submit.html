@@ -664,9 +664,10 @@ async function addAllergenProduct() {
   document.getElementById("product_name").value = "";
   allergenFields.forEach(([key]) => document.getElementById("allergen_" + key).value = "");
 
-  showSuccess("Allergen product record added.");
-  await reloadSupplier();
-  await loadSavedAllergens();
+ showSuccess("Allergen product record added.");
+await reloadSupplier();
+await loadSavedAllergens();
+await checkAndUpdateSubmissionStatus();
 }
 
 async function loadSavedAllergens() {
