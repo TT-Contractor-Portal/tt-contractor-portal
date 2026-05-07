@@ -125,7 +125,7 @@
 const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const params = new URLSearchParams(window.location.search);
 const typeParam = params.get("type");
@@ -161,7 +161,7 @@ async function createAccount() {
     return;
   }
 
-  const { data: signUpData, error: signUpError } = await db.auth.signUp({
+  const { data: signUpData, error: signUpError } = await client.auth.signUp({
     email: email,
     password: password,
     options: {
@@ -186,7 +186,7 @@ async function createAccount() {
   }
 
   // 1. Create the supplier company profile
-  const { data: company, error: companyError } = await db
+  const { data: company, error: companyError } = await client
     .from("quality_supplier_companies")
     .insert({
       company_name: companyName,
@@ -205,7 +205,7 @@ async function createAccount() {
   }
 
   // 2. Link this user to the supplier company
-  const { error: userLinkError } = await db
+  const { error: userLinkError } = await client
     .from("quality_supplier_users")
     .insert({
       company_id: company.id,
@@ -222,7 +222,7 @@ async function createAccount() {
   }
 
   // 3. Create the existing supplier record too, so your current pages still work
-  const { error: supplierError } = await db
+  const { error: supplierError } = await client
     .from("quality_suppliers")
     .insert({
       company_id: company.id,
