@@ -140,7 +140,7 @@
 const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const params = new URLSearchParams(window.location.search);
 const supplierId = params.get("id");
@@ -149,14 +149,14 @@ let currentProfile = null;
 let supplier = null;
 
 async function init() {
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user } } = await client.auth.getUser();
 
   if (!user) {
     window.location.href = "/login.html";
     return;
   }
 
-  const { data: profile } = await supabase
+  const { data: profile } = await client
     .from("user_profiles")
     .select("*")
     .eq("id", user.id)
@@ -175,7 +175,7 @@ async function init() {
 }
 
 async function loadSupplier() {
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("quality_suppliers")
     .select("*")
     .eq("id", supplierId)
@@ -220,7 +220,7 @@ function buildActions() {
 async function approve() {
   if (!confirm("Approve this supplier?")) return;
 
-  await supabase
+  await client
     .from("quality_suppliers")
     .update({
       status: "Approved",
@@ -237,7 +237,7 @@ async function reject() {
   const reason = prompt("Enter rejection reason:");
   if (!reason) return;
 
-  await supabase
+  await client
     .from("quality_suppliers")
     .update({
       status: "Rejected",
@@ -249,7 +249,7 @@ async function reject() {
 }
 
 async function loadDocuments() {
-  const { data, error } = await supabase
+  const { data, error } = await client
     .from("quality_supplier_documents")
     .select("*")
     .eq("supplier_id", supplierId)
@@ -275,7 +275,7 @@ async function loadDocuments() {
   }
 
   const rows = await Promise.all(data.map(async (doc) => {
-    const { data: signedData, error: signedError } = await supabase.storage
+    const { data: signedData, error: signedError } = await client.storage
       .from("quality-supplier-documents")
       .createSignedUrl(doc.file_path, 60 * 60);
 
@@ -304,7 +304,7 @@ async function loadDocuments() {
 }
 
 async function loadAllergens() {
-  const { data } = await supabase
+  const { data } = await client
     .from("quality_supplier_allergens")
     .select("*")
     .eq("supplier_id", supplierId);
@@ -323,7 +323,7 @@ async function loadAllergens() {
 }
 
 async function logout() {
-  await supabase.auth.signOut();
+  await client.auth.signOut();
   window.location.href = "/login.html";
 }
 
