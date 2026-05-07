@@ -700,13 +700,22 @@ async function loadSavedAllergens() {
 }
 
 async function reloadSupplier() {
-  const { data } = await db
+  const { data: updatedSupplier } = await db
     .from("quality_suppliers")
     .select("*")
     .eq("id", supplier.id)
     .single();
 
-  supplier = data;
+  supplier = updatedSupplier;
+
+  const { data: updatedCompany } = await db
+    .from("quality_supplier_companies")
+    .select("*")
+    .eq("id", supplierCompany.id)
+    .single();
+
+  supplierCompany = updatedCompany;
+
   renderPage();
 }
 
