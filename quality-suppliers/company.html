@@ -164,20 +164,20 @@
   const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
 
-  const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   const params = new URLSearchParams(window.location.search);
   const companyName = params.get("company");
 
   async function init() {
-    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    const { data: { user }, error: userError } = await client.auth.getUser();
 
     if (userError || !user) {
       window.location.href = "/login.html";
       return;
     }
 
-    const { data: profile, error: profileError } = await supabase
+    const { data: profile, error: profileError } = await client
       .from("user_profiles")
       .select("*")
       .eq("id", user.id)
@@ -210,7 +210,7 @@
   async function loadCompanySuppliers() {
     const tbody = document.getElementById("supplierTableBody");
 
-    const { data: suppliers, error } = await supabase
+    const { data: suppliers, error } = await client
       .from("quality_suppliers")
       .select("*")
       .eq("company_name", companyName)
@@ -290,7 +290,7 @@
   }
 
   async function logout() {
-    await supabase.auth.signOut();
+    await client.auth.signOut();
     window.location.href = "/login.html";
   }
 
