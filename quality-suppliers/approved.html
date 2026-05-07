@@ -1,3 +1,4 @@
+<!-- FULL FILE: /quality-suppliers/approved.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,45 +10,13 @@
 
   <style>
     body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #222; }
-
-    .sidebar {
-      position: fixed;
-      top: 0; left: 0;
-      width: 240px; height: 100vh;
-      background: #035740;
-      color: white;
-      padding: 24px 20px;
-      box-sizing: border-box;
-    }
-
-    .sidebar a {
-      display: block;
-      color: white;
-      text-decoration: none;
-      margin: 14px 0;
-      font-size: 16px;
-    }
-
+    .sidebar { position: fixed; top: 0; left: 0; width: 240px; height: 100vh; background: #035740; color: white; padding: 24px 20px; box-sizing: border-box; }
+    .sidebar a { display: block; color: white; text-decoration: none; margin: 14px 0; font-size: 16px; }
     .sidebar-logo { text-align: center; margin-bottom: 20px; }
     .sidebar-logo img { max-width: 140px; }
-
     .main { margin-left: 240px; padding: 20px; }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 30px;
-    }
-
-    .logout-btn {
-      background: #035740;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+    .logout-btn { background: #035740; color: white; border: none; padding: 8px 14px; cursor: pointer; border-radius: 5px; }
 
     .company-card {
       background: white;
@@ -59,42 +28,31 @@
       transition: 0.2s;
     }
 
-    .company-card:hover {
-      transform: translateY(-3px);
-    }
-
-    .company-name {
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .company-meta {
-      margin-top: 6px;
-      color: #666;
-      font-size: 14px;
-    }
+    .company-card:hover { transform: translateY(-3px); }
+    .company-name { font-size: 18px; font-weight: bold; }
+    .company-meta { margin-top: 6px; color: #666; font-size: 14px; }
 
     .badge {
       display: inline-block;
-      padding: 4px 8px;
-      border-radius: 6px;
+      padding: 5px 9px;
+      border-radius: 999px;
       font-size: 12px;
+      font-weight: bold;
       margin-left: 6px;
     }
 
     .approved { background: #d1e7dd; color: #0f5132; }
     .expired { background: #f8d7da; color: #842029; }
+    .raw { background: #e7f1ff; color: #084298; }
+    .packaging { background: #e9f7ef; color: #0f5132; }
+    .service { background: #f3e8ff; color: #581c87; }
 
-    .back-link {
-      color: #035740;
-      text-decoration: none;
-      font-weight: bold;
-    }
+    .back-link { color: #035740; text-decoration: none; font-weight: bold; }
+    .error { background: #f8d7da; color: #842029; padding: 12px; border-radius: 8px; margin: 15px 0; display: none; }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">
       <img src="/images/tt-logo.png" alt="TT Logo" />
@@ -108,7 +66,6 @@
     <a href="/admin/users.html" id="adminLink">Admin</a>
   </div>
 
-  <!-- Main -->
   <div class="main">
 
     <div class="topbar">
@@ -118,6 +75,8 @@
 
     <h1>Approved Quality Suppliers</h1>
     <a class="back-link" href="/quality-suppliers/index.html">← Back</a>
+
+    <div id="errorBox" class="error"></div>
 
     <div id="companyList" style="margin-top:20px;">
       Loading...
@@ -132,78 +91,114 @@
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   async function init() {
-    const { data: { user } } = await client.auth.getUser();
+    const { data: { user }, error: userError } = await client.auth.getUser();
 
-    if (!user) {
+    if (userError || !user) {
       window.location.href = "/login.html";
       return;
     }
 
-    const { data: profile } = await client
+    const { data: profile, error: profileError } = await client
       .from("user_profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
+    if (profileError || !profile) {
+      showError("Could not load your user profile.");
+      return;
+    }
+
     document.getElementById("welcomeText").innerText =
-      `Welcome, ${profile.full_name} — ${profile.role}`;
+      `Welcome, ${profile.full_name || "User"} — ${profile.role}`;
 
     if (profile.role !== "admin") {
       document.getElementById("adminLink").style.display = "none";
     }
 
-    loadSuppliers();
+    await loadCompanies();
   }
 
-  async function loadSuppliers() {
+  async function loadCompanies() {
     const { data, error } = await client
-      .from("quality_suppliers")
-      .select("*")
-      .in("status", ["Approved", "Expired"]);
+      .from("quality_supplier_companies")
+      .select(`
+        id,
+        company_name,
+        supplier_type,
+        status,
+        approved_at,
+        expires_at,
+        quality_suppliers (
+          id,
+          contact_name,
+          email,
+          phone,
+          status
+        )
+      `)
+      .in("status", ["Approved", "Expired"])
+      .order("company_name", { ascending: true });
 
     if (error) {
       console.error(error);
       document.getElementById("companyList").innerText = "Error loading suppliers";
+      showError(error.message);
       return;
     }
 
-    if (!data.length) {
+    if (!data || data.length === 0) {
       document.getElementById("companyList").innerText = "No approved suppliers found";
       return;
     }
 
-    // Group by company
-    const grouped = {};
+    document.getElementById("companyList").innerHTML = data.map(company => {
+      const statusClass = company.status === "Expired" ? "expired" : "approved";
+      const typeClass = getTypeClass(company.supplier_type);
+      const contacts = company.quality_suppliers || [];
 
-    data.forEach(s => {
-      if (!grouped[s.company_name]) {
-        grouped[s.company_name] = [];
-      }
-      grouped[s.company_name].push(s);
-    });
-
-    const html = Object.keys(grouped).map(company => {
-      const suppliers = grouped[company];
-
-      const approvedCount = suppliers.filter(s => s.status === "Approved").length;
-      const expiredCount = suppliers.filter(s => s.status === "Expired").length;
+      const expiryText = company.expires_at
+        ? new Date(company.expires_at).toLocaleDateString("en-GB")
+        : "No expiry date";
 
       return `
-        <div class="company-card" onclick="openCompany('${company}')">
-          <div class="company-name">${company}</div>
+        <div class="company-card" onclick="openCompany('${company.id}')">
+          <div class="company-name">
+            ${escapeHtml(company.company_name || "-")}
+            <span class="badge ${statusClass}">${escapeHtml(company.status || "-")}</span>
+            <span class="badge ${typeClass}">${escapeHtml(company.supplier_type || "-")}</span>
+          </div>
           <div class="company-meta">
-            ${approvedCount} Approved
-            ${expiredCount ? `<span class="badge expired">${expiredCount} Expired</span>` : ""}
+            ${contacts.length} contact${contacts.length === 1 ? "" : "s"} · Expires: ${expiryText}
           </div>
         </div>
       `;
     }).join("");
-
-    document.getElementById("companyList").innerHTML = html;
   }
 
-  function openCompany(company) {
-    window.location.href = `/quality-suppliers/company.html?company=${encodeURIComponent(company)}`;
+  function openCompany(companyId) {
+    window.location.href = `/quality-suppliers/profile.html?company_id=${companyId}`;
+  }
+
+  function getTypeClass(type) {
+    if (type === "Raw Material Supplier") return "raw";
+    if (type === "Packaging Supplier") return "packaging";
+    return "service";
+  }
+
+  function showError(message) {
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.innerText = message;
+  }
+
+  function escapeHtml(value) {
+    return String(value || "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
   }
 
   async function logout() {
