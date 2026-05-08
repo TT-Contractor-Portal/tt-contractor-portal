@@ -346,7 +346,7 @@ function renderForm() {
     <div class="card saq-section" data-section-index="${index}">
       <h2>${escapeHtml(section.title)}</h2>
       <div class="skip-note" style="display:none;">
-        This section is not required because your BRCGS / IoP grade is AA+, AA or A.
+        This section is not required because your BRCGS / IoP grade is AA+, AA or A. Please procede to section 12.
       </div>
       ${section.questions.map(([key, label, type]) => renderQuestion(key, label, type)).join("")}
     </div>
