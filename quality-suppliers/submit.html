@@ -797,7 +797,11 @@ async function reloadSupplier() {
 
   supplierCompany = updatedCompany;
 
-  renderPage();
+ renderPage();
+
+if (supplier?.supplier_type === "Packaging Supplier") {
+  await loadPackagingSaqStatus();
+}
 }
 
 function getValue(id) {
