@@ -281,24 +281,15 @@ const sections = [
       ["security_system", "Is there a security system in place to ensure only authorised personnel have access to production and storage areas?", "yesnona"]
     ]
   },
-  {
-    title: "Section 12: Product Information / Declaration of Compliance",
-    questions: [
-      ["food_contact_legislation", "Do all packaging products intended for food use meet the requirements of applicable UK legislation, including materials and articles in contact with food regulations?", "yesnona"],
-      ["spec_food_safe_packaging_evidence", "Current product specifications include evidence of product food safe packaging", "yesno"],
-      ["migration_tests", "Migration tests provided", "yesno"],
-      ["brcgs_cert_report", "BRCGS certification and report provided", "yesno"],
-      ["haccp_plan_flowchart", "HACCP plan with flow chart provided", "yesno"],
-      ["vaccp_taccp_chain_custody", "VACCP / TACCP or Chain of Custody documentation provided, including supply chain flow chart where available", "yesno"],
-      ["quality_policy_attachment", "Quality policy provided", "yesno"],
-      ["ethical_trade_policy_attachment", "Ethical trade policy provided", "yesno"],
-      ["environmental_policy_attachment", "Environmental policy provided", "yesno"],
-      ["traceability_test_if_not_gfsi", "If not GFSI accredited, last traceability test provided", "yesno"],
-      ["certificate_conformity_analysis", "Sample certificate of conformity and / or certificate of analysis provided", "yesno"],
-      ["supplier_approval_procedure", "Supplier approval procedure provided", "yesno"],
-      ["traceability_attachment", "Traceability documentation provided", "yesno"]
-    ]
-  }
+{
+  title: "Section 12: Product Information / Declaration of Compliance",
+  questions: [
+    ["food_contact_legislation", "Do all packaging products intended for food use meet the requirements of applicable UK legislation, including materials and articles in contact with food regulations?", "yesnona"],
+    ["migration_tests", "Migration tests provided", "yesno"],
+    ["vaccp_taccp_chain_custody", "VACCP / TACCP or Chain of Custody documentation provided, including supply chain flow chart where available", "yesno"],
+    ["certificate_conformity_analysis", "Will you provide a certificate of conformity or certificate of analysis with each delivery?", "yesno"]
+  ]
+}
 ];
 
 async function init() {
