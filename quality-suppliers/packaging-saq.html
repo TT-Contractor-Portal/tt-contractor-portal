@@ -342,12 +342,28 @@ async function init() {
 }
 
 function renderForm() {
-  document.getElementById("formArea").innerHTML = sections.map(section => `
-    <div class="card">
+  document.getElementById("formArea").innerHTML = sections.map((section, index) => `
+    <div class="card saq-section" data-section-index="${index}">
       <h2>${escapeHtml(section.title)}</h2>
+      <div class="skip-note" style="display:none;">
+        This section is not required because your BRCGS / IoP grade is AA+, AA or A.
+      </div>
       ${section.questions.map(([key, label, type]) => renderQuestion(key, label, type)).join("")}
     </div>
   `).join("");
+
+  const gradeEl = document.getElementById("brcgs_grade");
+  if (gradeEl) {
+    gradeEl.addEventListener("change", applyBrcGradeRules);
+  }
+
+  const brcExpiry = document.getElementById("brcgs_cert_expiry");
+  const isoExpiry = document.getElementById("iso_cert_expiry");
+
+  if (brcExpiry) brcExpiry.addEventListener("change", validateFutureDateField);
+  if (isoExpiry) isoExpiry.addEventListener("change", validateFutureDateField);
+
+  applyBrcGradeRules();
 }
 
 function renderQuestion(key, label, type) {
