@@ -498,12 +498,18 @@ function populateAnswers(answers) {
 function collectAnswers() {
   const answers = {};
 
-  sections.forEach(section => {
-    section.questions.forEach(([key]) => {
-      const el = document.getElementById(key);
-      answers[key] = el ? el.value : "";
-    });
+  const highGrade = isHighBrcGrade();
+
+sections.forEach((section, index) => {
+  const isSection1 = index === 0;
+  const isSection12 = section.title.startsWith("Section 12");
+  const skipSection = highGrade && !isSection1 && !isSection12;
+
+  section.questions.forEach(([key]) => {
+    const el = document.getElementById(key);
+    answers[key] = skipSection ? "Not required due to BRCGS / IoP grade" : (el ? el.value : "");
   });
+});
 
   answers.declaration_completed_by = document.getElementById("declaration_completed_by").value.trim();
   answers.declaration_position = document.getElementById("declaration_position").value.trim();
