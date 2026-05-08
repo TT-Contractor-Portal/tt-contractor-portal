@@ -295,6 +295,7 @@ async function loadExistingSupplier() {
   renderPage();
   await loadDocuments();
   await loadSavedAllergens();
+  await checkAndUpdateSubmissionStatus();
 }
 
 async function saveSupplier() {
