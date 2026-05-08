@@ -1,19 +1,15 @@
+<!-- FULL FILE: /quality-suppliers/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Quality Supplier Register - TT Contractor Portal</title>
+  <title>Quality Suppliers - TT Contractor Portal</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      color: #222;
-    }
+    body { margin: 0; font-family: Arial, sans-serif; background: #f5f5f5; color: #222; }
 
     .sidebar {
       position: fixed;
@@ -35,19 +31,10 @@
       font-size: 16px;
     }
 
-    .sidebar-logo {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+    .sidebar-logo { text-align: center; margin-bottom: 20px; }
+    .sidebar-logo img { max-width: 140px; }
 
-    .sidebar-logo img {
-      max-width: 140px;
-    }
-
-    .main {
-      margin-left: 240px;
-      padding: 20px;
-    }
+    .main { margin-left: 240px; padding: 20px; }
 
     .topbar {
       display: flex;
@@ -56,20 +43,36 @@
       margin-bottom: 30px;
     }
 
+    .logout-btn {
+      background: #035740;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .page-intro {
+      color: #666;
+      max-width: 750px;
+      margin-bottom: 24px;
+    }
+
     .cards {
-      display: flex;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
-      flex-wrap: wrap;
+      max-width: 760px;
     }
 
     .card {
       background: white;
-      padding: 30px;
+      padding: 24px;
       border-radius: 10px;
-      width: 300px;
       cursor: pointer;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       transition: 0.2s;
+      border-left: 6px solid #035740;
     }
 
     .card:hover {
@@ -83,21 +86,34 @@
 
     .card p {
       color: #666;
+      margin-bottom: 16px;
     }
 
-    .logout-btn {
-      background: #035740;
-      color: white;
-      border: none;
-      padding: 8px 14px;
-      cursor: pointer;
-      border-radius: 5px;
+    .count {
+      font-size: 34px;
+      font-weight: bold;
+      color: #035740;
+      margin-top: 10px;
+    }
+
+    .count-label {
+      color: #666;
+      font-size: 14px;
+    }
+
+    .error {
+      background: #f8d7da;
+      color: #842029;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      display: none;
+      max-width: 760px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-logo">
       <img src="/images/tt-logo.png" alt="TT Logo" />
@@ -106,12 +122,11 @@
     <a href="/index.html">Dashboard</a>
     <a href="/new-rams.html">New RAMS Review</a>
     <a href="/rams-register.html">RAMS Register</a>
-    <a href="/ttcontractors/index.html">Contractor Register</a>
-    <a href="/quality-suppliers/index.html">Quality Supplier Register</a>
+    <a href="/ttcontractors/index.html">Contractors</a>
+    <a href="/quality-suppliers/index.html">Quality Suppliers</a>
     <a href="/admin/users.html" id="adminLink">Admin</a>
   </div>
 
-  <!-- Main -->
   <div class="main">
 
     <div class="topbar">
@@ -119,20 +134,27 @@
       <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
-    <h1>Quality Supplier Register</h1>
+    <h1>Quality Suppliers</h1>
+    <p class="page-intro">
+      Manage raw material and packaging supplier approvals, supplier documentation and supplier review status.
+    </p>
+
+    <div id="errorBox" class="error"></div>
 
     <div class="cards">
 
-      <!-- Awaiting Approval -->
       <div class="card" id="awaitingCard" onclick="location.href='/quality-suppliers/awaiting-approval.html'">
         <h2>Awaiting Approval</h2>
-        <p>Suppliers ready for review and approval</p>
+        <p>Supplier companies ready for TT quality review and approval.</p>
+        <div class="count" id="awaitingCount">-</div>
+        <div class="count-label">awaiting approval</div>
       </div>
 
-      <!-- Approved -->
       <div class="card" onclick="location.href='/quality-suppliers/approved.html'">
         <h2>Approved Supplier Register</h2>
-        <p>View approved and expired suppliers</p>
+        <p>View approved and expired quality supplier companies.</p>
+        <div class="count" id="approvedCount">-</div>
+        <div class="count-label">approved / expired suppliers</div>
       </div>
 
     </div>
@@ -146,34 +168,69 @@
   const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   async function init() {
-    const { data: { user } } = await client.auth.getUser();
+    const { data: { user }, error: userError } = await client.auth.getUser();
 
-    if (!user) {
+    if (userError || !user) {
       window.location.href = "/login.html";
       return;
     }
 
-    const { data: profile } = await client
+    const { data: profile, error: profileError } = await client
       .from("user_profiles")
       .select("*")
       .eq("id", user.id)
       .single();
 
-    document.getElementById("welcomeText").innerText =
-      `Welcome, ${profile.full_name} — ${profile.role}`;
+    if (profileError || !profile) {
+      showError("Could not load your user profile.");
+      return;
+    }
 
-    // Hide admin link if not admin
+    document.getElementById("welcomeText").innerText =
+      `Welcome, ${profile.full_name || "User"} — ${profile.role}`;
+
     if (profile.role !== "admin") {
       document.getElementById("adminLink").style.display = "none";
     }
 
-    const canApprove =
-      profile.role === "reviewer" || profile.role === "admin";
+    const canApprove = profile.role === "reviewer" || profile.role === "admin";
 
-    // Hide awaiting approval card if not reviewer/admin
     if (!canApprove) {
       document.getElementById("awaitingCard").style.display = "none";
     }
+
+    await loadCounts();
+  }
+
+  async function loadCounts() {
+    const { count: awaitingCount, error: awaitingError } = await client
+      .from("quality_supplier_companies")
+      .select("id", { count: "exact", head: true })
+      .eq("status", "Ready for Review");
+
+    if (awaitingError) {
+      showError(awaitingError.message);
+      return;
+    }
+
+    const { count: approvedCount, error: approvedError } = await client
+      .from("quality_supplier_companies")
+      .select("id", { count: "exact", head: true })
+      .in("status", ["Approved", "Expired"]);
+
+    if (approvedError) {
+      showError(approvedError.message);
+      return;
+    }
+
+    document.getElementById("awaitingCount").innerText = awaitingCount || 0;
+    document.getElementById("approvedCount").innerText = approvedCount || 0;
+  }
+
+  function showError(message) {
+    const box = document.getElementById("errorBox");
+    box.style.display = "block";
+    box.innerText = message;
   }
 
   async function logout() {
