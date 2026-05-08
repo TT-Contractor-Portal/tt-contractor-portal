@@ -602,9 +602,10 @@ async function checkAndUpdateSubmissionStatus() {
     uploadedTypes.includes(type)
   );
 
-  let rawMaterialRequirementsComplete = true;
+ let rawMaterialRequirementsComplete = true;
+let packagingRequirementsComplete = true;
 
-  if (supplier.supplier_type === "Raw Material Supplier") {
+if (supplier.supplier_type === "Raw Material Supplier") {
     if (supplier.gfsi_certified !== true && supplier.gfsi_certified !== false) {
       rawMaterialRequirementsComplete = false;
     }
