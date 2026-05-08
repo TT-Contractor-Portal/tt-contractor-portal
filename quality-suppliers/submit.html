@@ -533,6 +533,43 @@ async function loadDocuments() {
   buildDocumentList(data || []);
 }
 
+async function loadPackagingSaqStatus() {
+  if (!supplierCompany || supplier.supplier_type !== "Packaging Supplier") return;
+
+  const { data, error } = await db
+    .from("quality_supplier_saq_responses")
+    .select("id, completed_at, expires_at")
+    .eq("company_id", supplierCompany.id)
+    .eq("supplier_type", "Packaging Supplier")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const box = document.getElementById("packagingSaqStatus");
+
+  if (error) {
+    box.innerText = "Unable to check SAQ status.";
+    return;
+  }
+
+  if (!data || !data.completed_at) {
+    box.innerHTML = `
+      <strong>Status:</strong> Not completed<br>
+      <span class="muted">This must be completed before the supplier can be submitted for review.</span>
+    `;
+    return;
+  }
+
+  const expiryText = data.expires_at
+    ? new Date(data.expires_at).toLocaleDateString("en-GB")
+    : "No expiry date";
+
+  box.innerHTML = `
+    <strong>Status:</strong> Completed<br>
+    <span class="muted">Expires: ${expiryText}</span>
+  `;
+}
+  
 async function checkAndUpdateSubmissionStatus() {
   if (!supplier || !supplierCompany) return;
 
