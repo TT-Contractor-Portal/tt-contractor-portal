@@ -602,10 +602,10 @@ async function checkAndUpdateSubmissionStatus() {
     uploadedTypes.includes(type)
   );
 
- let rawMaterialRequirementsComplete = true;
-let packagingRequirementsComplete = true;
+  let rawMaterialRequirementsComplete = true;
+  let packagingRequirementsComplete = true;
 
-if (supplier.supplier_type === "Raw Material Supplier") {
+  if (supplier.supplier_type === "Raw Material Supplier") {
     if (supplier.gfsi_certified !== true && supplier.gfsi_certified !== false) {
       rawMaterialRequirementsComplete = false;
     }
@@ -624,32 +624,32 @@ if (supplier.supplier_type === "Raw Material Supplier") {
     if (!allergens || allergens.length === 0) {
       rawMaterialRequirementsComplete = false;
     }
-if (supplier.supplier_type === "Packaging Supplier") {
-  const { data: saq, error: saqError } = await db
-    .from("quality_supplier_saq_responses")
-    .select("id, completed_at")
-    .eq("company_id", supplierCompany.id)
-    .eq("supplier_type", "Packaging Supplier")
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-
-  if (saqError) {
-    showError(saqError.message);
-    return;
   }
 
-  if (!saq || !saq.completed_at) {
-    packagingRequirementsComplete = false;
-  }
-}
-  
+  if (supplier.supplier_type === "Packaging Supplier") {
+    const { data: saq, error: saqError } = await db
+      .from("quality_supplier_saq_responses")
+      .select("id, completed_at")
+      .eq("company_id", supplierCompany.id)
+      .eq("supplier_type", "Packaging Supplier")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (saqError) {
+      showError(saqError.message);
+      return;
+    }
+
+    if (!saq || !saq.completed_at) {
+      packagingRequirementsComplete = false;
+    }
   }
 
-const isComplete =
-  allMandatoryDocsUploaded &&
-  rawMaterialRequirementsComplete &&
-  packagingRequirementsComplete;
+  const isComplete =
+    allMandatoryDocsUploaded &&
+    rawMaterialRequirementsComplete &&
+    packagingRequirementsComplete;
 
   if (!isComplete) return;
 
