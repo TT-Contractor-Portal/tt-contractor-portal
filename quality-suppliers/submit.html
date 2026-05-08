@@ -432,12 +432,18 @@ if (supplier.status === "Rejected") {
 
 document.getElementById("statusText").innerHTML = statusMessage;
 
-  const isRaw = supplier.supplier_type === "Raw Material Supplier";
+ const isRaw = supplier.supplier_type === "Raw Material Supplier";
+const isPackaging = supplier.supplier_type === "Packaging Supplier";
 
-  document.getElementById("gfsiCard").style.display = isRaw ? "block" : "none";
-  document.getElementById("allergenCard").style.display = isRaw ? "block" : "none";
+document.getElementById("gfsiCard").style.display = isRaw ? "block" : "none";
+document.getElementById("allergenCard").style.display = isRaw ? "block" : "none";
+document.getElementById("packagingSaqCard").style.display = isPackaging ? "block" : "none";
 
-  buildDocumentList();
+buildDocumentList();
+
+if (isPackaging) {
+  loadPackagingSaqStatus();
+}
 }
 
 function buildDocumentList(existingDocs = []) {
