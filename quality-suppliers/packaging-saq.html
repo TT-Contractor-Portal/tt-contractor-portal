@@ -407,6 +407,45 @@ function renderSelectQuestion(key, label, options) {
   `;
 }
 
+function isHighBrcGrade() {
+  const grade = document.getElementById("brcgs_grade")?.value;
+  return ["AA+", "AA", "A"].includes(grade);
+}
+
+function applyBrcGradeRules() {
+  const highGrade = isHighBrcGrade();
+
+  document.querySelectorAll(".saq-section").forEach(card => {
+    const index = Number(card.dataset.sectionIndex);
+    const note = card.querySelector(".skip-note");
+
+    const isSection1 = index === 0;
+    const isSection12 = sections[index]?.title?.startsWith("Section 12");
+
+    if (highGrade && !isSection1 && !isSection12) {
+      card.classList.add("disabled-section");
+      if (note) note.style.display = "block";
+    } else {
+      card.classList.remove("disabled-section");
+      if (note) note.style.display = "none";
+    }
+  });
+}
+
+function validateFutureDateField(event) {
+  const input = event.target;
+  if (!input.value) return;
+
+  const selected = new Date(input.value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  if (selected < today) {
+    input.value = "";
+    showError("Certificate expiry dates cannot be in the past.");
+  }
+}
+  
 async function loadExistingSaq() {
   const { data, error } = await db
     .from("quality_supplier_saq_responses")
