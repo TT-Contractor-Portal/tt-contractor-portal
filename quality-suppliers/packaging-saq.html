@@ -520,6 +520,20 @@ sections.forEach((section, index) => {
 }
 
 function validateCompleted(answers) {
+  if (answers.brcgs_cert_expiry) {
+    const brcDate = new Date(answers.brcgs_cert_expiry);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (brcDate < today) return "BRCGS / IoP certificate expiry date cannot be in the past.";
+  }
+
+  if (answers.iso_cert_expiry) {
+    const isoDate = new Date(answers.iso_cert_expiry);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (isoDate < today) return "ISO certificate expiry date cannot be in the past.";
+  }
+
   if (!answers.declaration_completed_by) return "Completed By is required.";
   if (!answers.declaration_position) return "Position is required.";
   if (!answers.declaration_confirm) return "You must confirm the supplier declaration.";
