@@ -1,0 +1,552 @@
+<!-- FULL FILE: /quality-suppliers/packaging-saq.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Packaging Supplier SAQ - TT Contractor Portal</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#f5f5f5; color:#222; }
+    .main { max-width:1100px; margin:0 auto; padding:24px; }
+    .card { background:#fff; padding:20px; border-radius:10px; margin-bottom:18px; box-shadow:0 2px 6px rgba(0,0,0,.1); }
+    h1,h2,h3 { margin-top:0; }
+    label { display:block; font-weight:bold; margin:12px 0 6px; }
+    input, select, textarea { width:100%; padding:10px; box-sizing:border-box; border:1px solid #ccc; border-radius:6px; }
+    textarea { min-height:80px; }
+    .row { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .btn { background:#035740; color:white; border:0; padding:10px 14px; border-radius:6px; cursor:pointer; margin-top:10px; }
+    .muted { color:#666; font-size:14px; }
+    .success { background:#d1e7dd; color:#0f5132; padding:10px; border-radius:8px; display:none; margin-bottom:12px; }
+    .error { background:#f8d7da; color:#842029; padding:10px; border-radius:8px; display:none; margin-bottom:12px; }
+    .question { border-top:1px solid #eee; padding-top:12px; margin-top:12px; }
+    .section-note { background:#eef6f1; padding:12px; border-radius:8px; color:#035740; }
+    .actions { display:flex; gap:10px; flex-wrap:wrap; }
+  </style>
+</head>
+
+<body>
+<div class="main">
+  <h1>Packaging Supplier SAQ</h1>
+  <p class="muted">
+    Complete this Supplier Assurance Questionnaire for packaging suppliers. Save progress at any time, then submit when complete.
+  </p>
+
+  <div id="successBox" class="success"></div>
+  <div id="errorBox" class="error"></div>
+
+  <div class="card">
+    <h2>Supplier</h2>
+    <p><strong id="companyName">Loading...</strong></p>
+    <p class="muted" id="statusText"></p>
+  </div>
+
+  <div id="formArea"></div>
+
+  <div class="card">
+    <h2>Supplier Declaration</h2>
+
+    <p class="section-note">
+      I confirm that the information supplied to Timothy Taylors Ltd is accurate and that any changes will be communicated within 28 days in advance where possible.
+      If the site has a recall or food safety incident that could affect the quality, safety, integrity, authenticity or legality of packaging supplied to Timothy Taylors Ltd,
+      Timothy Taylors Ltd will be notified within 24 hours of the incident.
+    </p>
+
+    <div class="row">
+      <div>
+        <label>Completed By</label>
+        <input id="declaration_completed_by" />
+      </div>
+      <div>
+        <label>Position</label>
+        <input id="declaration_position" />
+      </div>
+    </div>
+
+    <label>Additional Comments</label>
+    <textarea id="declaration_comments"></textarea>
+
+    <label>
+      <input type="checkbox" id="declaration_confirm" style="width:auto;" />
+      I confirm the above declaration
+    </label>
+  </div>
+
+  <div class="card">
+    <div class="actions">
+      <button class="btn" onclick="saveSaq(false)">Save Progress</button>
+      <button class="btn" onclick="saveSaq(true)">Submit Completed SAQ</button>
+      <button class="btn" onclick="window.location.href='/quality-suppliers/submit.html'">Back to Submission</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://rfcwfbdcdnjpaxwztvfr.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJmY3dmYmRjZG5qcGF4d3p0dmZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQzODQ5NzUsImV4cCI6MjA4OTk2MDk3NX0.9XLDNzgIXu5-i3oTvkYem3hTX2rgmF3D5vw40F8tNwQ";
+const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let currentUser = null;
+let supplierUserLink = null;
+let supplierCompany = null;
+let existingSaq = null;
+
+const yesNoNa = [
+  ["", "Select..."],
+  ["Yes", "Yes"],
+  ["No", "No"],
+  ["N/A", "N/A"]
+];
+
+const yesNo = [
+  ["", "Select..."],
+  ["Yes", "Yes"],
+  ["No", "No"]
+];
+
+const sections = [
+  {
+    title: "Section 1: General Packaging Supplier Details",
+    questions: [
+      ["products_supplied", "Products supplied", "textarea"],
+      ["managing_director_name", "Managing Director name", "text"],
+      ["sales_director_name", "Sales Director name", "text"],
+      ["sales_director_contact", "Sales Director contact number", "text"],
+      ["sales_director_email", "Sales Director email", "text"],
+      ["technical_name", "Technical contact name", "text"],
+      ["technical_contact", "Technical contact number", "text"],
+      ["technical_email", "Technical email", "text"],
+      ["quality_assurance_name", "Quality Assurance contact name", "text"],
+      ["quality_assurance_contact", "Quality Assurance contact number", "text"],
+      ["quality_assurance_email", "Quality Assurance email", "text"],
+      ["emergency_contact_1_name", "Emergency out of hours contact 1 name", "text"],
+      ["emergency_contact_1_number", "Emergency out of hours contact 1 number", "text"],
+      ["emergency_contact_2_name", "Emergency out of hours contact 2 name", "text"],
+      ["emergency_contact_2_number", "Emergency out of hours contact 2 number", "text"],
+      ["brcgs_iop_packaging", "Do you hold BRCGS / IoP Global Standard for Packaging?", "yesno"],
+      ["brcgs_grade", "BRCGS / IoP grade", "text"],
+      ["brcgs_cert_expiry", "BRCGS / IoP certificate expiry", "date"],
+      ["iso_accreditation", "Do you have ISO Standard accreditation?", "yesno"],
+      ["iso_standard", "ISO standard", "text"],
+      ["iso_cert_expiry", "ISO certificate expiry", "date"],
+      ["quality_policy_safe_legal_authentic", "Do you have an up to date documented quality policy that meets obligation to produce safe, legal, authentic and quality products?", "yesnona"],
+      ["ethical_trading_policy", "Do you have a policy statement on ethical trading?", "yesnona"],
+      ["environmental_policy", "Do you have an environmental policy?", "yesnona"],
+      ["company_established", "When was your company established?", "text"],
+      ["number_of_employees", "Number of employees", "text"]
+    ]
+  },
+  {
+    title: "Section 2: Premises",
+    questions: [
+      ["site_age", "What is the age of the site you are currently situated?", "text"],
+      ["building_good_repair", "Is the building in good repair internally and externally, minimising potential for pest entry, ingress of water and other contaminants?", "yesnona"],
+      ["off_site_storage", "Do you use off-site storage?", "yesnona"],
+      ["off_site_storage_audited", "If yes, are off-site storage facilities audited?", "yesnona"],
+      ["production_lighting_protected", "Is lighting in the production areas protected?", "yesnona"],
+      ["glass_breakage_procedure", "Do you have a glass breakage procedure?", "yesnona"],
+      ["environmental_analysis", "What environmental analysis do you perform?", "textarea"],
+      ["offsite_lab_accredited", "If an offsite laboratory is used, is it accredited?", "yesnona"],
+      ["lab_details", "If yes, please name the laboratory and UKAS / CLAS accreditation number", "textarea"],
+      ["planned_maintenance", "Do you have a planned maintenance system in place?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 3: Hygiene & Staff Facilities",
+    questions: [
+      ["hygiene_policy", "Do you have a hygiene policy?", "yesnona"],
+      ["contracted_cleaners", "Do you use contracted cleaners?", "yesnona"],
+      ["cleaning_schedules_records", "Do you have schedules for cleaning and records of completion?", "yesnona"],
+      ["hygiene_training", "Do staff undergo hygiene training?", "yesnona"],
+      ["chemicals_food_use", "Are all chemicals confirmed as suitable for food use?", "yesnona"],
+      ["cleaning_chemicals_locked", "Are cleaning chemicals kept in a locked facility?", "yesnona"],
+      ["coshh_info", "Do you have COSHH information for all chemicals used?", "yesnona"],
+      ["surfaces_hygienic", "Are all floors, ceilings and wall surfaces within production areas smooth, hygienic and impervious?", "yesnona"],
+      ["hygiene_swabs", "Do you perform hygiene swabs to verify cleaning?", "yesnona"],
+      ["protective_clothing", "Does the company issue protective clothing?", "yesnona"],
+      ["protective_clothing_frequency", "How often is protective clothing changed?", "text"],
+      ["protective_clothing_laundered", "How is protective clothing laundered? Contractor / in-house / home laundered", "text"],
+      ["visitor_health_questionnaires", "Do visitors / contractors fill in health questionnaires?", "yesnona"],
+      ["staff_handwashing", "Do staff wash their hands before commencing and resuming work duties?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 4: Pest Control",
+    questions: [
+      ["pest_contractor", "Do you have a pest contractor for the site?", "yesnona"],
+      ["pest_contractor_details", "If yes, name and details of the contractor", "textarea"],
+      ["pest_visit_frequency", "Frequency of pest control visits", "text"],
+      ["pest_records", "Are records maintained of all visits?", "yesnona"],
+      ["fly_control_units", "Are electronic fly control units in use?", "yesnona"],
+      ["building_proofed_against_pests", "Are parameters of the building proofed against pests?", "yesnona"],
+      ["bait_stations_all_areas", "Are bait stations in all areas?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 5: Material Control",
+    questions: [
+      ["finished_product_specs", "Do you have specifications for finished products?", "yesnona"],
+      ["supplier_monitoring", "How do you monitor / approve your suppliers?", "textarea"],
+      ["product_analysis", "What product analysis do you perform? e.g. micro, chemical analysis", "textarea"],
+      ["subcontracted_process", "Is any of the process sub-contracted?", "yesnona"],
+      ["subcontractor_haccp", "Has the sub-contractor been considered as part of your HACCP systems?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 6: Internal Auditing",
+    questions: [
+      ["glass_brittle_materials_policy", "Do you have a glass and brittle materials policy in place?", "yesnona"],
+      ["glass_brittle_materials_audits", "Do you carry out regular glass and brittle materials audits?", "yesnona"],
+      ["wood_policy", "Do you have a wood policy?", "yesnona"],
+      ["wood_audits", "Do you carry out regular wood audits?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 7: Quality Management Systems / Process Control",
+    questions: [
+      ["quality_manual", "Do you have a written Quality Manual?", "yesnona"],
+      ["haccp_system", "Do you have an implemented HACCP system that is periodically reviewed and updated?", "yesnona"],
+      ["haccp_ccps", "From the HACCP study, what CCPs have been identified? Please list.", "textarea"],
+      ["ccp_monitoring_records", "Are CCP monitoring records available?", "yesnona"],
+      ["haccp_verification", "How do you verify your HACCP system?", "textarea"],
+      ["staff_haccp_participation", "Do all staff participate in the HACCP system?", "yesnona"],
+      ["metal_detected", "Are all products supplied metal detected?", "yesnona"],
+      ["metal_detection_sensitivity", "If yes, what level of sensitivity is achieved?", "text"],
+      ["complaints_procedure", "Do you have a customer complaints procedure in place that identifies trends?", "yesnona"],
+      ["critical_equipment_calibration", "What critical equipment do you calibrate?", "textarea"],
+      ["non_conforming_products", "Is there a written procedure for handling non-conforming products?", "yesnona"],
+      ["corrective_action", "Is there a documented corrective action procedure?", "yesnona"],
+      ["preventative_action", "Is there a written preventative action procedure?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 8: Training",
+    questions: [
+      ["induction_training", "Do all staff undergo induction training prior to commencing work?", "yesnona"],
+      ["health_screen", "Do staff undergo health screening prior to commencing work?", "yesnona"],
+      ["job_training", "Are staff trained in the jobs they are required to carry out?", "yesnona"],
+      ["basic_food_hygiene", "Do staff undergo basic food hygiene training?", "yesnona"],
+      ["written_hygiene_rules", "Do you have written hygiene rules that all staff are trained against?", "yesnona"],
+      ["training_method", "How is this training carried out?", "textarea"],
+      ["training_records", "Are records kept of all training completed?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 9: Traceability / Product Recall",
+    questions: [
+      ["traceability_system", "Do you have a traceability system in place that can achieve forwards and backwards traceability?", "yesnona"],
+      ["traceability_challenge_frequency", "How often do you challenge your traceability system?", "text"],
+      ["traceability_basis", "What is the basis of your system and how does it work? e.g. batch codes / BBD tracked / lot number", "textarea"],
+      ["traceability_worked_example", "Please provide a worked example of your traceability system, preferably the last batch delivered to Timothy Taylors.", "textarea"],
+      ["recall_withdrawal_system", "Do you have a product recall and withdrawal system?", "yesnona"],
+      ["recall_challenge_frequency", "How often do you challenge the recall system and when was this last challenged?", "textarea"]
+    ]
+  },
+  {
+    title: "Section 10: Storage & Transport",
+    questions: [
+      ["storage_areas_suitable", "Are all storage areas well maintained and suitable to achieve product safety and quality?", "yesnona"],
+      ["vehicles_cleanliness_checked", "Are all vehicles checked for cleanliness prior to dispatch?", "yesnona"],
+      ["vehicles_cleaning_schedule", "Do all vehicles follow a cleaning schedule?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 11: Product Threat & Vulnerability Assessment",
+    questions: [
+      ["threat_vulnerability_assessment", "Do you have a documented threat and vulnerability assessment that includes all products supplied to Timothy Taylors Ltd?", "yesnona"],
+      ["packaging_identified_risk", "Have you identified any packaging supplied to Timothy Taylors as a risk?", "yesnona"],
+      ["packaging_risk_details", "If yes, please give details", "textarea"],
+      ["security_system", "Is there a security system in place to ensure only authorised personnel have access to production and storage areas?", "yesnona"]
+    ]
+  },
+  {
+    title: "Section 12: Product Information / Declaration of Compliance",
+    questions: [
+      ["food_contact_legislation", "Do all packaging products intended for food use meet the requirements of applicable UK legislation, including materials and articles in contact with food regulations?", "yesnona"],
+      ["spec_food_safe_packaging_evidence", "Current product specifications include evidence of product food safe packaging", "yesno"],
+      ["migration_tests", "Migration tests provided", "yesno"],
+      ["brcgs_cert_report", "BRCGS certification and report provided", "yesno"],
+      ["haccp_plan_flowchart", "HACCP plan with flow chart provided", "yesno"],
+      ["vaccp_taccp_chain_custody", "VACCP / TACCP or Chain of Custody documentation provided, including supply chain flow chart where available", "yesno"],
+      ["quality_policy_attachment", "Quality policy provided", "yesno"],
+      ["ethical_trade_policy_attachment", "Ethical trade policy provided", "yesno"],
+      ["environmental_policy_attachment", "Environmental policy provided", "yesno"],
+      ["traceability_test_if_not_gfsi", "If not GFSI accredited, last traceability test provided", "yesno"],
+      ["certificate_conformity_analysis", "Sample certificate of conformity and / or certificate of analysis provided", "yesno"],
+      ["supplier_approval_procedure", "Supplier approval procedure provided", "yesno"],
+      ["traceability_attachment", "Traceability documentation provided", "yesno"]
+    ]
+  }
+];
+
+async function init() {
+  const { data, error } = await db.auth.getUser();
+  const user = data?.user;
+
+  if (error || !user) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  currentUser = user;
+
+  const { data: link, error: linkError } = await db
+    .from("quality_supplier_users")
+    .select("company_id, full_name, email, role, is_active")
+    .eq("user_id", user.id)
+    .eq("is_active", true)
+    .maybeSingle();
+
+  if (linkError || !link) {
+    window.location.href = "/login.html";
+    return;
+  }
+
+  supplierUserLink = link;
+
+  const { data: company, error: companyError } = await db
+    .from("quality_supplier_companies")
+    .select("*")
+    .eq("id", link.company_id)
+    .maybeSingle();
+
+  if (companyError || !company) {
+    showError("Unable to load supplier company.");
+    return;
+  }
+
+  supplierCompany = company;
+
+  if (supplierCompany.supplier_type !== "Packaging Supplier") {
+    showError("This SAQ is only for Packaging Suppliers.");
+    return;
+  }
+
+  document.getElementById("companyName").innerText = company.company_name || "Packaging Supplier";
+
+  renderForm();
+  await loadExistingSaq();
+}
+
+function renderForm() {
+  document.getElementById("formArea").innerHTML = sections.map(section => `
+    <div class="card">
+      <h2>${escapeHtml(section.title)}</h2>
+      ${section.questions.map(([key, label, type]) => renderQuestion(key, label, type)).join("")}
+    </div>
+  `).join("");
+}
+
+function renderQuestion(key, label, type) {
+  if (type === "textarea") {
+    return `
+      <div class="question">
+        <label for="${key}">${escapeHtml(label)}</label>
+        <textarea id="${key}"></textarea>
+      </div>
+    `;
+  }
+
+  if (type === "yesnona") {
+    return renderSelectQuestion(key, label, yesNoNa);
+  }
+
+  if (type === "yesno") {
+    return renderSelectQuestion(key, label, yesNo);
+  }
+
+  return `
+    <div class="question">
+      <label for="${key}">${escapeHtml(label)}</label>
+      <input id="${key}" type="${type === "date" ? "date" : "text"}" />
+    </div>
+  `;
+}
+
+function renderSelectQuestion(key, label, options) {
+  return `
+    <div class="question">
+      <label for="${key}">${escapeHtml(label)}</label>
+      <select id="${key}">
+        ${options.map(([value, text]) => `<option value="${escapeHtml(value)}">${escapeHtml(text)}</option>`).join("")}
+      </select>
+    </div>
+  `;
+}
+
+async function loadExistingSaq() {
+  const { data, error } = await db
+    .from("quality_supplier_saq_responses")
+    .select("*")
+    .eq("company_id", supplierCompany.id)
+    .eq("supplier_type", "Packaging Supplier")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) {
+    showError(error.message);
+    return;
+  }
+
+  existingSaq = data;
+
+  if (existingSaq?.answers) {
+    populateAnswers(existingSaq.answers);
+  }
+
+  if (existingSaq?.completed_at) {
+    const expiryText = existingSaq.expires_at
+      ? new Date(existingSaq.expires_at).toLocaleDateString("en-GB")
+      : "No expiry date";
+
+    document.getElementById("statusText").innerText =
+      `SAQ completed. Expires: ${expiryText}`;
+  } else {
+    document.getElementById("statusText").innerText =
+      "SAQ not yet completed.";
+  }
+}
+
+function populateAnswers(answers) {
+  Object.keys(answers || {}).forEach(key => {
+    const el = document.getElementById(key);
+    if (!el) return;
+
+    if (el.type === "checkbox") {
+      el.checked = !!answers[key];
+    } else {
+      el.value = answers[key] || "";
+    }
+  });
+}
+
+function collectAnswers() {
+  const answers = {};
+
+  sections.forEach(section => {
+    section.questions.forEach(([key]) => {
+      const el = document.getElementById(key);
+      answers[key] = el ? el.value : "";
+    });
+  });
+
+  answers.declaration_completed_by = document.getElementById("declaration_completed_by").value.trim();
+  answers.declaration_position = document.getElementById("declaration_position").value.trim();
+  answers.declaration_comments = document.getElementById("declaration_comments").value.trim();
+  answers.declaration_confirm = document.getElementById("declaration_confirm").checked;
+
+  return answers;
+}
+
+function validateCompleted(answers) {
+  if (!answers.declaration_completed_by) return "Completed By is required.";
+  if (!answers.declaration_position) return "Position is required.";
+  if (!answers.declaration_confirm) return "You must confirm the supplier declaration.";
+
+  return null;
+}
+
+async function saveSaq(markComplete) {
+  clearMessages();
+
+  if (!supplierCompany || !currentUser) {
+    showError("Supplier profile has not loaded.");
+    return;
+  }
+
+  const answers = collectAnswers();
+
+  if (markComplete) {
+    const validationError = validateCompleted(answers);
+    if (validationError) {
+      showError(validationError);
+      return;
+    }
+  }
+
+  const now = new Date();
+  const expiresAt = new Date();
+  expiresAt.setFullYear(expiresAt.getFullYear() + 3);
+
+  const payload = {
+    company_id: supplierCompany.id,
+    supplier_type: "Packaging Supplier",
+    answers: answers,
+    updated_at: now.toISOString()
+  };
+
+  if (markComplete) {
+    payload.completed_by = currentUser.id;
+    payload.completed_by_name = supplierUserLink.full_name || currentUser.email || "Supplier";
+    payload.completed_at = now.toISOString();
+    payload.expires_at = expiresAt.toISOString();
+  }
+
+  if (existingSaq?.id) {
+    const { data, error } = await db
+      .from("quality_supplier_saq_responses")
+      .update(payload)
+      .eq("id", existingSaq.id)
+      .select()
+      .single();
+
+    if (error) {
+      showError(error.message);
+      return;
+    }
+
+    existingSaq = data;
+  } else {
+    const { data, error } = await db
+      .from("quality_supplier_saq_responses")
+      .insert(payload)
+      .select()
+      .single();
+
+    if (error) {
+      showError(error.message);
+      return;
+    }
+
+    existingSaq = data;
+  }
+
+  showSuccess(markComplete ? "Packaging SAQ submitted successfully." : "Packaging SAQ progress saved.");
+  await loadExistingSaq();
+}
+
+function showSuccess(message) {
+  const box = document.getElementById("successBox");
+  box.style.display = "block";
+  box.innerText = message;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function showError(message) {
+  const box = document.getElementById("errorBox");
+  box.style.display = "block";
+  box.innerText = message;
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function clearMessages() {
+  document.getElementById("successBox").style.display = "none";
+  document.getElementById("errorBox").style.display = "none";
+}
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+init();
+</script>
+</body>
+</html>
