@@ -380,9 +380,13 @@ function renderQuestion(key, label, type) {
     return renderSelectQuestion(key, label, yesNoNa);
   }
 
-  if (type === "yesno") {
-    return renderSelectQuestion(key, label, yesNo);
-  }
+ if (type === "yesno") {
+  return renderSelectQuestion(key, label, yesNo);
+}
+
+if (type === "brcgrade") {
+  return renderSelectQuestion(key, label, brcGrades);
+}
 
   return `
     <div class="question">
