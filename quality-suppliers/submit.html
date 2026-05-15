@@ -705,6 +705,45 @@ async function checkAndUpdateSubmissionStatus() {
   submitBtn.style.opacity = "1";
   return true;
 }
+
+async function submitForApproval() {
+  clearMessages();
+
+  const isReady = await checkAndUpdateSubmissionStatus();
+
+  if (!isReady) {
+    showError("Please complete all mandatory sections before submitting for approval.");
+    return;
+  }
+
+  if (!confirm("Submit this supplier profile to TT for approval? You can still view it afterwards, but it will move to the TT review queue.")) {
+    return;
+  }
+
+  const { error: supplierError } = await db
+    .from("quality_suppliers")
+    .update({ status: "Ready for Review" })
+    .eq("id", supplier.id);
+
+  if (supplierError) {
+    showError(supplierError.message);
+    return;
+  }
+
+  const { error: companyError } = await db
+    .from("quality_supplier_companies")
+    .update({ status: "Ready for Review" })
+    .eq("id", supplierCompany.id);
+
+  if (companyError) {
+    showError(companyError.message);
+    return;
+  }
+
+  showSuccess("Your submission has been sent to TT for approval.");
+
+  await loadExistingSupplier();
+}
   
 async function saveGfsi() {
   if (!supplier) return;
