@@ -206,7 +206,7 @@ if (adminNavLink) {
         )
       `)
       .eq("status", "Ready for Review")
-      .order("created_at", { ascending: true });
+      .order("created_at", { ascending: false });
 
     if (error) {
       console.error(error);
