@@ -146,9 +146,11 @@ async function init() {
   document.getElementById("welcomeText").innerText =
     `Welcome, ${profile.full_name || "User"} — ${profile.role}`;
 
-  if (profile.role !== "admin") {
-    document.getElementById("adminLink").style.display = "none";
-  }
+ const adminNavLink = document.getElementById("adminNavLink");
+
+if (adminNavLink) {
+  adminNavLink.style.display = profile.role === "admin" ? "block" : "none";
+}
 
   if (!companyId) {
     showError("No supplier company ID was provided.");
