@@ -299,10 +299,11 @@ async function reject() {
 
   const { error: companyError } = await client
     .from("quality_supplier_companies")
-    .update({
-      status: "Rejected",
-      reviewer_notes: reason
-    })
+   .update({
+  status: "Rejected",
+  is_active: false,
+  reviewer_notes: reason
+})
     .eq("id", companyId);
 
   if (companyError) {
