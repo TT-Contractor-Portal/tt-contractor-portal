@@ -276,7 +276,10 @@ async function approve() {
   if (supplierIds.length > 0) {
     const { error: supplierError } = await client
       .from("quality_suppliers")
-      .update({ status: "Approved" })
+     .update({
+  status: "Approved",
+  is_active: true
+})
       .in("id", supplierIds);
 
     if (supplierError) {
