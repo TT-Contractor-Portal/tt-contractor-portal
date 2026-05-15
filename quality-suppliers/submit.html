@@ -581,7 +581,29 @@ async function loadPackagingSaqStatus() {
 }
   
 async function checkAndUpdateSubmissionStatus() {
-  if (!supplier || !supplierCompany) return;
+  if (!supplier || !supplierCompany) return false;
+
+  const submitCard = document.getElementById("submitApprovalCard");
+  const submitStatus = document.getElementById("submitApprovalStatus");
+  const submitBtn = document.getElementById("submitApprovalBtn");
+
+  if (!submitCard || !submitStatus || !submitBtn) return false;
+
+  if (supplier.status === "Ready for Review" || supplierCompany.status === "Ready for Review") {
+    submitCard.style.display = "block";
+    submitStatus.innerHTML = `
+      <strong>Status:</strong> Submitted<br>
+      <span class="muted">Your submission has already been sent to TT for review.</span>
+    `;
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = "0.5";
+    return true;
+  }
+
+  if (supplier.status === "Approved" || supplierCompany.status === "Approved") {
+    submitCard.style.display = "none";
+    return true;
+  }
 
   const docs = supplier.supplier_type === "Raw Material Supplier" ? rawDocs : packagingDocs;
 
@@ -592,7 +614,7 @@ async function checkAndUpdateSubmissionStatus() {
 
   if (docsError) {
     showError(docsError.message);
-    return;
+    return false;
   }
 
   const uploadedTypes = (uploadedDocs || []).map(d => d.document_type);
@@ -608,16 +630,17 @@ async function checkAndUpdateSubmissionStatus() {
     })
     .map(([type]) => type);
 
-  const allMandatoryDocsUploaded = mandatoryDocs.every(type =>
-    uploadedTypes.includes(type)
-  );
+  const missingDocs = mandatoryDocs.filter(type => !uploadedTypes.includes(type));
 
-  let rawMaterialRequirementsComplete = true;
-  let packagingRequirementsComplete = true;
+  let missingItems = [];
+
+  if (missingDocs.length) {
+    missingItems.push("Missing mandatory documents: " + missingDocs.join(", "));
+  }
 
   if (supplier.supplier_type === "Raw Material Supplier") {
     if (supplier.gfsi_certified !== true && supplier.gfsi_certified !== false) {
-      rawMaterialRequirementsComplete = false;
+      missingItems.push("GFSI certification answer is required.");
     }
 
     const { data: allergens, error: allergenError } = await db
@@ -628,11 +651,11 @@ async function checkAndUpdateSubmissionStatus() {
 
     if (allergenError) {
       showError(allergenError.message);
-      return;
+      return false;
     }
 
     if (!allergens || allergens.length === 0) {
-      rawMaterialRequirementsComplete = false;
+      missingItems.push("At least one product allergen record is required.");
     }
   }
 
@@ -648,48 +671,39 @@ async function checkAndUpdateSubmissionStatus() {
 
     if (saqError) {
       showError(saqError.message);
-      return;
+      return false;
     }
 
     if (!saq || !saq.completed_at) {
-      packagingRequirementsComplete = false;
+      missingItems.push("Packaging Supplier SAQ must be completed.");
     }
   }
 
-  const isComplete =
-    allMandatoryDocsUploaded &&
-    rawMaterialRequirementsComplete &&
-    packagingRequirementsComplete;
+  submitCard.style.display = "block";
 
-  if (!isComplete) return;
-
-  if (supplier.status === "Ready for Review" || supplierCompany.status === "Ready for Review") {
-    return;
+  if (missingItems.length > 0) {
+    submitStatus.innerHTML = `
+      <strong>Status:</strong> Not ready to submit<br><br>
+      <span class="muted">${missingItems.map(item => `• ${escapeHtml(item)}`).join("<br>")}</span>
+    `;
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = "0.5";
+    return false;
   }
 
-  const { error: supplierError } = await db
-    .from("quality_suppliers")
-    .update({ status: "Ready for Review" })
-    .eq("id", supplier.id);
+  submitStatus.innerHTML = `
+    <strong>Status:</strong> Ready to submit<br>
+    <span style="color: green; font-weight: bold;">
+      ✔ All mandatory sections appear complete.
+    </span><br><br>
+    <span class="muted">
+      You can still add more allergen product records if required. Only press Submit for Approval when the full submission is complete.
+    </span>
+  `;
 
-  if (supplierError) {
-    showError(supplierError.message);
-    return;
-  }
-
-  const { error: companyError } = await db
-    .from("quality_supplier_companies")
-    .update({ status: "Ready for Review" })
-    .eq("id", supplierCompany.id);
-
-  if (companyError) {
-    showError(companyError.message);
-    return;
-  }
-
-  showSuccess("Your submission is complete and has been sent for review.");
-
-  await loadExistingSupplier();
+  submitBtn.disabled = false;
+  submitBtn.style.opacity = "1";
+  return true;
 }
   
 async function saveGfsi() {
